@@ -212,7 +212,7 @@ void CDisplacer::ZapBeam(Vector vecOrg)
 	if (m_iBeams >= ISLAVE_MAX_BEAMS)
 		return;
 
-	vecOrg = pev->origin + gpGlobals->v_up * 36;
+	vecOrg = m_pPlayer->pev->origin + gpGlobals->v_up * 36;
 	float deflection = 0.01;
 	vecAim = gpGlobals->v_forward + gpGlobals->v_right * RANDOM_FLOAT(-deflection, deflection) + gpGlobals->v_up * RANDOM_FLOAT(-deflection, deflection);
 	UTIL_TraceLine(vecOrg, vecOrg + vecAim * 1024, dont_ignore_monsters, ENT(pev), &tr);
@@ -232,7 +232,7 @@ void CDisplacer::ZapBeam(Vector vecOrg)
 	pEntity = CBaseEntity::Instance(tr.pHit);
 	if (pEntity != NULL && 0 != pEntity->pev->takedamage)
 	{
-		pEntity->TraceAttack(pev, 1.25*gSkillData.slaveDmgZap, vecAim, &tr, DMG_SHOCK);
+		pEntity->TraceAttack(m_pPlayer->pev, gSkillData.slaveDmgZap, vecAim, &tr, DMG_SHOCK);
 	}
 	UTIL_EmitAmbientSound(ENT(pev), tr.vecEndPos, "weapons/electro4.wav", 0.5, ATTN_NORM, 0, RANDOM_LONG(140, 160));
 #endif
