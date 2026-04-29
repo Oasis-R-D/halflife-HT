@@ -79,7 +79,8 @@ public:
 
 	void ClearBeams();
 	void ZapBeam(Vector vecOrg);
-
+	void BeamGlow();
+	void ArmBeam();
 private:
 
 	CBeam* m_pBeam[ISLAVE_MAX_BEAMS];

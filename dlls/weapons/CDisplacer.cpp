@@ -21,7 +21,7 @@
 #include "UserMessages.h"
 
 #ifndef CLIENT_DLL
-#include "effects.h
+#include "effects.h"
 #include "rope/CRope.h"
 #include "ctf/CTFGoal.h"
 #include "ctf/CTFGoalFlag.h"
@@ -96,11 +96,6 @@ void CDisplacer::Holster()
 	if (m_pfnThink == &CDisplacer::SpinupThink)
 	{
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 20;
-		SetThink(nullptr);
-	}
-	else if (m_pfnThink == &CDisplacer::AltSpinupThink)
-	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 60;
 		SetThink(nullptr);
 	}
 }
