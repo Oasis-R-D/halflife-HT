@@ -53,17 +53,11 @@ public:
 
 	void PrimaryAttack() override;
 
-	void SecondaryAttack() override;
-
 	void Reload() override;
 
 	void EXPORT SpinupThink();
 
-	void EXPORT AltSpinupThink();
-
 	void EXPORT FireThink();
-
-	void EXPORT AltFireThink();
 
 	int iItemSlot() override;
 
@@ -80,7 +74,17 @@ public:
 #endif
 	}
 
+	void ClearBeams();
+	void ArmBeam();
+	void ZapBeam(Vector vecOrg);
+	void BeamGlow();
+
 private:
+
+	CBeam* m_pBeam[ISLAVE_MAX_BEAMS];
+
+	int m_iBeams;
+
 	int m_iSpriteTexture;
 
 	float m_flStartTime;
