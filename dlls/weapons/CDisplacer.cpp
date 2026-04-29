@@ -13,8 +13,6 @@
 *
 ****/
 
-#define ISLAVE_MAX_BEAMS 8
-
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -349,7 +347,7 @@ void CDisplacer::ArmBeam()
 		return;
 
 	UTIL_MakeAimVectors(m_pPlayer->pev->angles);
-	Vector vecSrc = m_pPlayer->pev->origin + gpGlobals->v_up * 48 + gpGlobals->v_right * side * 16 + gpGlobals->v_forward * 32; // TO-DO: use view org
+	Vector vecSrc = m_pPlayer->pev->origin + gpGlobals->v_up * 48 + gpGlobals->v_right * 16 + gpGlobals->v_forward * 32; // TO-DO: use view org
 
 	for (int i = 0; i < 3; i++)
 	{

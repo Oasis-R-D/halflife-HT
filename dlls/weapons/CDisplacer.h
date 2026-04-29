@@ -34,6 +34,8 @@ enum class DisplacerMode
 	FIRED
 };
 
+#define ISLAVE_MAX_BEAMS 8
+
 static const size_t DISPLACER_NUM_BEAMS = 2;
 
 class CDisplacer : public CBasePlayerWeapon
