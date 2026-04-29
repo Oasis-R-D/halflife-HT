@@ -34,7 +34,7 @@ TYPEDESCRIPTION CSporeLauncher::m_SaveData[] =
 IMPLEMENT_SAVERESTORE(CSporeLauncher, CSporeLauncher::BaseClass);
 #endif
 
-LINK_ENTITY_TO_CLASS(weapon_sporelauncher, CSporeLauncher);
+//LINK_ENTITY_TO_CLASS(weapon_sporelauncher, CSporeLauncher);
 
 void CSporeLauncher::Precache()
 {

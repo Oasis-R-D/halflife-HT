@@ -44,7 +44,7 @@ TYPEDESCRIPTION CGrapple::m_SaveData[] =
 IMPLEMENT_SAVERESTORE(CGrapple, CGrapple::BaseClass);
 #endif
 
-LINK_ENTITY_TO_CLASS(weapon_grapple, CGrapple);
+//LINK_ENTITY_TO_CLASS(weapon_grapple, CGrapple);
 
 void CGrapple::Precache()
 {

@@ -313,8 +313,8 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_357");
 
 	// gauss
-	UTIL_PrecacheOtherWeapon("weapon_gauss");
-	UTIL_PrecacheOther("ammo_gaussclip");
+	//UTIL_PrecacheOtherWeapon("weapon_gauss");
+	//UTIL_PrecacheOther("ammo_gaussclip");
 
 	// rpg
 	UTIL_PrecacheOtherWeapon("weapon_rpg");
@@ -325,7 +325,7 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_crossbow");
 
 	// egon
-	UTIL_PrecacheOtherWeapon("weapon_egon");
+	//UTIL_PrecacheOtherWeapon("weapon_egon");
 
 	// tripmine
 	UTIL_PrecacheOtherWeapon("weapon_tripmine");
@@ -342,7 +342,7 @@ void W_Precache()
 	// hornetgun
 	UTIL_PrecacheOtherWeapon("weapon_hornetgun");
 
-	UTIL_PrecacheOtherWeapon("weapon_grapple");
+	//UTIL_PrecacheOtherWeapon("weapon_grapple");
 
 	UTIL_PrecacheOtherWeapon("weapon_eagle");
 
@@ -353,8 +353,8 @@ void W_Precache()
 
 	UTIL_PrecacheOtherWeapon("weapon_displacer");
 
-	UTIL_PrecacheOtherWeapon("weapon_sporelauncher");
-	UTIL_PrecacheOther("ammo_spore");
+	//UTIL_PrecacheOtherWeapon("weapon_sporelauncher");
+	//UTIL_PrecacheOther("ammo_spore");
 
 	UTIL_PrecacheOtherWeapon("weapon_shockrifle");
 
@@ -363,7 +363,7 @@ void W_Precache()
 
 	UTIL_PrecacheOtherWeapon("weapon_knife");
 
-	UTIL_PrecacheOtherWeapon("weapon_penguin");
+	//UTIL_PrecacheOtherWeapon("weapon_penguin");
 
 	PRECACHE_SOUND("weapons/spore_hit1.wav");
 	PRECACHE_SOUND("weapons/spore_hit2.wav");

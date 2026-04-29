@@ -24,7 +24,7 @@
 #include "gamerules.h"
 #include "UserMessages.h"
 
-LINK_ENTITY_TO_CLASS(weapon_gauss, CGauss);
+//LINK_ENTITY_TO_CLASS(weapon_gauss, CGauss);
 
 float CGauss::GetFullChargeTime()
 {
@@ -614,7 +614,6 @@ void CGauss::SendStopEvent(bool sendToHost)
 }
 
 
-
 class CGaussAmmo : public CBasePlayerAmmo
 {
 	void Spawn() override
@@ -638,4 +637,4 @@ class CGaussAmmo : public CBasePlayerAmmo
 		return false;
 	}
 };
-LINK_ENTITY_TO_CLASS(ammo_gaussclip, CGaussAmmo);
+//LINK_ENTITY_TO_CLASS(ammo_gaussclip, CGaussAmmo);

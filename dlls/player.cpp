@@ -3855,9 +3855,9 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 		GiveNamedItem("ammo_357");
 		GiveNamedItem("weapon_crossbow");
 		GiveNamedItem("ammo_crossbow");
-		GiveNamedItem("weapon_egon");
-		GiveNamedItem("weapon_gauss");
-		GiveNamedItem("ammo_gaussclip");
+		//GiveNamedItem("weapon_egon");
+		//GiveNamedItem("weapon_gauss");
+		//GiveNamedItem("ammo_gaussclip");
 		GiveNamedItem("weapon_rpg");
 		GiveNamedItem("ammo_rpgclip");
 		GiveNamedItem("weapon_satchel");
@@ -3865,14 +3865,15 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 		GiveNamedItem("weapon_hornetgun");
 
 		GiveNamedItem("weapon_eagle");
-		GiveNamedItem("weapon_sporelauncher");
+		//GiveNamedItem("weapon_sporelauncher");
 		GiveNamedItem("weapon_shockrifle");
 		GiveNamedItem("weapon_knife");
 		GiveNamedItem("weapon_m249");
 		GiveNamedItem("weapon_pipewrench");
-		GiveNamedItem("weapon_grapple");
+		//GiveNamedItem("weapon_grapple");
 		GiveNamedItem("weapon_sniperrifle");
 		GiveNamedItem("weapon_displacer");
+		
 		//TODO: not given
 		//GiveNamedItem( "ammo_762" );
 

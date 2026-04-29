@@ -27,7 +27,6 @@
 #include "weapons/CSporeLauncher.h"
 #include "weapons/CSniperRifle.h"
 #include "weapons/CKnife.h"
-#include "weapons/CPenguin.h"
 
 #include "usercmd.h"
 #include "entity_state.h"
@@ -87,7 +86,6 @@ CShockRifle g_ShockRifle;
 CSporeLauncher g_SporeLauncher;
 CSniperRifle g_SniperRifle;
 CKnife g_Knife;
-CPenguin g_Penguin;
 
 
 /*
@@ -517,7 +515,6 @@ void HUD_InitClientWeapons()
 	HUD_PrepEntity(&g_SporeLauncher, &player);
 	HUD_PrepEntity(&g_SniperRifle, &player);
 	HUD_PrepEntity(&g_Knife, &player);
-	HUD_PrepEntity(&g_Penguin, &player);
 }
 
 /*
@@ -611,8 +608,6 @@ CBasePlayerWeapon* GetLocalWeapon(int id)
 		return &g_SniperRifle;
 	case WEAPON_KNIFE:
 		return &g_Knife;
-	case WEAPON_PENGUIN:
-		return &g_Penguin;
 
 	default:
 		return nullptr;

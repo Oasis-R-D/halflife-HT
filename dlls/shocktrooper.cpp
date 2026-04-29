@@ -996,7 +996,8 @@ void CShockTrooper::Precache()
 		m_voicePitch = 100;
 
 	UTIL_PrecacheOther("monster_shockroach");
-
+	UTIL_PrecacheOther("spore");
+	
 	iShockTrooperMuzzleFlash = PRECACHE_MODEL("sprites/muzzle_shock.spr");
 }
 

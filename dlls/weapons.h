@@ -97,7 +97,6 @@ public:
 #define DISPLACER_WEIGHT 10
 #define SPORELAUNCHER_WEIGHT 20
 #define SNIPERRIFLE_WEIGHT 10
-#define PENGUIN_WEIGHT 5
 
 
 // weapon clip/carry ammo capacities
@@ -116,7 +115,6 @@ public:
 #define M249_MAX_CARRY 200
 #define SPORELAUNCHER_MAX_CARRY 20
 #define SNIPERRIFLE_MAX_CARRY 15
-#define PENGUIN_MAX_CARRY 9
 
 // the maximum amount of ammo each weapon's clip can hold
 #define WEAPON_NOCLIP -1
@@ -141,8 +139,6 @@ public:
 #define SPORELAUNCHER_MAX_CLIP 5
 #define SHOCKRIFLE_MAX_CLIP 10
 #define SNIPERRIFLE_MAX_CLIP 5
-#define PENGUIN_MAX_CLIP 3
-
 
 // the default amount of ammo that comes with each gun when it spawns
 #define GLOCK_DEFAULT_GIVE 17
