@@ -232,7 +232,7 @@ void CDisplacer::ZapBeam(Vector vecOrg)
 	pEntity = CBaseEntity::Instance(tr.pHit);
 	if (pEntity != NULL && 0 != pEntity->pev->takedamage)
 	{
-		pEntity->TraceAttack(m_pPlayer->pev, gSkillData.slaveDmgZap, vecAim, &tr, DMG_SHOCK);
+		pEntity->TraceAttack(m_pPlayer->pev, 30, vecAim, &tr, DMG_SHOCK);
 	}
 	UTIL_EmitAmbientSound(ENT(pev), tr.vecEndPos, "weapons/electro4.wav", 0.5, ATTN_NORM, 0, RANDOM_LONG(140, 160));
 #endif
