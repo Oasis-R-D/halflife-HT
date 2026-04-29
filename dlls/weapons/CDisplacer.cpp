@@ -83,6 +83,7 @@ bool CDisplacer::Deploy()
 void CDisplacer::Holster()
 {
 	ClearBeams();
+
 	m_fInReload = false;
 
 	STOP_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/displacer_spin.wav");
@@ -181,8 +182,7 @@ void CDisplacer::SpinupThink()
 		ArmBeam();
 		BeamGlow();
 
-		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireDisplacer, 0, g_vecZero, g_vecZero,
-			0, 0, static_cast<int>(m_Mode), 0, 0, 0);
+		//PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireDisplacer, 0, g_vecZero, g_vecZero, 0, 0, static_cast<int>(m_Mode), 0, 0, 0);
 
 		m_flStartTime = gpGlobals->time;
 		m_iSoundState = 0;
@@ -198,12 +198,7 @@ void CDisplacer::SpinupThink()
 
 			pev->nextthink = gpGlobals->time + 0.1;
 		}
-
-		m_iImplodeCounter = static_cast<int>((gpGlobals->time - m_flStartTime) * 100.0 + 50.0);
 	}
-
-	if (m_iImplodeCounter > 250)
-		m_iImplodeCounter = 250;
 
 	m_iSoundState = 128;
 
@@ -301,6 +296,14 @@ void CDisplacer::FireThink()
 	}
 #endif
 
+	SetThink(&CDisplacer::ClearThink);
+
+	pev->nextthink = gpGlobals->time + 0.1;
+}
+
+void CDisplacer::ClearThink()
+{
+	ClearBeams();
 	SetThink(nullptr);
 }
 

@@ -34,7 +34,7 @@ enum class DisplacerMode
 	FIRED
 };
 
-static const size_t DISPLACER_NUM_BEAMS = 4;
+static const size_t DISPLACER_NUM_BEAMS = 2;
 
 class CDisplacer : public CBasePlayerWeapon
 {
@@ -58,6 +58,7 @@ public:
 	void EXPORT SpinupThink();
 
 	void EXPORT FireThink();
+	void EXPORT ClearThink();
 
 	int iItemSlot() override;
 
@@ -75,9 +76,7 @@ public:
 	}
 
 	void ClearBeams();
-	void ArmBeam();
 	void ZapBeam(Vector vecOrg);
-	void BeamGlow();
 
 private:
 
@@ -92,7 +91,6 @@ private:
 
 	DisplacerMode m_Mode;
 
-	int m_iImplodeCounter;
 	int m_iSoundState;
 
 	unsigned short m_usFireDisplacer;

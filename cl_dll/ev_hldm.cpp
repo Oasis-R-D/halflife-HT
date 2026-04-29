@@ -1798,6 +1798,7 @@ void EV_FireDisplacer(event_args_t* args)
 
 		int iStartAttach, iEndAttach;
 
+		// TO-DO: either figure out how to make it have random end points or keep using server vers
 		for (size_t uiIndex = 0; uiIndex < DISPLACER_NUM_BEAMS; ++uiIndex)
 		{
 			if (iAttach <= 2)
@@ -1818,27 +1819,15 @@ void EV_FireDisplacer(event_args_t* args)
 				1, 60 * 0.01, 190 / 255.0, 30, 0, 10,
 				96 / 255.0, 128 / 255.0, 16 / 255.0);
 		}
-
 		break;
 	}
 
 	case DisplacerMode::FIRED:
 	{
-		//bparam1 indicates whether it's a primary or secondary attack. - Solokiller
-		if (0 == args->bparam1)
-		{
-			gEngfuncs.pEventAPI->EV_PlaySound(
-				args->entindex, args->origin,
-				CHAN_WEAPON, "weapons/displacer_fire.wav",
-				gEngfuncs.pfnRandomFloat(0.8, 0.9), ATTN_NORM, 0, PITCH_NORM);
-		}
-		else
-		{
-			gEngfuncs.pEventAPI->EV_PlaySound(
-				args->entindex, args->origin,
-				CHAN_WEAPON, "weapons/displacer_self.wav",
-				gEngfuncs.pfnRandomFloat(0.8, 0.9), ATTN_NORM, 0, PITCH_NORM);
-		}
+		gEngfuncs.pEventAPI->EV_PlaySound(
+			args->entindex, args->origin,
+			CHAN_WEAPON, "weapons/displacer_fire.wav",
+			gEngfuncs.pfnRandomFloat(0.8, 0.9), ATTN_NORM, 0, PITCH_NORM);
 
 		if (EV_IsLocal(args->entindex))
 		{
