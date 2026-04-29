@@ -143,7 +143,7 @@ char* CScientist::GetScientistModel() const
 		return pszOverride;
 	}
 
-	return "models/scientist.mdl";
+	return (char *)"models/scientist.mdl";
 }
 
 //=========================================================
@@ -1179,7 +1179,7 @@ char* CDeadScientist::GetScientistModel() const
 		return pszOverride;
 	}
 
-	return "models/scientist.mdl";
+	return (char *)"models/scientist.mdl";
 }
 
 bool CDeadScientist::KeyValue(KeyValueData* pkvd)
