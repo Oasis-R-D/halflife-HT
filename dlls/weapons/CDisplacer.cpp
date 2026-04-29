@@ -21,6 +21,7 @@
 #include "UserMessages.h"
 
 #ifndef CLIENT_DLL
+#include "effects.h
 #include "rope/CRope.h"
 #include "ctf/CTFGoal.h"
 #include "ctf/CTFGoalFlag.h"
@@ -208,6 +209,7 @@ void CDisplacer::SpinupThink()
 //=========================================================
 void CDisplacer::ZapBeam(Vector vecOrg)
 {
+#ifndef CLIENT_DLL
 	Vector vecAim;
 	TraceResult tr;
 	CBaseEntity* pEntity;
@@ -238,6 +240,7 @@ void CDisplacer::ZapBeam(Vector vecOrg)
 		pEntity->TraceAttack(pev, 1.25*gSkillData.slaveDmgZap, vecAim, &tr, DMG_SHOCK);
 	}
 	UTIL_EmitAmbientSound(ENT(pev), tr.vecEndPos, "weapons/electro4.wav", 0.5, ATTN_NORM, 0, RANDOM_LONG(140, 160));
+#endif
 }
 
 void CDisplacer::FireThink()
@@ -340,6 +343,7 @@ void CDisplacer::IncrementAmmo(CBasePlayer* pPlayer)
 
 void CDisplacer::ArmBeam()
 {
+#ifndef CLIENT_DLL
 	TraceResult tr;
 	float flDist = 1.0;
 
@@ -379,6 +383,7 @@ void CDisplacer::ArmBeam()
 	m_pBeam[m_iBeams]->SetNoise(80);
 	m_pBeam[m_iBeams]->pev->spawnflags |= SF_BEAM_TEMPORARY; // Flag these to be destroyed on save/restore or level transition
 	m_iBeams++;
+#endif
 }
 
 //=========================================================
@@ -386,6 +391,7 @@ void CDisplacer::ArmBeam()
 //=========================================================
 void CDisplacer::ClearBeams()
 {
+#ifndef CLIENT_DLL
 	for (int i = 0; i < ISLAVE_MAX_BEAMS; i++)
 	{
 		if (m_pBeam[i])
@@ -398,6 +404,7 @@ void CDisplacer::ClearBeams()
 	pev->skin = 0;
 
 	STOP_SOUND(ENT(pev), CHAN_WEAPON, "debris/zap4.wav");
+#endif
 }
 
 //=========================================================
@@ -405,6 +412,7 @@ void CDisplacer::ClearBeams()
 //=========================================================
 void CDisplacer::BeamGlow()
 {
+#ifndef CLIENT_DLL
 	int b = m_iBeams * 32;
 	if (b > 255)
 		b = 255;
@@ -416,4 +424,5 @@ void CDisplacer::BeamGlow()
 			m_pBeam[i]->SetBrightness(b);
 		}
 	}
+#endif
 }
