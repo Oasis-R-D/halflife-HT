@@ -28,9 +28,6 @@
 
 #include "gamerules.h"
 
-extern edict_t* EntSelectSpawnPoint(CBasePlayer* pPlayer);
-
-extern CBaseEntity* g_pLastSpawn;
 #endif
 
 #include "CDisplacer.h"
@@ -173,8 +170,19 @@ void CDisplacer::SpinupThink()
 		flags = 0;
 		//#endif
 
-		ArmBeam();
-		BeamGlow();
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSrc);
+		WRITE_BYTE(TE_DLIGHT);
+		WRITE_COORD(vecSrc.x);			 // X
+		WRITE_COORD(vecSrc.y);			 // Y
+		WRITE_COORD(vecSrc.z);			 // Z
+		WRITE_BYTE(12);					 // radius * 0.1
+		WRITE_BYTE(255);				 // r
+		WRITE_BYTE(180);				 // g
+		WRITE_BYTE(96);					 // b
+		WRITE_BYTE(10); // time * 10
+		WRITE_BYTE(0);					 // decay * 0.1
+		MESSAGE_END();
 
 		//PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireDisplacer, 0, g_vecZero, g_vecZero, 0, 0, static_cast<int>(m_Mode), 0, 0, 0);
 
@@ -193,6 +201,9 @@ void CDisplacer::SpinupThink()
 			pev->nextthink = gpGlobals->time + 0.1;
 		}
 	}
+
+	ArmBeam();
+	BeamGlow();
 
 	m_iSoundState = 128;
 
@@ -221,7 +232,7 @@ void CDisplacer::ZapBeam(Vector vecOrg)
 	if (!m_pBeam[m_iBeams])
 		return;
 
-	m_pBeam[m_iBeams]->PointEntInit(tr.vecEndPos, entindex());
+	m_pBeam[m_iBeams]->PointEntInit(tr.vecEndPos, m_pPlayer->entindex());
 	m_pBeam[m_iBeams]->SetEndAttachment(1);
 	m_pBeam[m_iBeams]->SetColor(180, 255, 96);
 	m_pBeam[m_iBeams]->SetBrightness(255);
@@ -291,10 +302,10 @@ void CDisplacer::FireThink()
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", SUIT_SENTENCE, SUIT_REPEAT_OK);
 	}
 #endif
-
+	pev->nextthink = gpGlobals->time + 0.2;
 	SetThink(&CDisplacer::ClearThink);
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	
 }
 
 void CDisplacer::ClearThink()
@@ -370,7 +381,7 @@ void CDisplacer::ArmBeam()
 	if (!m_pBeam[m_iBeams])
 		return;
 
-	m_pBeam[m_iBeams]->PointEntInit(tr.vecEndPos, entindex());
+	m_pBeam[m_iBeams]->PointEntInit(tr.vecEndPos, m_pPlayer->entindex());
 	m_pBeam[m_iBeams]->SetEndAttachment(1);
 	// m_pBeam[m_iBeams]->SetColor( 180, 255, 96 );
 	m_pBeam[m_iBeams]->SetColor(96, 128, 16);

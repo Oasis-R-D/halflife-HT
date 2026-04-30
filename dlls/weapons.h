@@ -1176,11 +1176,12 @@ public:
 	void Holster() override;
 	void WeaponIdle() override;
 	void Throw();
+	void Detonate();
 
 	bool UseDecrement() override
 	{
 #if defined(CLIENT_WEAPONS)
-		return UTIL_DefaultUseDecrement();
+		return true;
 #else
 		return false;
 #endif
