@@ -137,7 +137,7 @@ void CDisplacer::PrimaryAttack()
 
 		m_Mode = DisplacerMode::STARTED;
 
-		EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/displacer_spin.wav", RANDOM_FLOAT(0.8, 0.9), ATTN_NORM);
+		//EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/displacer_spin.wav", RANDOM_FLOAT(0.8, 0.9), ATTN_NORM);
 
 		m_flTimeWeaponIdle = m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.5;
 	}
@@ -202,6 +202,8 @@ void CDisplacer::SpinupThink()
 		}
 	}
 
+	// TO-DO: time properly
+	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "debris/zap4.wav", 1, ATTN_NORM, 0, 100 + m_iBeams * 10);
 	ArmBeam();
 	BeamGlow();
 
