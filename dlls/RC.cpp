@@ -1,5 +1,15 @@
+#include "extdll.h"
+#include "util.h"
+#include "cbase.h"
+#include "monsters.h"
+#include "weapons.h"
+#include "player.h"
+#include "soundent.h"
+#include "gamerules.h"
+#include "UserMessages.h"
 #include "RC.h"
 
+// controllable RC car
 LINK_ENTITY_TO_CLASS(pl_rc, CRC);
 void CRC::RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, int RCType, CBasePlayer* owner)
 {

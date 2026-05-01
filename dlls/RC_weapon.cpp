@@ -1,4 +1,13 @@
-#include "RC.h" // includes all needed weapon includes too
+#include "extdll.h"
+#include "util.h"
+#include "cbase.h"
+#include "monsters.h"
+#include "weapons.h"
+#include "player.h"
+#include "soundent.h"
+#include "gamerules.h"
+#include "UserMessages.h"
+#include "RC.h"
 
 LINK_ENTITY_TO_CLASS(weapon_rc, CRCWeapon);
 
@@ -8,7 +17,7 @@ void CRCWeapon::Spawn()
 {
 	pev->classname = MAKE_STRING("weapon_rc"); // hack to allow for old names
 	Precache();
-	SET_MODEL(ENT(pev), "models/w_9mmAR.mdl");
+	SET_MODEL(ENT(pev), "models/w_sqknest.mdl");
 	m_iId = WEAPON_RC;
 
 	m_iDefaultAmmo = 1; // to-do: constant
@@ -19,16 +28,14 @@ void CRCWeapon::Spawn()
 }
 
 
-void CSqueak::Precache()
+void CRCWeapon::Precache()
 {
 	PRECACHE_MODEL("models/w_sqknest.mdl");
 	PRECACHE_MODEL("models/v_squeak.mdl");
 	PRECACHE_MODEL("models/p_squeak.mdl");
 	PRECACHE_SOUND("squeek/sqk_hunt2.wav");
 	PRECACHE_SOUND("squeek/sqk_hunt3.wav");
-	UTIL_PrecacheOther("monster_snark");
-
-	m_usSnarkFire = PRECACHE_EVENT(1, "events/snarkfire.sc");
+	UTIL_PrecacheOther("pl_rc");
 }
 
 bool CRCWeapon::GetItemInfo(ItemInfo* p)
@@ -40,7 +47,7 @@ bool CRCWeapon::GetItemInfo(ItemInfo* p)
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = WEAPON_NOCLIP;
 	p->iSlot = 4;
-	p->iPosition = 3;
+	p->iPosition = 4;
 	p->iId = m_iId = WEAPON_RC;
 	p->iWeight = SNARK_WEIGHT; // share
 	p->iFlags = ITEM_FLAG_LIMITINWORLD | ITEM_FLAG_EXHAUSTIBLE;
@@ -81,7 +88,7 @@ void CRCWeapon::Holster()
 	if (0 == m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 	{
 		m_pPlayer->ClearWeaponBit(m_iId);
-		SetThink(&CSqueak::DestroyItem);
+		SetThink(&CRCWeapon::DestroyItem);
 		pev->nextthink = gpGlobals->time + 0.1;
 		return;
 	}
@@ -183,8 +190,7 @@ void CRCWeapon::WeaponIdle()
 	m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15); // how long till we do this again.
 }
 
-
-
+/*
 class CRCWeaponAmmoClip : public CBasePlayerAmmo
 {
 	void Spawn() override
@@ -210,3 +216,4 @@ class CRCWeaponAmmoClip : public CBasePlayerAmmo
 };
 LINK_ENTITY_TO_CLASS(ammo_mp5clip, CRCWeaponAmmoClip);
 LINK_ENTITY_TO_CLASS(ammo_9mmAR, CRCWeaponAmmoClip);
+*/

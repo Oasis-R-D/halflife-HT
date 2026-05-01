@@ -1270,3 +1270,28 @@ public:
 private:
 	unsigned short m_usSnarkFire;
 };
+
+class CRC : public CBasePlayerWeapon
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	int iItemSlot() override { return 5; }
+	bool GetItemInfo(ItemInfo* p) override;
+
+	void PrimaryAttack() override;
+	void SecondaryAttack() override;
+	bool Deploy() override;
+	void Holster() override;
+	void WeaponIdle() override;
+	bool m_fJustThrown;
+
+	bool UseDecrement() override
+	{
+#if defined(CLIENT_WEAPONS)
+		return UTIL_DefaultUseDecrement();
+#else
+		return false;
+#endif
+	}
+};

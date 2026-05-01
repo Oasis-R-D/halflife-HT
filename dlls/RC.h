@@ -1,15 +1,5 @@
 #pragma once
 
-#include "extdll.h"
-#include "util.h"
-#include "cbase.h"
-#include "monsters.h"
-#include "weapons.h"
-#include "player.h"
-#include "soundent.h"
-#include "gamerules.h"
-#include "UserMessages.h"
-
 // UNDONE: Save/restore this?  Don't forget to set classname and LINK_ENTITY_TO_CLASS()
 
 enum
