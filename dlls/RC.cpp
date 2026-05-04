@@ -41,7 +41,7 @@ void CRC::Precache()
 
 int CRC::Classify()
 {
-	return CLASS_MACHINE; // to-do: make player ally
+	return CLASS_PLAYER_ALLY; // TO-DO: this prob doesn't anger friendly NPCs when friendly fire occurs
 }
 
 void CRC::Spawn()
@@ -52,24 +52,25 @@ void CRC::Spawn()
 	pev->friction = 0;
 	pev->solid = SOLID_BBOX;
 	pev->angles = m_direction;
-	pev->sequence = 0;
-	pev->frame = 0;
 
-	SetBits(pev->flags, FL_MONSTER);
-
-	SET_MODEL(ENT(pev), "models/grenade.mdl");
+	SET_MODEL(ENT(pev), "models/grenade.mdl"); // placeholder
 	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 8));
 	UTIL_SetOrigin(pev, m_SpawnPos);
 
-	pev->flags |= FL_MONSTER;
+	pev->sequence = 0;
+	pev->frame = 0;
+
+	// NPCs attack it
+	SetBits(pev->flags, FL_MONSTER);
+	pev->flags |= FL_MONSTER; // extraneous?
+
 	pev->takedamage = DAMAGE_YES;
 	pev->health = 20;
 
 	SetTouch(&CRC::Impact);
 
+	// ready attacks
 	m_fAttackDelay = gpGlobals->time;
-
-	pev->nextthink = gpGlobals->time;
 }
 
 void CRC::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
@@ -108,8 +109,6 @@ bool CRC::StartControl(CBasePlayer* pController)
 	}
 
 	m_pController->m_iHideHUD |= HIDEHUD_WEAPONS;
-
-	pev->nextthink = pev->ltime + 0.1;
 
 	m_pController->pev->maxspeed = 0.00001;
 
@@ -150,19 +149,21 @@ bool CRC::AttackThink()
 }
 
 void CRC::DriveThink()
-{ // player controls
+{
 	if (!m_pController)
 	{
-		ALERT(at_console, "RC without controller!\n");
-		UTIL_Remove(this);
+		ExplodeThink();
 		return;
 	}
 
+	// check attacks
 	if (AttackThink() == true) 
-		return; // was detonated by the player
-
-	int ft = 0, bk = 0, rt = 0, lf = 0, jmp = 0;
+		return; // was detonated by the player or water
+	
 	const bool onGround = FBitSet(pev->flags, FL_ONGROUND);
+	
+	// input handling
+	int ft = 0, bk = 0, rt = 0, lf = 0, jmp = 0;
 
 	if (onGround)
 	{
@@ -198,6 +199,7 @@ void CRC::DriveThink()
 	int turn = lf + rt; 	// make it into 1 value, -1 if left, 1 if right, 0 if none or both
 	int drive = ft + bk;	// make it into 1 value, -1 if reverse, 1 if forward, 0 if none or both
 	
+	// move the RC car (TO-DO: make actually work)
 	if (turn != 0)
 	{
 		pev->avelocity.y = pev->avelocity.y + (turn * RC_SPEED_TURN * DT);
@@ -213,6 +215,7 @@ void CRC::DriveThink()
 		pev->velocity.z += RC_SPEED_JUMP;
 	}
 
+	// report status
 	ALERT(at_console, "DRIVE: %d, TURN %d, JUMP %d, DT %f\n", drive, turn, jmp, DT);
 }
 
