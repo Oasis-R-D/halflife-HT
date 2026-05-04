@@ -11,8 +11,9 @@
 #define DT gpGlobals->frametime
 #define RC_SPEED_DRIVE 100
 #define RC_SPEED_TURN 100
+#define RC_SPEED_JUMP 64
 #define RC_ATTACK_DELAY 0.25
-
+#define RC_JUMP_DELAY 0.25
 // controllable RC car
 LINK_ENTITY_TO_CLASS(pl_rc, CRC);
 CRC* CRC::RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, int RCType)
@@ -171,10 +172,8 @@ void CRC::DriveThink()
 		return;
 
 	int ft = 0, bk = 0, rt = 0, lf = 0, jmp = 0;
-	bool onGround = FBitSet(pev->flags, FL_ONGROUND);
+	const bool onGround = FBitSet(pev->flags, FL_ONGROUND);
 
-	// can't do both
-	// braking takes higher priority
 	if (onGround)
 	{
 		if ((m_pController->pev->button & IN_BACK) != 0)
@@ -197,8 +196,11 @@ void CRC::DriveThink()
 			lf = -1;
 		}
 
-		if ((m_pController->m_afButtonPressed & IN_JUMP) != 0 && onGround) // TO-DO: check on ground, add delay
+		if (m_fJumpDelay == -1)
+			m_fJumpDelay = gpGlobals->time + RC_JUMP_DELAY;
+		else if ((m_pController->m_afButtonPressed & IN_JUMP) != 0 && m_fJumpDelay < gpGlobals->time) // TO-DO: check on ground, add delay
 		{
+			m_fJumpDelay = -1; // set once we are on ground
 			jmp = 1;
 		}
 	}
@@ -208,17 +210,20 @@ void CRC::DriveThink()
 	
 	if (turn != 0)
 	{
-		pev->avelocity.y += turn * RC_SPEED_TURN * DT;
+		pev->avelocity.y += (turn * RC_SPEED_TURN * DT);
 	}
 
 	if (drive != 0)
 	{
-		pev->velocity = pev->velocity + drive * gpGlobals->v_forward * RC_SPEED_DRIVE * DT;
+		pev->velocity = pev->velocity + (drive * gpGlobals->v_forward * RC_SPEED_DRIVE * DT);
 	}
 
 	if (jmp != 0)
+	{
+		pev->velocity.z += RC_SPEED_JUMP;
+	}
 
-	ALERT(at_console, "DRIVE: %d, TURN %d, JUMP %d\n", drive, turn, jmp);
+	ALERT(at_console, "DRIVE: %d, TURN %d, JUMP %d, DT %f\n", drive, turn, jmp, DT);
 }
 
 void CRC::ExplodeThink()
@@ -263,7 +268,7 @@ void CRC::ExplodeThink()
 		Vector origin = pev->origin;
 		origin.z -= 1;
 
-		RadiusDamage(origin, pev, pevOwner, pev->dmg, CLASS_NONE, DMG_BLAST);
+		RadiusDamage(origin, pev, pevOwner, pev->dmg, 256, CLASS_NONE, DMG_BLAST);
 	}
 
 	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);

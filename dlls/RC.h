@@ -45,7 +45,8 @@ public:
 	Vector m_direction;
 
 	float m_fAttackDelay;
-
+	float m_fJumpDelay;
+	
 	int m_idShard;
 
 protected:
