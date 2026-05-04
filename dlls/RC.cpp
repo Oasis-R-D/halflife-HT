@@ -121,8 +121,8 @@ bool CRC::StartControl(CBasePlayer* pController)
 
 bool CRC::AttackThink()
 {
-	if ((m_pController->m_afButtonPressed & IN_ATTACK2) != 0)
-	{
+	if ((m_pController->m_afButtonPressed & IN_ATTACK2) != 0 || pev->waterlevel == 3)
+	{	// detonate if underwater or told to
 		ExplodeThink();
 		return true;
 	}
