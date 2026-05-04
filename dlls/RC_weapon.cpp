@@ -83,6 +83,18 @@ void CRCWeapon::Holster()
 
 void CRCWeapon::PrimaryAttack()
 {
+	Throw(RC_EXPLODE);
+}
+
+
+
+void CRCWeapon::SecondaryAttack()
+{
+	Throw(RC_GUN);
+}
+
+void CRCWeapon::Throw(int type)
+{
 	if (m_pPlayer->m_pRCcar != NULL) // shouldn't happen
 		return;
 
@@ -90,13 +102,13 @@ void CRCWeapon::PrimaryAttack()
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = 0.15;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = 0.15;
 		return;
 	}
 
 	if (0 >= m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 	{
-		m_flNextPrimaryAttack = 0.15;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = 0.15;
 		return;
 	}
 
@@ -128,11 +140,7 @@ void CRCWeapon::PrimaryAttack()
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
 #ifndef CLIENT_DLL
-
-		EHANDLE player; // 2 lines because C++ is mean
-		player = m_pPlayer;
-
-		CRC* RC = CRC::RC_Create(100, tr.vecEndPos, Vector(0, pev->angles.y, 0), RC_EXPLODE);
+		CRC* RC = CRC::RC_Create(100, tr.vecEndPos, Vector(0, pev->angles.y, 0), type);
 		RC->Use(m_pPlayer, m_pPlayer, USE_SET, 1); // start controlling
 		RC->pev->velocity = gpGlobals->v_forward * 200 + m_pPlayer->pev->velocity;
 #endif
@@ -143,16 +151,9 @@ void CRCWeapon::PrimaryAttack()
 
 		m_fJustThrown = true;
 
-		m_flNextPrimaryAttack = GetNextAttackDelay(0.3);
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = GetNextAttackDelay(0.3);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0;
 	}
-}
-
-
-
-void CRCWeapon::SecondaryAttack()
-{
-    // switch RC type if one isn't spawned (player should have enough ammo to give the RC), explode / esc if one is
 }
 
 void CRCWeapon::WeaponIdle()

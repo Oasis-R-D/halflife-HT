@@ -1281,6 +1281,7 @@ public:
 
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
+	void Throw(int type);
 	bool Deploy() override;
 	void Holster() override;
 	void WeaponIdle() override;
