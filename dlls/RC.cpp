@@ -9,11 +9,18 @@
 #include "RC.h"
 
 #define DT gpGlobals->frametime
-#define RC_SPEED_DRIVE 100
-#define RC_SPEED_TURN 100
-#define RC_SPEED_JUMP 64
-#define RC_ATTACK_DELAY 0.25
+#define RC_SPEED_DRIVE 1600
+#define RC_SPEED_TURN 800
+#define RC_SPEED_JUMP 192
+
+#define RC_ATTACK_DELAY 0.15
 #define RC_JUMP_DELAY 0.25
+
+#define RC_TURN_FRICTION 0.75
+
+// values clamped to this
+#define RC_MAX_TURNSPEED 256
+#define RC_MAX_DRIVESPEED 256
 
 // controllable RC car
 LINK_ENTITY_TO_CLASS(pl_rc, CRC);
@@ -35,7 +42,11 @@ CRC* CRC::RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, in
 
 void CRC::Precache()
 {
-	PRECACHE_SOUND("weapons/RC_fire.wav");
+	PRECACHE_SOUND("weapons/hks1.wav");
+	PRECACHE_SOUND("weapons/hks3.wav");
+	PRECACHE_SOUND("weapons/hks2.wav");
+	PRECACHE_MODEL("models/rc.mdl");
+
 	m_idShard = PRECACHE_MODEL("models/metalplategibs.mdl");
 }
 
@@ -48,13 +59,14 @@ void CRC::Spawn()
 {
 	Precache();
 
-	pev->movetype = MOVETYPE_TOSS;
-	pev->friction = 0;
+	pev->movetype = MOVETYPE_STEP;
+
 	pev->solid = SOLID_BBOX;
 	pev->angles = m_direction;
 
-	SET_MODEL(ENT(pev), "models/grenade.mdl"); // placeholder
-	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 8));
+	SET_MODEL(ENT(pev), "models/rc.mdl"); // placeholder
+	//UTIL_SetSize(pev, Vector(-4, -4, 0), Vector(4, 4, 8));
+
 	UTIL_SetOrigin(pev, m_SpawnPos);
 
 	pev->sequence = 0;
@@ -71,6 +83,7 @@ void CRC::Spawn()
 
 	// ready attacks
 	m_fAttackDelay = gpGlobals->time;
+	m_fExplodeDelay = gpGlobals->time + 1;
 }
 
 void CRC::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
@@ -89,6 +102,7 @@ void CRC::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, f
 	}
 	else
 	{
+		ALERT(at_console, "unused\n");
 		ExplodeThink();
 	}
 }
@@ -112,16 +126,17 @@ bool CRC::StartControl(CBasePlayer* pController)
 
 	m_pController->pev->maxspeed = 0.00001;
 
-	//SET_VIEW(m_pController->edict(), edict());
-	//m_pController->m_hViewEntity = this;
+	SET_VIEW(m_pController->edict(), edict());
+	m_pController->m_hViewEntity = this;
 
 	return true;
 }
 
 bool CRC::AttackThink()
 {
-	if ((m_pController->m_afButtonPressed & IN_ATTACK2) != 0 || pev->waterlevel == 3)
+	if (((m_pController->m_afButtonPressed & IN_ATTACK2) != 0 && m_fExplodeDelay < gpGlobals->time) || pev->waterlevel == 3)
 	{	// detonate if underwater or told to
+		ALERT(at_console, "detonated\n");
 		ExplodeThink();
 		return true;
 	}
@@ -130,14 +145,15 @@ bool CRC::AttackThink()
 		if ((m_pController->pev->button & IN_ATTACK) != 0 && m_fAttackDelay < gpGlobals->time)
 		{
 			// shoot
-			EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "weapons/RC_fire.wav", 1.0, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 10));
+			char wpnsnd2[256];
+			sprintf(wpnsnd2, "weapons/hks%d.wav", RANDOM_LONG(1, 3));
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, wpnsnd2, 1.0, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 10));
+
+			UTIL_MakeVectors(pev->angles); // has to be called or else it follows mouse (which the camera doesn't)
 
 			Vector vecSrc = pev->origin + gpGlobals->v_up * 4 + gpGlobals->v_right * 4;
 
-			Vector vecEnd = vecSrc + gpGlobals->v_forward * 8 + gpGlobals->v_up * 2; // angle up
-			Vector vecAiming = (vecEnd - vecSrc).Normalize();
-
-			m_pController->FireBulletsPlayer(RANDOM_LONG(1, 2), vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pController->pev, m_pController->random_seed);
+			FireBullets(RANDOM_LONG(1, 2), vecSrc, gpGlobals->v_forward, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 1, 0, pev);
 			
 			CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
 
@@ -148,10 +164,19 @@ bool CRC::AttackThink()
 	return false;
 }
 
+static void clamp(float &x, float value)
+{
+	if (x > value)
+		x = value;
+	else if (x < -value)
+		x = -value;
+}
+
 void CRC::DriveThink()
 {
 	if (!m_pController)
 	{
+		ALERT(at_console, "no controller!\n");
 		ExplodeThink();
 		return;
 	}
@@ -179,12 +204,12 @@ void CRC::DriveThink()
 
 		if ((m_pController->pev->button & IN_MOVERIGHT) != 0)
 		{
-			rt = 1;
+			rt = -1;
 		}
 		
 		if ((m_pController->pev->button & IN_MOVELEFT) != 0)
 		{
-			lf = -1;
+			lf = 1;
 		}
 
 		if (m_fJumpDelay == -1)
@@ -194,15 +219,28 @@ void CRC::DriveThink()
 			m_fJumpDelay = -1; // set once we are on ground
 			jmp = 1;
 		}
+
+		
 	}
+
+	float movespeed = pev->velocity.Length();
+	clamp(movespeed, RC_MAX_DRIVESPEED);
+
+	float frictionMult = RC_TURN_FRICTION + (1 - (movespeed / RC_MAX_DRIVESPEED));
+	clamp(frictionMult, 1.0);
+	pev->avelocity = pev->avelocity - (frictionMult * pev->avelocity * DT); // TO-DO: more friction when speed is lower?
+
+	pev->angles = pev->angles + pev->avelocity * DT; // avelocity doesn't work in step movetype
+	UTIL_MakeVectors(pev->angles);
 
 	int turn = lf + rt; 	// make it into 1 value, -1 if left, 1 if right, 0 if none or both
 	int drive = ft + bk;	// make it into 1 value, -1 if reverse, 1 if forward, 0 if none or both
 	
-	// move the RC car (TO-DO: make actually work)
+	// move the RC car
 	if (turn != 0)
 	{
-		pev->avelocity.y = pev->avelocity.y + (turn * RC_SPEED_TURN * DT);
+		pev->avelocity.y = pev->avelocity.y + (turn * RC_SPEED_TURN * DT * (movespeed / RC_MAX_DRIVESPEED));
+		clamp(pev->avelocity.y, RC_MAX_TURNSPEED);
 	}
 
 	if (drive != 0)
@@ -284,6 +322,8 @@ void CRC::ExplodeThink()
 	if (!m_pController)
 		return;
 
+	m_pController->pev->maxspeed = 0;
+
 	SET_VIEW(m_pController->edict(), m_pController->edict());
 	m_pController->EquipWeapon();
 	m_pController->m_hViewEntity = NULL;
@@ -330,6 +370,7 @@ bool CRC::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDa
 	pev->health -= flDamage;
 	if (pev->health <= 0)
 	{
+		ALERT(at_console, "killed\n");
 		pev->takedamage = DAMAGE_NO;
 
 		ClearBits(pev->flags, FL_MONSTER); // why are they set in the first place???

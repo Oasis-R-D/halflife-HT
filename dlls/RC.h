@@ -52,7 +52,7 @@ public:
 
 	float m_fAttackDelay;
 	float m_fJumpDelay;
-	
+	float m_fExplodeDelay;
 	int m_idShard;
 
 protected:
