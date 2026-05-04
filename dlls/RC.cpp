@@ -39,15 +39,23 @@ void CRC::Precache()
 	m_idShard = PRECACHE_MODEL("models/metalplategibs.mdl");
 }
 
+int CRC::Classify()
+{
+	return CLASS_MACHINE; // to-do: make player ally
+}
+
 void CRC::Spawn()
 {
 	Precache();
 
-	pev->velocity = m_direction * 100; // toss forward a 'lil
 	pev->movetype = MOVETYPE_TOSS;
 	pev->friction = 0;
 	pev->solid = SOLID_BBOX;
 	pev->angles = m_direction;
+	pev->sequence = 0;
+	pev->frame = 0;
+
+	SetBits(pev->flags, FL_MONSTER);
 
 	SET_MODEL(ENT(pev), "models/grenade.mdl");
 	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 8));
@@ -313,4 +321,51 @@ void CRC::ExplodeThink()
 void CRC::Impact(CBaseEntity* pOther)
 { // extra collision stuff
 	return;
+}
+
+void CRC::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+{
+	/*
+	if (ptr->iHitgroup == 10)
+	{
+		// hit armor
+		if (pev->dmgtime != gpGlobals->time || (RANDOM_LONG(0, 10) < 1))
+		{
+			UTIL_Ricochet(ptr->vecEndPos, RANDOM_FLOAT(1, 2));
+			pev->dmgtime = gpGlobals->time;
+		}
+
+		flDamage = 0.1; // don't hurt the monster much, but allow bits_COND_LIGHT_DAMAGE to be generated
+	}
+	*/
+	
+	if (0 == pev->takedamage)
+		return;
+
+	AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
+}
+
+// take damage. bitsDamageType indicates type of damage sustained, ie: DMG_BULLET
+
+bool CRC::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	if (0 == pev->takedamage)
+		return false;
+
+	pev->health -= flDamage;
+	if (pev->health <= 0)
+	{
+		pev->health = 0;
+		pev->takedamage = DAMAGE_NO;
+		pev->dmgtime = gpGlobals->time;
+
+		ClearBits(pev->flags, FL_MONSTER); // why are they set in the first place???
+
+		SetUse(NULL);
+		ExplodeThink();
+
+		return false;
+	}
+
+	return true;
 }

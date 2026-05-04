@@ -20,13 +20,20 @@ enum
 
 // OVERLOADS SOME ENTVARS:
 // speed - the ideal magnitude of my velocity
-class CRC : public CBaseEntity
+class CRC : public CBaseMonster
 {
 	int m_iTrail;
 public:
 	static CRC* RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, int RCType); // add damage, spread and owner so entities calling this can give it the proper stuff
 	void Spawn() override;
 	void Precache() override;
+
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
+	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+	int Classify() override;
+
+	int BloodColor() override { return DONT_BLEED; } // don't bleed
+	void GibMonster() override {} // don't gib
 
 	void EXPORT Impact(CBaseEntity* pOther);
 	//int ShouldCollide(CBaseEntity* pentTouched) override;
