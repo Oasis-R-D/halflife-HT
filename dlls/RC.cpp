@@ -145,30 +145,7 @@ bool CRC::AttackThink()
 			m_fAttackDelay = gpGlobals->time + RC_ATTACK_DELAY;
 		}
 	}
-	else if (m_Flare == RC_TURRET)
-	{
-		if (m_fAttackDelay < gpGlobals->time)
-		{
-			CBaseMonster* Enemy;
-			Enemy = nullptr; // temp fix, add enemy acquiring code later
-			if (Enemy)
-			{
-				// shoot
-				EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "weapons/RC_fire.wav", 1.0, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 10));
 
-				Vector vecSrc = pev->origin + gpGlobals->v_up * 4 + gpGlobals->v_right * 4; // TO-DO: make relative to monster dir
-
-				Vector vecEnd = vecSrc + gpGlobals->v_forward * 8 + gpGlobals->v_up * 2; // angle up
-				Vector vecAiming = (vecEnd - vecSrc).Normalize();
-
-				m_pController->FireBulletsPlayer(RANDOM_LONG(1, 2), vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pController->pev, m_pController->random_seed);
-				
-				CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
-
-				m_fAttackDelay = gpGlobals->time + RC_ATTACK_DELAY;
-			}
-		}
-	}
 	return false;
 }
 
@@ -218,12 +195,12 @@ void CRC::DriveThink()
 		}
 	}
 
-	int turn = lf + rt; // make it into 1 value, -1 if left, 1 if right, 0 if none or both
-	int drive = ft + bk;// make it into 1 value, -1 if reverse, 1 if forward, 0 if none or both
+	int turn = lf + rt; 	// make it into 1 value, -1 if left, 1 if right, 0 if none or both
+	int drive = ft + bk;	// make it into 1 value, -1 if reverse, 1 if forward, 0 if none or both
 	
 	if (turn != 0)
 	{
-		pev->avelocity.y += (turn * RC_SPEED_TURN * DT);
+		pev->avelocity.y = pev->avelocity.y + (turn * RC_SPEED_TURN * DT);
 	}
 
 	if (drive != 0)
@@ -267,44 +244,39 @@ void CRC::ExplodeThink()
 
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3.0);
 
-		entvars_t* pevOwner;
-		if (pev->owner)
-			pevOwner = VARS(pev->owner);
-		else
-			pevOwner = NULL;
-
-		pev->owner = NULL; // can't traceline attack owner if this is set
-
 		// Counteract the + 1 in RadiusDamage.
 		Vector origin = pev->origin;
 		origin.z -= 1;
-
-		RadiusDamage(origin, pev, pevOwner, pev->dmg, 256, CLASS_NONE, DMG_BLAST);
+		
+		pev->owner = NULL; // can't traceline attack owner if this is set
+		RadiusDamage(origin, pev, m_pController ? m_pController->pev : NULL, pev->dmg, CLASS_NONE, DMG_BLAST);
 	}
-
-	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
-		WRITE_BYTE(TE_BREAKMODEL);
-		// position
-		WRITE_COORD(pev->origin.x);
-		WRITE_COORD(pev->origin.y);
-		WRITE_COORD(pev->origin.z);
-		// size
-		WRITE_COORD(8);
-		WRITE_COORD(8);
-		WRITE_COORD(8);
-		// velocity
-		WRITE_COORD(pev->velocity.x);
-		WRITE_COORD(pev->velocity.y);
-		WRITE_COORD(pev->velocity.z);
-		WRITE_BYTE(50); // randomization
-		// Model
-		WRITE_SHORT(m_idShard); // model id#
-		// # of shards
-		WRITE_BYTE(pev->dmg / 10); // let client decide
-		// duration
-		WRITE_BYTE(30); // 3.0 seconds
-		WRITE_BYTE(BREAK_SMOKE); // flags
-	MESSAGE_END();
+	else // don't do both (optimization)
+	{
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_BREAKMODEL);
+			// position
+			WRITE_COORD(pev->origin.x);
+			WRITE_COORD(pev->origin.y);
+			WRITE_COORD(pev->origin.z);
+			// size
+			WRITE_COORD(8);
+			WRITE_COORD(8);
+			WRITE_COORD(8);
+			// velocity
+			WRITE_COORD(pev->velocity.x);
+			WRITE_COORD(pev->velocity.y);
+			WRITE_COORD(pev->velocity.z);
+			WRITE_BYTE(50); // randomization
+			// Model
+			WRITE_SHORT(m_idShard); // model id#
+			// # of shards
+			WRITE_BYTE(pev->dmg / 10); // let client decide
+			// duration
+			WRITE_BYTE(30); // 3.0 seconds
+			WRITE_BYTE(BREAK_SMOKE); // flags
+		MESSAGE_END();
+	}
 
 	if (!m_pController)
 		return;
@@ -355,9 +327,7 @@ bool CRC::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDa
 	pev->health -= flDamage;
 	if (pev->health <= 0)
 	{
-		pev->health = 0;
 		pev->takedamage = DAMAGE_NO;
-		pev->dmgtime = gpGlobals->time;
 
 		ClearBits(pev->flags, FL_MONSTER); // why are they set in the first place???
 

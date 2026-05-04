@@ -14,8 +14,7 @@
 enum
 {
 	RC_EXPLODE = 0, // moving satchel charge
-	RC_GUN,			// shoots straight
-	RC_TURRET,		// shoots automatically
+	RC_GUN,			// shoots (almost) straight
 };
 
 // OVERLOADS SOME ENTVARS:
