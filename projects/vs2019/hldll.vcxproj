@@ -224,6 +224,8 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\dlls\player.cpp" />
     <ClCompile Include="..\..\dlls\python.cpp" />
     <ClCompile Include="..\..\dlls\rat.cpp" />
+    <ClCompile Include="..\..\dlls\RC.cpp" />
+    <ClCompile Include="..\..\dlls\RC_weapon.cpp" />
     <ClCompile Include="..\..\dlls\roach.cpp" />
     <ClCompile Include="..\..\dlls\rope\CElectrifiedWire.cpp" />
     <ClCompile Include="..\..\dlls\rope\CRope.cpp" />
@@ -359,6 +361,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClInclude Include="..\..\dlls\nodes.h" />
     <ClInclude Include="..\..\dlls\plane.h" />
     <ClInclude Include="..\..\dlls\player.h" />
+    <ClInclude Include="..\..\dlls\RC.h" />
     <ClInclude Include="..\..\dlls\rope\CElectrifiedWire.h" />
     <ClInclude Include="..\..\dlls\rope\CRope.h" />
     <ClInclude Include="..\..\dlls\rope\CRopeSample.h" />

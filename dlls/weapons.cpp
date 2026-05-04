@@ -291,6 +291,7 @@ void W_Precache()
 	UTIL_PrecacheOther("item_antidote");
 	UTIL_PrecacheOther("item_security");
 	UTIL_PrecacheOther("item_longjump");
+	UTIL_PrecacheOther("item_longjump");
 
 	// shotgun
 	UTIL_PrecacheOtherWeapon("weapon_shotgun");
@@ -362,6 +363,8 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_762");
 
 	UTIL_PrecacheOtherWeapon("weapon_knife");
+
+	UTIL_PrecacheOtherWeapon("weapon_rc");
 
 	PRECACHE_SOUND("weapons/spore_hit1.wav");
 	PRECACHE_SOUND("weapons/spore_hit2.wav");

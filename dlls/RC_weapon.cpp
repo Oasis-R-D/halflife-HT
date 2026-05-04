@@ -22,8 +22,6 @@ void CRCWeapon::Spawn()
 
 	m_iDefaultAmmo = 1; // to-do: constant
 
-	m_flNextGrenadeLoad = gpGlobals->time;
-
 	FallInit(); // get ready to fall down.
 }
 
@@ -41,7 +39,7 @@ void CRCWeapon::Precache()
 bool CRCWeapon::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "RCs";
+	p->pszAmmo1 = "rcs";
 	p->iMaxAmmo1 = 3; // TO-DO: constant
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
@@ -53,20 +51,6 @@ bool CRCWeapon::GetItemInfo(ItemInfo* p)
 	p->iFlags = ITEM_FLAG_LIMITINWORLD | ITEM_FLAG_EXHAUSTIBLE;
 
 	return true;
-}
-
-void CRCWeapon::IncrementAmmo(CBasePlayer* pPlayer)
-{
-	if (pPlayer->GiveAmmo(1, "9mm", _9MM_MAX_CARRY) >= 0)
-	{
-		EMIT_SOUND(pPlayer->edict(), CHAN_STATIC, "ctf/pow_backpack.wav", 0.5, ATTN_NORM);
-	}
-
-	if (m_flNextGrenadeLoad < gpGlobals->time)
-	{
-		pPlayer->GiveAmmo(1, "ARgrenades", M203_GRENADE_MAX_CARRY);
-		m_flNextGrenadeLoad = gpGlobals->time + 10;
-	}
 }
 
 bool CRCWeapon::Deploy()
@@ -99,6 +83,9 @@ void CRCWeapon::Holster()
 
 void CRCWeapon::PrimaryAttack()
 {
+	if (m_pPlayer->m_pRCcar != NULL) // shouldn't happen
+		return;
+
 	// don't fire underwater
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
@@ -113,47 +100,52 @@ void CRCWeapon::PrimaryAttack()
 		return;
 	}
 
-	m_iClip--;
+	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+	TraceResult tr;
+	Vector trace_origin;
 
-	// player "shoot" animation
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
-	Vector vecDir;
-
-#ifdef CLIENT_DLL
-	if (bIsMultiplayer())
-#else
-	if (g_pGameRules->IsMultiplayer())
-#endif
+	// HACK HACK:  Ugly hacks to handle change in origin based on new physics code for players
+	// Move origin up if crouched and start trace a bit outside of body ( 20 units instead of 16 )
+	trace_origin = m_pPlayer->pev->origin;
+	if ((m_pPlayer->pev->flags & FL_DUCKING) != 0)
 	{
-		// optimized multiplayer. Widened to make it easier to hit a moving player
-		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
+		trace_origin = trace_origin - (VEC_HULL_MIN - VEC_DUCK_HULL_MIN);
 	}
-	else
-	{
-		// single player spread
-		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, VECTOR_CONE_3DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
-	}
+
+	// find place to toss monster
+	UTIL_TraceLine(trace_origin + gpGlobals->v_forward * 20, trace_origin + gpGlobals->v_forward * 64, dont_ignore_monsters, NULL, &tr);
 
 	int flags;
-#if defined(CLIENT_WEAPONS)
+#ifdef CLIENT_WEAPONS
 	flags = UTIL_DefaultPlaybackFlags();
 #else
 	flags = 0;
 #endif
 
-	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
-		// HEV suit - indicate out of ammo condition
-		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);
+	if (tr.fAllSolid == 0 && tr.fStartSolid == 0 && tr.flFraction > 0.25)
+	{
+		// player "shoot" animation
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
-	m_flNextPrimaryAttack = GetNextAttackDelay(0.1);
+#ifndef CLIENT_DLL
 
-	if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1;
+		EHANDLE player; // 2 lines because C++ is mean
+		player = m_pPlayer;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
+		CRC* RC = CRC::RC_Create(100, tr.vecEndPos, Vector(0, pev->angles.y, 0), RC_EXPLODE);
+		RC->Use(m_pPlayer, m_pPlayer, USE_SET, 1); // start controlling
+		RC->pev->velocity = gpGlobals->v_forward * 200 + m_pPlayer->pev->velocity;
+#endif
+
+		m_pPlayer->m_iWeaponVolume = QUIET_GUN_VOLUME;
+
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+
+		m_fJustThrown = true;
+
+		m_flNextPrimaryAttack = GetNextAttackDelay(0.3);
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0;
+	}
 }
 
 
@@ -165,55 +157,40 @@ void CRCWeapon::SecondaryAttack()
 
 void CRCWeapon::WeaponIdle()
 {
-	ResetEmptySound();
-
-	m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
-
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	int iAnim;
-	switch (RANDOM_LONG(0, 1))
+	if (m_fJustThrown)
 	{
-	case 0:
-		iAnim = MP5_LONGIDLE;
-		break;
+		m_fJustThrown = false;
 
-	default:
-	case 1:
-		iAnim = MP5_IDLE1;
-		break;
-	}
-
-	SendWeaponAnim(iAnim);
-
-	m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15); // how long till we do this again.
-}
-
-/*
-class CRCWeaponAmmoClip : public CBasePlayerAmmo
-{
-	void Spawn() override
-	{
-		Precache();
-		SET_MODEL(ENT(pev), "models/w_9mmARclip.mdl");
-		CBasePlayerAmmo::Spawn();
-	}
-	void Precache() override
-	{
-		PRECACHE_MODEL("models/w_9mmARclip.mdl");
-		PRECACHE_SOUND("items/9mmclip1.wav");
-	}
-	bool AddAmmo(CBaseEntity* pOther) override
-	{
-		bool bResult = (pOther->GiveAmmo(AMMO_MP5CLIP_GIVE, "9mm", _9MM_MAX_CARRY) != -1);
-		if (bResult)
+		if (0 == m_pPlayer->m_rgAmmo[PrimaryAmmoIndex()])
 		{
-			EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", 1, ATTN_NORM);
+			RetireWeapon();
+			return;
 		}
-		return bResult;
+
+		SendWeaponAnim(SQUEAK_UP);
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
+		return;
 	}
-};
-LINK_ENTITY_TO_CLASS(ammo_mp5clip, CRCWeaponAmmoClip);
-LINK_ENTITY_TO_CLASS(ammo_9mmAR, CRCWeaponAmmoClip);
-*/
+
+	int iAnim;
+	float flRand = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 0, 1);
+	if (flRand <= 0.75)
+	{
+		iAnim = SQUEAK_IDLE1;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 30.0 / 16 * (2);
+	}
+	else if (flRand <= 0.875)
+	{
+		iAnim = SQUEAK_FIDGETFIT;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 70.0 / 16.0;
+	}
+	else
+	{
+		iAnim = SQUEAK_FIDGETNIP;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 80.0 / 16.0;
+	}
+	SendWeaponAnim(iAnim);
+}

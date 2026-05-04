@@ -86,7 +86,7 @@ CShockRifle g_ShockRifle;
 CSporeLauncher g_SporeLauncher;
 CSniperRifle g_SniperRifle;
 CKnife g_Knife;
-CRC g_RC;
+CRCWeapon g_RC;
 
 /*
 ======================

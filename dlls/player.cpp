@@ -115,6 +115,7 @@ TYPEDESCRIPTION CBasePlayer::m_playerSaveData[] =
 		DEFINE_FIELD(CBasePlayer, m_tbdPrev, FIELD_TIME),
 
 		DEFINE_FIELD(CBasePlayer, m_pTank, FIELD_EHANDLE),
+		DEFINE_FIELD(CBasePlayer, m_pRCcar, FIELD_EHANDLE),
 		DEFINE_FIELD(CBasePlayer, m_hViewEntity, FIELD_EHANDLE),
 		DEFINE_FIELD(CBasePlayer, m_iHideHUD, FIELD_INTEGER),
 		DEFINE_FIELD(CBasePlayer, m_iFOV, FIELD_INTEGER),
@@ -841,6 +842,12 @@ void CBasePlayer::Killed(entvars_t* pevAttacker, int iGib)
 		m_pTank = NULL;
 	}
 
+	if (m_pRCcar != NULL)
+	{
+		m_pRCcar->Use(this, this, USE_OFF, 0);
+		m_pRCcar = NULL;
+	}
+
 	// this client isn't going to be thinking for a while, so reset the sound until they respawn
 	pSound = CSoundEnt::SoundPointerForIndex(CSoundEnt::ClientSoundIndex(edict()));
 	{
@@ -1447,6 +1454,12 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 	{
 		m_pTank->Use(this, this, USE_OFF, 0);
 		m_pTank = NULL;
+	}
+
+	if (m_pRCcar != NULL)
+	{
+		m_pRCcar->Use(this, this, USE_OFF, 0);
+		m_pRCcar = NULL;
 	}
 
 	// clear out the suit message cache so we don't keep chattering
@@ -2766,6 +2779,13 @@ void CBasePlayer::PostThink()
 		{ // they've moved off the platform
 			m_pTank->Use(this, this, USE_OFF, 0);
 			m_pTank = NULL;
+		}
+	}
+	else if (m_pRCcar != NULL)
+	{
+		if (0 == pev->weaponmodel)
+		{
+			m_pRCcar->Use(this, this, USE_SET, 2); // try controlling
 		}
 	}
 
@@ -4213,7 +4233,7 @@ Called every frame by the player PostThink
 void CBasePlayer::ItemPostFrame()
 {
 	// check if the player is using a tank
-	if (m_pTank != NULL)
+	if (m_pTank != NULL || m_pRCcar != NULL)
 		return;
 
 	if (0 == oldweapons.value)
@@ -4231,7 +4251,7 @@ void CBasePlayer::ItemPostFrame()
 	ImpulseCommands();
 
 	// check again if the player is using a tank if they started using it in PlayerUse
-	if (m_pTank != NULL)
+	if (m_pTank != NULL || m_pRCcar != NULL)
 		return;
 
 	if (!m_pActiveItem)

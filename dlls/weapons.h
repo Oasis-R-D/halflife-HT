@@ -1271,7 +1271,7 @@ private:
 	unsigned short m_usSnarkFire;
 };
 
-class CRC : public CBasePlayerWeapon
+class CRCWeapon : public CBasePlayerWeapon
 {
 public:
 	void Spawn() override;
@@ -1294,4 +1294,5 @@ public:
 		return false;
 #endif
 	}
+
 };
