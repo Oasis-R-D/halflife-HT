@@ -36,7 +36,8 @@ public:
 	void StopControl();
 	void DriveThink();
 	
-	void EXPORT ExplodeThink();
+	bool AttackThink();
+	void ExplodeThink();
 
 	int m_Flare;
 
@@ -44,7 +45,7 @@ public:
 	Vector m_direction;
 
 	float m_fAttackDelay;
-	
+
 	int m_idShard;
 
 protected:

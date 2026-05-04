@@ -57,8 +57,9 @@ void CRC::Spawn()
 
 	SetTouch(&CRC::Impact);
 
+	m_fAttackDelay = gpGlobals->time;
+
 	pev->nextthink = gpGlobals->time;
-	
 }
 
 void CRC::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
@@ -107,6 +108,7 @@ bool CRC::StartControl(CBasePlayer* pController)
 
 	return true;
 }
+
 bool CRC::AttackThink()
 {
 	if ((m_pController->m_afButtonPressed & IN_ATTACK2) != 0)
@@ -124,7 +126,7 @@ bool CRC::AttackThink()
 			Vector vecSrc = pev->origin + gpGlobals->v_up * 4 + gpGlobals->v_right * 4;
 
 			Vector vecEnd = vecSrc + gpGlobals->v_forward * 8 + gpGlobals->v_up * 2; // angle up
-			Vector vecAiming = (vecEnd - vecSrc).Normalize;
+			Vector vecAiming = (vecEnd - vecSrc).Normalize();
 
 			m_pController->FireBulletsPlayer(RANDOM_LONG(1, 2), vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pController->pev, m_pController->random_seed);
 			
@@ -144,7 +146,7 @@ bool CRC::AttackThink()
 				Vector vecSrc = pev->origin + gpGlobals->v_up * 4 + gpGlobals->v_right * 4; // TO-DO: make relative to monster dir
 
 				Vector vecEnd = vecSrc + gpGlobals->v_forward * 8 + gpGlobals->v_up * 2; // angle up
-				Vector vecAiming = (vecEnd - vecSrc).Normalize;
+				Vector vecAiming = (vecEnd - vecSrc).Normalize();
 
 				m_pController->FireBulletsPlayer(RANDOM_LONG(1, 2), vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pController->pev, m_pController->random_seed);
 				
@@ -166,7 +168,7 @@ void CRC::DriveThink()
 
 	if (AttackThink()) // true if exploded
 		return;
-	
+
 	int ft = 0, bk = 0, rt = 0, lf = 0, jmp = 0;
 	bool onGround = FBitSet(pev->flags, FL_ONGROUND);
 
