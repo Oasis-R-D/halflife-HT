@@ -14,6 +14,7 @@
 #define RC_SPEED_JUMP 64
 #define RC_ATTACK_DELAY 0.25
 #define RC_JUMP_DELAY 0.25
+
 // controllable RC car
 LINK_ENTITY_TO_CLASS(pl_rc, CRC);
 CRC* CRC::RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, int RCType)
@@ -131,6 +132,8 @@ bool CRC::AttackThink()
 
 			m_pController->FireBulletsPlayer(RANDOM_LONG(1, 2), vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pController->pev, m_pController->random_seed);
 			
+			CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
+
 			m_fAttackDelay = gpGlobals->time + RC_ATTACK_DELAY;
 		}
 	}
@@ -152,6 +155,8 @@ bool CRC::AttackThink()
 
 				m_pController->FireBulletsPlayer(RANDOM_LONG(1, 2), vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pController->pev, m_pController->random_seed);
 				
+				CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
+
 				m_fAttackDelay = gpGlobals->time + RC_ATTACK_DELAY;
 			}
 		}
@@ -168,8 +173,8 @@ void CRC::DriveThink()
 		return;
 	}
 
-	if (AttackThink()) // true if exploded
-		return;
+	if (AttackThink() == true) 
+		return; // was detonated by the player
 
 	int ft = 0, bk = 0, rt = 0, lf = 0, jmp = 0;
 	const bool onGround = FBitSet(pev->flags, FL_ONGROUND);
@@ -229,8 +234,6 @@ void CRC::DriveThink()
 void CRC::ExplodeThink()
 {
 	UTIL_Remove(this);
-	// TODO: explode big if set to explode, otherwise break apart
-
 	if (m_Flare == RC_EXPLODE)
 	{
 		int iContents = UTIL_PointContents(pev->origin);
