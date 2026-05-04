@@ -43,7 +43,9 @@ public:
 	Vector m_SpawnPos;
 	Vector m_direction;
 
-	unsigned int m_BulletDamage;
+	float m_fAttackDelay;
+	
+	int m_idShard;
 
 protected:
 	CBasePlayer* m_pController;

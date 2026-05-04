@@ -11,6 +11,7 @@
 #define DT gpGlobals->frametime
 #define RC_SPEED_DRIVE 100
 #define RC_SPEED_TURN 100
+#define RC_ATTACK_DELAY 0.25
 
 // controllable RC car
 LINK_ENTITY_TO_CLASS(pl_rc, CRC);
@@ -19,7 +20,7 @@ CRC* CRC::RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, in
 	// Create a new entity with CRC private data
 	CRC* pRC = GetClassPtr((CRC*)NULL);
 	pRC->pev->classname = MAKE_STRING("pl_rc");
-	pRC->m_BulletDamage = RCDamage;
+	pRC->pev->dmg = RCDamage;
 	pRC->m_SpawnPos = VecSpawnPos;
 	pRC->m_direction = vecDir;
 	pRC->m_Flare = RCType; // tracer type
@@ -32,7 +33,8 @@ CRC* CRC::RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, in
 
 void CRC::Precache()
 {
-	PRECACHE_SOUND("weapons/hks1.wav");
+	PRECACHE_SOUND("weapons/RC_fire.wav");
+	m_idShard = PRECACHE_MODEL("models/metalplategibs.mdl");
 }
 
 void CRC::Spawn()
@@ -105,6 +107,53 @@ bool CRC::StartControl(CBasePlayer* pController)
 
 	return true;
 }
+bool CRC::AttackThink()
+{
+	if ((m_pController->m_afButtonPressed & IN_ATTACK2) != 0)
+	{
+		ExplodeThink();
+		return true;
+	}
+	else if (m_Flare == RC_GUN)
+	{
+		if ((m_pController->pev->button & IN_ATTACK) != 0 && m_fAttackDelay < gpGlobals->time)
+		{
+			// shoot
+			EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "weapons/RC_fire.wav", 1.0, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 10));
+
+			Vector vecSrc = pev->origin + gpGlobals->v_up * 4 + gpGlobals->v_right * 4;
+
+			Vector vecEnd = vecSrc + gpGlobals->v_forward * 8 + gpGlobals->v_up * 2; // angle up
+			Vector vecAiming = (vecEnd - vecSrc).Normalize;
+
+			m_pController->FireBulletsPlayer(RANDOM_LONG(1, 2), vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pController->pev, m_pController->random_seed);
+			
+			m_fAttackDelay = gpGlobals->time + RC_ATTACK_DELAY;
+		}
+	}
+	else if (m_Flare == RC_TURRET)
+	{
+		if (m_fAttackDelay < gpGlobals->time)
+		{
+			CbaseMonster Enemy;
+			if (Enemy)
+			{
+				// shoot
+				EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "weapons/RC_fire.wav", 1.0, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 10));
+
+				Vector vecSrc = pev->origin + gpGlobals->v_up * 4 + gpGlobals->v_right * 4; // TO-DO: make relative to monster dir
+
+				Vector vecEnd = vecSrc + gpGlobals->v_forward * 8 + gpGlobals->v_up * 2; // angle up
+				Vector vecAiming = (vecEnd - vecSrc).Normalize;
+
+				m_pController->FireBulletsPlayer(RANDOM_LONG(1, 2), vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pController->pev, m_pController->random_seed);
+				
+				m_fAttackDelay = gpGlobals->time + RC_ATTACK_DELAY;
+			}
+		}
+	}
+	return false;
+}
 
 void CRC::DriveThink()
 { // player controls
@@ -115,34 +164,40 @@ void CRC::DriveThink()
 		return;
 	}
 
-	if ((m_pController->m_afButtonPressed & IN_ATTACK2) != 0)
-	{
-		ExplodeThink();
+	if (AttackThink()) // true if exploded
 		return;
-	}
-
-	int ft = 0, bk = 0, rt = 0, lf = 0;
+	
+	int ft = 0, bk = 0, rt = 0, lf = 0, jmp = 0;
+	bool onGround = FBitSet(pev->flags, FL_ONGROUND);
 
 	// can't do both
 	// braking takes higher priority
-	if ((m_pController->pev->button & IN_BACK) != 0)
+	if (onGround)
 	{
-		bk = -1;
-	}
-	
-	if ((m_pController->pev->button & IN_FORWARD) != 0)
-	{
-		ft = 1;
-	}
+		if ((m_pController->pev->button & IN_BACK) != 0)
+		{
+			bk = -1;
+		}
+		
+		if ((m_pController->pev->button & IN_FORWARD) != 0)
+		{
+			ft = 1;
+		}
 
-	if ((m_pController->pev->button & IN_MOVERIGHT) != 0)
-	{
-		rt = 1;
-	}
-	
-	if ((m_pController->pev->button & IN_MOVELEFT) != 0)
-	{
-		lf = -1;
+		if ((m_pController->pev->button & IN_MOVERIGHT) != 0)
+		{
+			rt = 1;
+		}
+		
+		if ((m_pController->pev->button & IN_MOVELEFT) != 0)
+		{
+			lf = -1;
+		}
+
+		if ((m_pController->m_afButtonPressed & IN_JUMP) != 0 && onGround) // TO-DO: check on ground, add delay
+		{
+			jmp = 1;
+		}
 	}
 
 	int turn = lf + rt; // make it into 1 value, -1 if left, 1 if right, 0 if none or both
@@ -158,13 +213,79 @@ void CRC::DriveThink()
 		pev->velocity = pev->velocity + drive * gpGlobals->v_forward * RC_SPEED_DRIVE * DT;
 	}
 
-	ALERT(at_console, "DRIVE: %d, TURN %d\n", drive, turn);
+	if (jmp != 0)
+
+	ALERT(at_console, "DRIVE: %d, TURN %d, JUMP %d\n", drive, turn, jmp);
 }
 
 void CRC::ExplodeThink()
 {
 	UTIL_Remove(this);
 	// TODO: explode big if set to explode, otherwise break apart
+
+	if (m_Flare == RC_EXPLODE)
+	{
+		int iContents = UTIL_PointContents(pev->origin);
+
+		// VFX
+		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_EXPLOSION);	// This makes a dynamic light and the explosion sprites/sound
+			WRITE_COORD(pev->origin.x); // Send to PAS because of the sound
+			WRITE_COORD(pev->origin.y);
+			WRITE_COORD(pev->origin.z);
+			if (iContents != CONTENTS_WATER)
+			{
+				WRITE_SHORT(g_sModelIndexFireball);
+			}
+			else
+			{
+				WRITE_SHORT(g_sModelIndexWExplosion);
+			}
+			WRITE_BYTE((pev->dmg - 50) * .60); // scale * 10
+			WRITE_BYTE(15);					   // framerate
+			WRITE_BYTE(TE_EXPLFLAG_NONE);
+		MESSAGE_END();
+
+		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3.0);
+
+		entvars_t* pevOwner;
+		if (pev->owner)
+			pevOwner = VARS(pev->owner);
+		else
+			pevOwner = NULL;
+
+		pev->owner = NULL; // can't traceline attack owner if this is set
+
+		// Counteract the + 1 in RadiusDamage.
+		Vector origin = pev->origin;
+		origin.z -= 1;
+
+		RadiusDamage(origin, pev, pevOwner, pev->dmg, CLASS_NONE, bitsDamageType);
+	}
+
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_BREAKMODEL);
+		// position
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		// size
+		WRITE_COORD(8);
+		WRITE_COORD(8);
+		WRITE_COORD(8);
+		// velocity
+		WRITE_COORD(pev->velocity.x);
+		WRITE_COORD(pev->velocity.y);
+		WRITE_COORD(pev->velocity.z);
+		WRITE_BYTE(50); // randomization
+		// Model
+		WRITE_SHORT(m_idShard); // model id#
+		// # of shards
+		WRITE_BYTE(pev->dmg / 10); // let client decide
+		// duration
+		WRITE_BYTE(30); // 3.0 seconds
+		WRITE_BYTE(BREAK_SMOKE); // flags
+	MESSAGE_END();
 
 	if (!m_pController)
 		return;
