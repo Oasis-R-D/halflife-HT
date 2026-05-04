@@ -137,7 +137,8 @@ bool CRC::AttackThink()
 	{
 		if (m_fAttackDelay < gpGlobals->time)
 		{
-			CbaseMonster Enemy;
+			CBaseMonster* Enemy;
+			Enemy = nullptr; // temp fix, add enemy acquiring code later
 			if (Enemy)
 			{
 				// shoot
@@ -262,7 +263,7 @@ void CRC::ExplodeThink()
 		Vector origin = pev->origin;
 		origin.z -= 1;
 
-		RadiusDamage(origin, pev, pevOwner, pev->dmg, CLASS_NONE, bitsDamageType);
+		RadiusDamage(origin, pev, pevOwner, pev->dmg, CLASS_NONE, DMG_BLAST);
 	}
 
 	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
