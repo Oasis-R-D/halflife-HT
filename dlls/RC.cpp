@@ -13,7 +13,7 @@
 #define RC_SPEED_TURN 800
 #define RC_SPEED_JUMP 192
 
-#define RC_ATTACK_DELAY 0.15
+#define RC_ATTACK_DELAY 0.1
 #define RC_JUMP_DELAY 0.25
 
 #define RC_TURN_FRICTION 0.75
@@ -152,8 +152,10 @@ bool CRC::AttackThink()
 			UTIL_MakeVectors(pev->angles); // has to be called or else it follows mouse (which the camera doesn't)
 
 			Vector vecSrc = pev->origin + gpGlobals->v_up * 4 + gpGlobals->v_right * 4;
+			Vector vecEnd = vecSrc + gpGlobals->v_forward * 32 + gpGlobals->v_up * 2; // angle up
+			Vector vecAiming = (vecEnd - vecSrc).Normalize();
 
-			FireBullets(RANDOM_LONG(1, 2), vecSrc, gpGlobals->v_forward, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 1, 0, pev);
+			FireBullets(RANDOM_LONG(1, 2), vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 1, 0, pev);
 			
 			CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
 
@@ -283,14 +285,23 @@ void CRC::ExplodeThink()
 			WRITE_BYTE(TE_EXPLFLAG_NONE);
 		MESSAGE_END();
 
-		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3.0);
+		switch (RANDOM_LONG(0, 2))
+		{
+		case 0:
+			EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris1.wav", 0.55, ATTN_NORM);
+			break;
+		case 1:
+			EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris2.wav", 0.55, ATTN_NORM);
+			break;
+		case 2:
+			EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris3.wav", 0.55, ATTN_NORM);
+			break;
+		}
 
-		// Counteract the + 1 in RadiusDamage.
-		Vector origin = pev->origin;
-		origin.z -= 1;
+		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3.0);
 		
 		pev->owner = NULL; // can't traceline attack owner if this is set
-		RadiusDamage(origin, pev, m_pController ? m_pController->pev : NULL, pev->dmg, CLASS_NONE, DMG_BLAST);
+		RadiusDamage(pev->origin, pev, m_pController ? m_pController->pev : NULL, pev->dmg, CLASS_NONE, DMG_BLAST);
 	}
 	else // don't do both (optimization)
 	{
@@ -299,7 +310,7 @@ void CRC::ExplodeThink()
 			// position
 			WRITE_COORD(pev->origin.x);
 			WRITE_COORD(pev->origin.y);
-			WRITE_COORD(pev->origin.z);
+			WRITE_COORD(pev->origin.z+1);
 			// size
 			WRITE_COORD(8);
 			WRITE_COORD(8);
@@ -308,11 +319,11 @@ void CRC::ExplodeThink()
 			WRITE_COORD(pev->velocity.x);
 			WRITE_COORD(pev->velocity.y);
 			WRITE_COORD(pev->velocity.z);
-			WRITE_BYTE(50); // randomization
+			WRITE_BYTE(25); // randomization
 			// Model
 			WRITE_SHORT(m_idShard); // model id#
 			// # of shards
-			WRITE_BYTE(pev->dmg / 10); // let client decide
+			WRITE_BYTE(5);
 			// duration
 			WRITE_BYTE(30); // 3.0 seconds
 			WRITE_BYTE(BREAK_SMOKE); // flags

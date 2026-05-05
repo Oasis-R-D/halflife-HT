@@ -15,6 +15,15 @@
 
 #pragma once
 
+enum TFCRifleAnim
+{
+	TFCRIFLE_IDLE = 0,
+	TFCRIFLE_AIM,
+	TFCRIFLE_FIRE,
+	TFCRIFLE_DRAW,
+	TFCRIFLE_HOLSTER,
+};
+
 enum SniperRifleAnim
 {
 	SNIPERRIFLE_DRAW = 0,

@@ -1132,7 +1132,7 @@ void CBasePlayer::TabulateAmmo()
 	ammo_uranium = AmmoInventory(GetAmmoIndex("uranium"));
 	ammo_hornets = AmmoInventory(GetAmmoIndex("Hornets"));
 	ammo_spores = AmmoInventory(GetAmmoIndex("spores"));
-	ammo_762 = AmmoInventory(GetAmmoIndex("762"));
+	ammo_223 = AmmoInventory(GetAmmoIndex("223"));
 }
 
 
@@ -3896,7 +3896,7 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 		GiveNamedItem("weapon_rc");
 
 		//TODO: not given
-		//GiveNamedItem( "ammo_762" );
+		//GiveNamedItem( "ammo_223" );
 
 		gEvilImpulse101 = false;
 		break;

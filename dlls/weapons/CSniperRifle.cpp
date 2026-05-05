@@ -43,7 +43,7 @@ void CSniperRifle::Precache()
 	m_iId = WEAPON_SNIPERRIFLE;
 
 	PRECACHE_MODEL("models/w_m40a1.mdl");
-	PRECACHE_MODEL("models/v_m40a1.mdl");
+	PRECACHE_MODEL("models/v_sniper.mdl");
 	PRECACHE_MODEL("models/p_m40a1.mdl");
 
 	PRECACHE_SOUND("weapons/sniper_fire.wav");
@@ -70,7 +70,7 @@ void CSniperRifle::Spawn()
 
 bool CSniperRifle::Deploy()
 {
-	return BaseClass::DefaultDeploy("models/v_m40a1.mdl", "models/p_m40a1.mdl", SNIPERRIFLE_DRAW, "bow");
+	return BaseClass::DefaultDeploy("models/v_sniper.mdl", "models/p_m40a1.mdl", TFCRIFLE_DRAW, "bow");
 }
 
 void CSniperRifle::Holster()
@@ -84,7 +84,7 @@ void CSniperRifle::Holster()
 
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.25;
 
-	SendWeaponAnim(SNIPERRIFLE_HOLSTER);
+	SendWeaponAnim(TFCRIFLE_HOLSTER);
 }
 
 void CSniperRifle::WeaponIdle()
@@ -94,20 +94,18 @@ void CSniperRifle::WeaponIdle()
 
 	ResetEmptySound();
 
+	/*
 	if (m_bReloading && gpGlobals->time >= m_flReloadStart + 2.324)
 	{
 		SendWeaponAnim(SNIPERRIFLE_RELOAD2);
 		m_bReloading = false;
 	}
+	*/
 
 	if (m_flTimeWeaponIdle < UTIL_WeaponTimeBase())
 	{
-		if (0 != m_iClip)
-			SendWeaponAnim(SNIPERRIFLE_SLOWIDLE);
-		else
-			SendWeaponAnim(SNIPERRIFLE_SLOWIDLE2);
-
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.348;
+		SendWeaponAnim(TFCRIFLE_IDLE);
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.10;
 	}
 }
 
@@ -126,7 +124,7 @@ void CSniperRifle::PrimaryAttack()
 		return;
 	}
 
-	m_pPlayer->m_iWeaponVolume = QUIET_GUN_VOLUME;
+	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 
 	--m_iClip;
 
@@ -142,7 +140,7 @@ void CSniperRifle::PrimaryAttack()
 	//TODO: 8192 constant should be defined somewhere - Solokiller
 	Vector vecShot = m_pPlayer->FireBulletsPlayer(1,
 		vecSrc, vecAiming, g_vecZero,
-		8192, BULLET_PLAYER_762, 0, 0,
+		8192, BULLET_PLAYER_223, 0, 0,
 		m_pPlayer->pev, m_pPlayer->random_seed);
 
 	PLAYBACK_EVENT_FULL(UTIL_DefaultPlaybackFlags(),
@@ -152,8 +150,8 @@ void CSniperRifle::PrimaryAttack()
 		m_iClip, m_pPlayer->m_rgAmmo[PrimaryAmmoIndex()],
 		0, 0);
 
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2.0f;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0f;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
 }
 
 void CSniperRifle::SecondaryAttack()
@@ -170,22 +168,35 @@ void CSniperRifle::SecondaryAttack()
 
 void CSniperRifle::Reload()
 {
-	if (m_pPlayer->ammo_762 > 0)
+	if (m_pPlayer->ammo_223 > 0)
 	{
 		if (m_pPlayer->m_iFOV != 0)
 		{
 			ToggleZoom();
 		}
-
+		/*
 		if (0 != m_iClip)
-		{
+		{ // tac reload
 			if (DefaultReload(SNIPERRIFLE_MAX_CLIP, SNIPERRIFLE_RELOAD3, 2.324))
 			{
 				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2.324;
 			}
 		}
 		else if (DefaultReload(SNIPERRIFLE_MAX_CLIP, SNIPERRIFLE_RELOAD1, 2.324))
+		{ // empty reload
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 4.102;
+			m_flReloadStart = gpGlobals->time;
+			m_bReloading = true;
+		}
+		else
 		{
+			m_bReloading = false;
+		}
+		*/
+
+		// PLACEHOLDER SINCE TFC HAS NO RELOADS
+		if (DefaultReload(SNIPERRIFLE_MAX_CLIP, TFCRIFLE_DRAW, 2))
+		{ // empty reload
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 4.102;
 			m_flReloadStart = gpGlobals->time;
 			m_bReloading = true;
@@ -206,7 +217,7 @@ int CSniperRifle::iItemSlot()
 
 bool CSniperRifle::GetItemInfo(ItemInfo* p)
 {
-	p->pszAmmo1 = "762";
+	p->pszAmmo1 = "223";
 	p->iMaxAmmo1 = SNIPERRIFLE_MAX_CARRY;
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo2 = 0;
@@ -222,7 +233,7 @@ bool CSniperRifle::GetItemInfo(ItemInfo* p)
 
 void CSniperRifle::IncrementAmmo(CBasePlayer* pPlayer)
 {
-	if (pPlayer->GiveAmmo(1, "762", SNIPERRIFLE_MAX_CARRY) >= 0)
+	if (pPlayer->GiveAmmo(1, "223", SNIPERRIFLE_MAX_CARRY) >= 0)
 	{
 		EMIT_SOUND(pPlayer->edict(), CHAN_STATIC, "ctf/pow_backpack.wav", 0.5, ATTN_NORM);
 	}
@@ -260,7 +271,7 @@ public:
 
 	bool AddAmmo(CBaseEntity* pOther) override
 	{
-		if (pOther->GiveAmmo(AMMO_SNIPERRIFLE_GIVE, "762", SNIPERRIFLE_MAX_CARRY) != -1)
+		if (pOther->GiveAmmo(AMMO_SNIPERRIFLE_GIVE, "223", SNIPERRIFLE_MAX_CARRY) != -1)
 		{
 			EMIT_SOUND(edict(), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
 
@@ -271,4 +282,4 @@ public:
 	}
 };
 
-LINK_ENTITY_TO_CLASS(ammo_762, CSniperRifleAmmo);
+LINK_ENTITY_TO_CLASS(ammo_223, CSniperRifleAmmo);

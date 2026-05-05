@@ -316,7 +316,7 @@ void EV_HLDM_DecalGunshot(pmtrace_t* pTrace, int iBulletType)
 		case BULLET_PLAYER_BUCKSHOT:
 		case BULLET_PLAYER_357:
 		case BULLET_PLAYER_556:
-		case BULLET_PLAYER_762:
+		case BULLET_PLAYER_223:
 		case BULLET_PLAYER_EAGLE:
 		default:
 			// smoke and decal
@@ -357,7 +357,7 @@ void EV_HLDM_CheckTracer(int idx, float* vecSrc, float* end, float* forward, flo
 		case BULLET_MONSTER_9MM:
 		case BULLET_MONSTER_12MM:
 		case BULLET_PLAYER_556:
-		case BULLET_PLAYER_762:
+		case BULLET_PLAYER_223:
 		case BULLET_PLAYER_EAGLE:
 		default:
 			EV_CreateTracer(vecTracerSrc, end);
@@ -467,7 +467,7 @@ void EV_HLDM_FireBullets(int idx, float* forward, float* right, float* up, int c
 				EV_HLDM_DecalGunshot(&tr, iBulletType);
 				break;
 
-			case BULLET_PLAYER_762:
+			case BULLET_PLAYER_223:
 				EV_HLDM_PlayTextureSound(idx, &tr, vecSrc, vecEnd, iBulletType);
 				EV_HLDM_DecalGunshot(&tr, iBulletType);
 				break;
@@ -1906,7 +1906,8 @@ void EV_SniperRifle(event_args_t* args)
 	if (EV_IsLocal(idx))
 	{
 		EV_MuzzleFlash();
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(iClip <= 0 ? SNIPERRIFLE_FIRELASTROUND : SNIPERRIFLE_FIRE, 0);
+		//gEngfuncs.pEventAPI->EV_WeaponAnimation(iClip <= 0 ? SNIPERRIFLE_FIRELASTROUND : SNIPERRIFLE_FIRE, 0);
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(TFCRIFLE_FIRE, 0);
 		V_PunchAxis(0, -2.0);
 	}
 
@@ -1928,7 +1929,7 @@ void EV_SniperRifle(event_args_t* args)
 		vecSrc,
 		vecAiming,
 		8192.0,
-		BULLET_PLAYER_762,
+		BULLET_PLAYER_223,
 		0,
 		0,
 		args->fparam1,

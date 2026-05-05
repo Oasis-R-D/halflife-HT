@@ -360,7 +360,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_shockrifle");
 
 	UTIL_PrecacheOtherWeapon("weapon_sniperrifle");
-	UTIL_PrecacheOther("ammo_762");
+	UTIL_PrecacheOther("ammo_223");
 
 	UTIL_PrecacheOtherWeapon("weapon_knife");
 

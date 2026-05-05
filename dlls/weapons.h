@@ -114,7 +114,7 @@ public:
 #define M203_GRENADE_MAX_CARRY 10
 #define M249_MAX_CARRY 200
 #define SPORELAUNCHER_MAX_CARRY 20
-#define SNIPERRIFLE_MAX_CARRY 15
+#define SNIPERRIFLE_MAX_CARRY 20
 
 // the maximum amount of ammo each weapon's clip can hold
 #define WEAPON_NOCLIP -1
@@ -138,7 +138,7 @@ public:
 #define M249_MAX_CLIP 50
 #define SPORELAUNCHER_MAX_CLIP 5
 #define SHOCKRIFLE_MAX_CLIP 10
-#define SNIPERRIFLE_MAX_CLIP 5
+#define SNIPERRIFLE_MAX_CLIP 10
 
 // the default amount of ammo that comes with each gun when it spawns
 #define GLOCK_DEFAULT_GIVE 17
@@ -161,7 +161,7 @@ public:
 #define DISPLACER_DEFAULT_GIVE 40
 #define SPORELAUNCHER_DEFAULT_GIVE 5
 #define SHOCKRIFLE_DEFAULT_GIVE 10
-#define SNIPERRIFLE_DEFAULT_GIVE 5
+#define SNIPERRIFLE_DEFAULT_GIVE 10
 
 // The amount of ammo given to a player by an ammo item.
 #define AMMO_URANIUMBOX_GIVE 20
@@ -195,7 +195,7 @@ typedef enum
 	BULLET_MONSTER_12MM,
 
 	BULLET_PLAYER_556,
-	BULLET_PLAYER_762,
+	BULLET_PLAYER_223,
 	BULLET_PLAYER_EAGLE,
 } Bullet;
 
