@@ -22,6 +22,19 @@
 #define RC_MAX_TURNSPEED 256
 #define RC_MAX_DRIVESPEED 256
 
+LINK_ENTITY_TO_CLASS(pl_rc_cam, CRCcamera);
+class CRCcamera : public CBaseEntity
+{
+public:
+	void Spawn() override
+	{
+		Precache();
+		pev->movetype = MOVETYPE_NONE;
+		pev->solid = SOLID_NOT;
+		UTIL_SetOrigin(pev, pev->origin);
+	}
+}
+
 // controllable RC car
 LINK_ENTITY_TO_CLASS(pl_rc, CRC);
 CRC* CRC::RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, int RCType)
@@ -57,6 +70,13 @@ int CRC::Classify()
 
 void CRC::Spawn()
 {
+	// spawn the camera
+	CRCcamera* pRCcam = GetClassPtr((CRCcamera*)NULL);
+	pRCcam->pev->classname = MAKE_STRING("pl_rc_cam");
+	pRCcam->pev->angles = m_direction
+	pRCcam->Spawn();
+	m_pCamera = pRCcam;
+
 	Precache();
 
 	pev->movetype = MOVETYPE_STEP;
@@ -126,8 +146,8 @@ bool CRC::StartControl(CBasePlayer* pController)
 
 	m_pController->pev->maxspeed = 0.00001;
 
-	SET_VIEW(m_pController->edict(), edict());
-	m_pController->m_hViewEntity = this;
+	SET_VIEW(m_pController->edict(), m_pCamera->edict());
+	m_pController->m_hViewEntity = m_pCamera;
 
 	return true;
 }
@@ -187,6 +207,12 @@ void CRC::DriveThink()
 	if (AttackThink() == true) 
 		return; // was detonated by the player or water
 	
+	if (!m_pCamera)
+	{
+		ALERT(at_console, "no camera!\n");
+		return;
+	}
+
 	const bool onGround = FBitSet(pev->flags, FL_ONGROUND);
 	
 	// input handling
@@ -254,6 +280,9 @@ void CRC::DriveThink()
 	{
 		pev->velocity.z += RC_SPEED_JUMP;
 	}
+
+	m_pCamera->pev->origin = pev->origin + Vector(0, 0, 4);
+	m_pCamera->pev->angles = pev->angles;
 
 	// report status
 	ALERT(at_console, "DRIVE: %d, TURN %d, JUMP %d, DT %f\n", drive, turn, jmp, DT);

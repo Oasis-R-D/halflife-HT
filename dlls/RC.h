@@ -57,4 +57,5 @@ public:
 
 protected:
 	CBasePlayer* m_pController;
+	EHANDLE m_pCamera;
 };
