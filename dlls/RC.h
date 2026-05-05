@@ -21,7 +21,7 @@ class CRCcamera : public CBaseEntity
 {
 public:
 	void Spawn() override;
-}
+};
 
 class CRC : public CBaseMonster
 {

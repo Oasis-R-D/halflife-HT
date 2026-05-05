@@ -25,11 +25,11 @@
 LINK_ENTITY_TO_CLASS(pl_rc_cam, CRCcamera);
 void CRCcamera::Spawn()
 {
-		Precache();
-		pev->classname = MAKE_STRING("pl_rc_cam");
-		pev->movetype = MOVETYPE_NONE;
-		pev->solid = SOLID_NOT;
-		UTIL_SetOrigin(pev, pev->origin);
+	Precache();
+	pev->classname = MAKE_STRING("pl_rc_cam");
+	pev->movetype = MOVETYPE_NONE;
+	pev->solid = SOLID_NOT;
+	UTIL_SetOrigin(pev, pev->origin);
 }
 
 // controllable RC car
