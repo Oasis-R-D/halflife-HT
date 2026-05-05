@@ -169,6 +169,7 @@ HLDLL_OBJS = \
 	$(HLDLL_OBJ_DIR)/shockroach.o \
 	$(HLDLL_OBJ_DIR)/shocktrooper.o \
 	$(HLDLL_OBJ_DIR)/shotgun.o \
+	$(HLDLL_OBJ_DIR)/shotgun_single.o \
 	$(HLDLL_OBJ_DIR)/skeleton.o \
 	$(HLDLL_OBJ_DIR)/skill.o \
 	$(HLDLL_OBJ_DIR)/sound.o \

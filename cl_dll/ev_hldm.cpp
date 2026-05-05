@@ -583,7 +583,7 @@ void EV_FireGlock2(event_args_t* args)
 //======================
 //	  SHOTGUN START
 //======================
-void EV_FireShotGunDouble(event_args_t* args)
+void EV_FireShotGunDouble(event_args_t* args) // SPAS-12
 {
 	int idx;
 	Vector origin;
@@ -633,7 +633,7 @@ void EV_FireShotGunDouble(event_args_t* args)
 	}
 }
 
-void EV_FireShotGunSingle(event_args_t* args)
+void EV_FireShotGunSingle(event_args_t* args) // MOSSBERG
 {
 	int idx;
 	Vector origin;

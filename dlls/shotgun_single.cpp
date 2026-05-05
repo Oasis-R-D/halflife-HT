@@ -24,14 +24,13 @@
 
 // special deathmatch shotgun spreads
 #define VECTOR_CONE_DM_SHOTGUN Vector(0.08716, 0.04362, 0.00)		// 10 degrees by 5 degrees
-#define VECTOR_CONE_DM_DOUBLESHOTGUN Vector(0.17365, 0.04362, 0.00) // 20 degrees by 5 degrees
 
 LINK_ENTITY_TO_CLASS(weapon_shotgun, CShotgunSingle);
 
 void CShotgunSingle::Spawn()
 {
 	Precache();
-	m_iId = WEAPON_SHOTGUN;
+	m_iId = WEAPON_SHOTGUN_SINGLE;
 	SET_MODEL(ENT(pev), "models/w_shotgun.mdl");
 
 	m_iDefaultAmmo = SHOTGUN_DEFAULT_GIVE;
@@ -63,7 +62,6 @@ void CShotgunSingle::Precache()
 	PRECACHE_SOUND("weapons/scock1.wav");	 // cock gun
 
 	m_usSingleFire = PRECACHE_EVENT(1, "events/shotgun1.sc");
-	m_usDoubleFire = PRECACHE_EVENT(1, "events/shotgun2.sc");
 }
 
 bool CShotgunSingle::GetItemInfo(ItemInfo* p)
@@ -77,7 +75,7 @@ bool CShotgunSingle::GetItemInfo(ItemInfo* p)
 	p->iSlot = 2;
 	p->iPosition = 1;
 	p->iFlags = 0;
-	p->iId = m_iId = WEAPON_SHOTGUN;
+	p->iId = m_iId = WEAPON_SHOTGUN_SINGLE;
 	p->iWeight = SHOTGUN_WEIGHT;
 
 	return true;
@@ -114,7 +112,7 @@ void CShotgunSingle::PrimaryAttack()
 		return;
 	}
 
-	m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
+	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
 	m_iClip--;

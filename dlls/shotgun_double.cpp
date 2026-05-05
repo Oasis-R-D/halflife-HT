@@ -13,6 +13,8 @@
 *
 ****/
 
+// TO-DO: rename CPP to shotgun_double.cpp
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -26,12 +28,12 @@
 #define VECTOR_CONE_DM_SHOTGUN Vector(0.08716, 0.04362, 0.00)		// 10 degrees by 5 degrees
 #define VECTOR_CONE_DM_DOUBLESHOTGUN Vector(0.17365, 0.04362, 0.00) // 20 degrees by 5 degrees
 
-LINK_ENTITY_TO_CLASS(weapon_shotgun, CShotgun);
+LINK_ENTITY_TO_CLASS(weapon_shotgun, CShotgunDouble);
 
-void CShotgun::Spawn()
+void CShotgunDouble::Spawn()
 {
 	Precache();
-	m_iId = WEAPON_SHOTGUN;
+	m_iId = WEAPON_SHOTGUN_DOUBLE;
 	SET_MODEL(ENT(pev), "models/w_shotgun.mdl");
 
 	m_iDefaultAmmo = SHOTGUN_DEFAULT_GIVE;
@@ -40,7 +42,7 @@ void CShotgun::Spawn()
 }
 
 
-void CShotgun::Precache()
+void CShotgunDouble::Precache()
 {
 	PRECACHE_MODEL("models/v_shotgun.mdl");
 	PRECACHE_MODEL("models/w_shotgun.mdl");
@@ -62,11 +64,10 @@ void CShotgun::Precache()
 	PRECACHE_SOUND("weapons/357_cock1.wav"); // gun empty sound
 	PRECACHE_SOUND("weapons/scock1.wav");	 // cock gun
 
-	m_usSingleFire = PRECACHE_EVENT(1, "events/shotgun1.sc");
 	m_usDoubleFire = PRECACHE_EVENT(1, "events/shotgun2.sc");
 }
 
-bool CShotgun::GetItemInfo(ItemInfo* p)
+bool CShotgunDouble::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "buckshot";
@@ -77,13 +78,13 @@ bool CShotgun::GetItemInfo(ItemInfo* p)
 	p->iSlot = 2;
 	p->iPosition = 1;
 	p->iFlags = 0;
-	p->iId = m_iId = WEAPON_SHOTGUN;
+	p->iId = m_iId = WEAPON_SHOTGUN_DOUBLE;
 	p->iWeight = SHOTGUN_WEIGHT;
 
 	return true;
 }
 
-void CShotgun::IncrementAmmo(CBasePlayer* pPlayer)
+void CShotgunDouble::IncrementAmmo(CBasePlayer* pPlayer)
 {
 	if (pPlayer->GiveAmmo(1, "buckshot", BUCKSHOT_MAX_CARRY) >= 0)
 	{
@@ -91,12 +92,12 @@ void CShotgun::IncrementAmmo(CBasePlayer* pPlayer)
 	}
 }
 
-bool CShotgun::Deploy()
+bool CShotgunDouble::Deploy()
 {
 	return DefaultDeploy("models/v_shotgun.mdl", "models/p_shotgun.mdl", SHOTGUN_DRAW, "shotgun");
 }
 
-void CShotgun::PrimaryAttack()
+void CShotgunDouble::PrimaryAttack()
 {
 	// don't fire underwater
 	if (m_pPlayer->pev->waterlevel == 3)
@@ -179,7 +180,7 @@ void CShotgun::PrimaryAttack()
 }
 
 /*
-void CShotgun::SecondaryAttack()
+void CShotgunDouble::SecondaryAttack()
 {
 	// don't fire underwater
 	if (m_pPlayer->pev->waterlevel == 3)
@@ -254,7 +255,7 @@ void CShotgun::SecondaryAttack()
 }
 */
 
-void CShotgun::Reload()
+void CShotgunDouble::Reload()
 {
 	int maxClip = SHOTGUN_MAX_CLIP;
 
@@ -308,7 +309,7 @@ void CShotgun::Reload()
 }
 
 
-void CShotgun::WeaponIdle()
+void CShotgunDouble::WeaponIdle()
 {
 	ResetEmptySound();
 
@@ -378,7 +379,7 @@ void CShotgun::WeaponIdle()
 	}
 }
 
-void CShotgun::ItemPostFrame()
+void CShotgunDouble::ItemPostFrame()
 {
 	if (pev->armortype == 1 && m_flNextPrimaryAttack < gpGlobals->time)
 	{
@@ -396,7 +397,7 @@ void CShotgun::ItemPostFrame()
 }
 
 
-class CShotgunAmmo : public CBasePlayerAmmo
+class CShotgunDoubleAmmo : public CBasePlayerAmmo
 {
 	void Spawn() override
 	{
@@ -419,4 +420,4 @@ class CShotgunAmmo : public CBasePlayerAmmo
 		return false;
 	}
 };
-LINK_ENTITY_TO_CLASS(ammo_buckshot, CShotgunAmmo);
+LINK_ENTITY_TO_CLASS(ammo_buckshot, CShotgunDoubleAmmo);

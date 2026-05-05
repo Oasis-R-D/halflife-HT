@@ -294,7 +294,10 @@
     <ClCompile Include="..\..\dlls\scripted.cpp">
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dlls\shotgun.cpp">
+    <ClCompile Include="..\..\dlls\shotgun_double.cpp">
+      <Filter>Source Files\dlls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\shotgun_single.cpp">
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dlls\singleplay_gamerules.cpp">

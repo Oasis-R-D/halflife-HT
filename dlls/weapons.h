@@ -750,7 +750,7 @@ enum shotgun_e
 	SHOTGUN_IDLE_DEEP
 };
 
-class CShotgun : public CBasePlayerWeapon
+class CShotgunSingle : public CBasePlayerWeapon
 {
 public:
 #ifndef CLIENT_DLL
@@ -771,7 +771,44 @@ public:
 	void Reload() override;
 	void WeaponIdle() override;
 	void ItemPostFrame() override;
-	int m_fInReload; //TODO: not used, remove
+	float m_flNextReload;
+	int m_iShell;
+
+	bool UseDecrement() override
+	{
+#if defined(CLIENT_WEAPONS)
+		return UTIL_DefaultUseDecrement();
+#else
+		return false;
+#endif
+	}
+
+private:
+	unsigned short m_usSingleFire;
+};
+
+class CShotgunDouble : public CBasePlayerWeapon
+{
+public:
+#ifndef CLIENT_DLL
+	bool Save(CSave& save) override;
+	bool Restore(CRestore& restore) override;
+	static TYPEDESCRIPTION m_SaveData[];
+#endif
+
+
+	void Spawn() override;
+	void Precache() override;
+	int iItemSlot() override { return 3; }
+	bool GetItemInfo(ItemInfo* p) override;
+	void IncrementAmmo(CBasePlayer* pPlayer) override;
+
+	void PrimaryAttack() override;
+	//void SecondaryAttack() override;
+	bool Deploy() override;
+	void Reload() override;
+	void WeaponIdle() override;
+	void ItemPostFrame() override;
 	float m_flNextReload;
 	int m_iShell;
 
@@ -786,7 +823,6 @@ public:
 
 private:
 	unsigned short m_usDoubleFire;
-	unsigned short m_usSingleFire;
 };
 
 class CLaserSpot : public CBaseEntity

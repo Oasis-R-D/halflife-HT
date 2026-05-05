@@ -68,7 +68,8 @@ CCrowbar g_Crowbar;
 CPython g_Python;
 CMP5 g_Mp5;
 CCrossbow g_Crossbow;
-CShotgun g_Shotgun;
+CShotgunDouble g_ShotgunDouble;
+CShotgunSingle g_ShotgunSingle;
 CRpg g_Rpg;
 CGauss g_Gauss;
 CEgon g_Egon;
@@ -497,7 +498,8 @@ void HUD_InitClientWeapons()
 	HUD_PrepEntity(&g_Python, &player);
 	HUD_PrepEntity(&g_Mp5, &player);
 	HUD_PrepEntity(&g_Crossbow, &player);
-	HUD_PrepEntity(&g_Shotgun, &player);
+	HUD_PrepEntity(&g_ShotgunDouble, &player);
+	HUD_PrepEntity(&g_ShotgunSingle, &player);
 	HUD_PrepEntity(&g_Rpg, &player);
 	HUD_PrepEntity(&g_Gauss, &player);
 	HUD_PrepEntity(&g_Egon, &player);
@@ -573,8 +575,10 @@ CBasePlayerWeapon* GetLocalWeapon(int id)
 		return &g_Mp5;
 	case WEAPON_CROSSBOW:
 		return &g_Crossbow;
-	case WEAPON_SHOTGUN:
-		return &g_Shotgun;
+	case WEAPON_SHOTGUN_DOUBLE:
+		return &g_ShotgunDouble;
+	case WEAPON_SHOTGUN_SINGLE:
+		return &g_ShotgunSingle;
 	case WEAPON_RPG:
 		return &g_Rpg;
 	case WEAPON_GAUSS:
