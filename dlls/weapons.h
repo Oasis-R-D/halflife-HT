@@ -767,7 +767,6 @@ public:
 	void IncrementAmmo(CBasePlayer* pPlayer) override;
 
 	void PrimaryAttack() override;
-	void SecondaryAttack() override;
 	bool Deploy() override;
 	void Reload() override;
 	void WeaponIdle() override;

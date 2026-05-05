@@ -106,12 +106,30 @@ void CShotgun::PrimaryAttack()
 		return;
 	}
 
-	if (m_iClip <= 0)
+	if (m_iClip <= 1)
 	{
 		Reload();
 		if (m_iClip == 0)
 			PlayEmptySound();
 		return;
+	}
+
+	// fire twice
+	if (pev->armortype == 1) // second shot
+	{
+		pev->armortype = 0;
+
+		m_flPumpTime = gpGlobals->time + 0.5;
+
+		m_flNextPrimaryAttack = GetNextAttackDelay(0.75);
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.75;
+	}
+	else // first shot
+	{
+		pev->armortype = 1;
+
+		m_flNextPrimaryAttack = GetNextAttackDelay(0.125);
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.125;
 	}
 
 	m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
@@ -125,7 +143,6 @@ void CShotgun::PrimaryAttack()
 #else
 	flags = 0;
 #endif
-
 
 	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
 
@@ -150,16 +167,10 @@ void CShotgun::PrimaryAttack()
 
 	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usSingleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
 
-
 	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);
 
-	//if (m_iClip != 0)
-	m_flPumpTime = gpGlobals->time + 0.5;
-
-	m_flNextPrimaryAttack = GetNextAttackDelay(0.75);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.75;
 	if (m_iClip != 0)
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5.0;
 	else
@@ -167,7 +178,7 @@ void CShotgun::PrimaryAttack()
 	m_fInSpecialReload = 0;
 }
 
-
+/*
 void CShotgun::SecondaryAttack()
 {
 	// don't fire underwater
@@ -241,7 +252,7 @@ void CShotgun::SecondaryAttack()
 
 	m_fInSpecialReload = 0;
 }
-
+*/
 
 void CShotgun::Reload()
 {
@@ -369,6 +380,11 @@ void CShotgun::WeaponIdle()
 
 void CShotgun::ItemPostFrame()
 {
+	if (pev->armortype == 1 && m_flNextPrimaryAttack < gpGlobals->time)
+	{
+		PrimaryAttack();
+	}
+
 	if (0 != m_flPumpTime && m_flPumpTime < gpGlobals->time)
 	{
 		// play pumping sound
