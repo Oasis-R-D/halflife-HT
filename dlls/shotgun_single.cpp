@@ -26,9 +26,9 @@
 #define VECTOR_CONE_DM_SHOTGUN Vector(0.08716, 0.04362, 0.00)		// 10 degrees by 5 degrees
 #define VECTOR_CONE_DM_DOUBLESHOTGUN Vector(0.17365, 0.04362, 0.00) // 20 degrees by 5 degrees
 
-LINK_ENTITY_TO_CLASS(weapon_shotgun, CShotgun);
+LINK_ENTITY_TO_CLASS(weapon_shotgun, CShotgunSingle);
 
-void CShotgun::Spawn()
+void CShotgunSingle::Spawn()
 {
 	Precache();
 	m_iId = WEAPON_SHOTGUN;
@@ -40,7 +40,7 @@ void CShotgun::Spawn()
 }
 
 
-void CShotgun::Precache()
+void CShotgunSingle::Precache()
 {
 	PRECACHE_MODEL("models/v_shotgun.mdl");
 	PRECACHE_MODEL("models/w_shotgun.mdl");
@@ -66,7 +66,7 @@ void CShotgun::Precache()
 	m_usDoubleFire = PRECACHE_EVENT(1, "events/shotgun2.sc");
 }
 
-bool CShotgun::GetItemInfo(ItemInfo* p)
+bool CShotgunSingle::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "buckshot";
@@ -83,7 +83,7 @@ bool CShotgun::GetItemInfo(ItemInfo* p)
 	return true;
 }
 
-void CShotgun::IncrementAmmo(CBasePlayer* pPlayer)
+void CShotgunSingle::IncrementAmmo(CBasePlayer* pPlayer)
 {
 	if (pPlayer->GiveAmmo(1, "buckshot", BUCKSHOT_MAX_CARRY) >= 0)
 	{
@@ -91,12 +91,12 @@ void CShotgun::IncrementAmmo(CBasePlayer* pPlayer)
 	}
 }
 
-bool CShotgun::Deploy()
+bool CShotgunSingle::Deploy()
 {
 	return DefaultDeploy("models/v_shotgun.mdl", "models/p_shotgun.mdl", SHOTGUN_DRAW, "shotgun");
 }
 
-void CShotgun::PrimaryAttack()
+void CShotgunSingle::PrimaryAttack()
 {
 	// don't fire underwater
 	if (m_pPlayer->pev->waterlevel == 3)
@@ -112,24 +112,6 @@ void CShotgun::PrimaryAttack()
 		if (m_iClip == 0)
 			PlayEmptySound();
 		return;
-	}
-
-	// fire twice
-	if (pev->armortype == 1) // second shot
-	{
-		pev->armortype = 0;
-
-		m_flPumpTime = gpGlobals->time + 0.5;
-
-		m_flNextPrimaryAttack = GetNextAttackDelay(0.75);
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.75;
-	}
-	else // first shot
-	{
-		pev->armortype = 1;
-
-		m_flNextPrimaryAttack = GetNextAttackDelay(0.125);
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.125;
 	}
 
 	m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
@@ -165,12 +147,16 @@ void CShotgun::PrimaryAttack()
 		vecDir = m_pPlayer->FireBulletsPlayer(6, vecSrc, vecAiming, VECTOR_CONE_10DEGREES, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 	}
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usDoubleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usSingleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
 
 	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);
 
+	m_flPumpTime = gpGlobals->time + 0.5;
+
+	m_flNextPrimaryAttack = GetNextAttackDelay(0.75);
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.75;
 	if (m_iClip != 0)
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5.0;
 	else
@@ -178,83 +164,7 @@ void CShotgun::PrimaryAttack()
 	m_fInSpecialReload = 0;
 }
 
-/*
-void CShotgun::SecondaryAttack()
-{
-	// don't fire underwater
-	if (m_pPlayer->pev->waterlevel == 3)
-	{
-		PlayEmptySound();
-		m_flNextPrimaryAttack = GetNextAttackDelay(0.15);
-		return;
-	}
-
-	if (m_iClip <= 1)
-	{
-		Reload();
-		PlayEmptySound();
-		return;
-	}
-
-	m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
-	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
-
-	m_iClip -= 2;
-
-
-	int flags;
-#if defined(CLIENT_WEAPONS)
-	flags = UTIL_DefaultPlaybackFlags();
-#else
-	flags = 0;
-#endif
-
-	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
-
-	// player "shoot" animation
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
-
-	Vector vecDir;
-
-#ifdef CLIENT_DLL
-	if (bIsMultiplayer())
-#else
-	if (g_pGameRules->IsMultiplayer())
-#endif
-	{
-		// tuned for deathmatch
-		vecDir = m_pPlayer->FireBulletsPlayer(8, vecSrc, vecAiming, VECTOR_CONE_DM_DOUBLESHOTGUN, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
-	}
-	else
-	{
-		// untouched default single player
-		vecDir = m_pPlayer->FireBulletsPlayer(12, vecSrc, vecAiming, VECTOR_CONE_10DEGREES, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
-	}
-
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usDoubleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
-
-	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
-		// HEV suit - indicate out of ammo condition
-		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);
-
-	//if (m_iClip != 0)
-	m_flPumpTime = gpGlobals->time + 0.95;
-
-	m_flNextPrimaryAttack = GetNextAttackDelay(1.5);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5;
-	if (m_iClip != 0)
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 6.0;
-	else
-		m_flTimeWeaponIdle = 1.5;
-
-	m_fInSpecialReload = 0;
-}
-*/
-
-void CShotgun::Reload()
+void CShotgunSingle::Reload()
 {
 	int maxClip = SHOTGUN_MAX_CLIP;
 
@@ -308,7 +218,7 @@ void CShotgun::Reload()
 }
 
 
-void CShotgun::WeaponIdle()
+void CShotgunSingle::WeaponIdle()
 {
 	ResetEmptySound();
 
@@ -378,13 +288,8 @@ void CShotgun::WeaponIdle()
 	}
 }
 
-void CShotgun::ItemPostFrame()
+void CShotgunSingle::ItemPostFrame()
 {
-	if (pev->armortype == 1 && m_flNextPrimaryAttack < gpGlobals->time)
-	{
-		PrimaryAttack();
-	}
-
 	if (0 != m_flPumpTime && m_flPumpTime < gpGlobals->time)
 	{
 		// play pumping sound
@@ -394,29 +299,3 @@ void CShotgun::ItemPostFrame()
 
 	CBasePlayerWeapon::ItemPostFrame();
 }
-
-
-class CShotgunAmmo : public CBasePlayerAmmo
-{
-	void Spawn() override
-	{
-		Precache();
-		SET_MODEL(ENT(pev), "models/w_shotbox.mdl");
-		CBasePlayerAmmo::Spawn();
-	}
-	void Precache() override
-	{
-		PRECACHE_MODEL("models/w_shotbox.mdl");
-		PRECACHE_SOUND("items/9mmclip1.wav");
-	}
-	bool AddAmmo(CBaseEntity* pOther) override
-	{
-		if (pOther->GiveAmmo(AMMO_BUCKSHOTBOX_GIVE, "buckshot", BUCKSHOT_MAX_CARRY) != -1)
-		{
-			EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", 1, ATTN_NORM);
-			return true;
-		}
-		return false;
-	}
-};
-LINK_ENTITY_TO_CLASS(ammo_buckshot, CShotgunAmmo);
