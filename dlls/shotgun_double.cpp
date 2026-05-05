@@ -28,10 +28,12 @@
 #define VECTOR_CONE_DM_SHOTGUN Vector(0.08716, 0.04362, 0.00)		// 10 degrees by 5 degrees
 #define VECTOR_CONE_DM_DOUBLESHOTGUN Vector(0.17365, 0.04362, 0.00) // 20 degrees by 5 degrees
 
-LINK_ENTITY_TO_CLASS(weapon_shotgun, CShotgunDouble);
+LINK_ENTITY_TO_CLASS(weapon_shotgun, CShotgunDouble); // compatibility with HL1 maps
+LINK_ENTITY_TO_CLASS(weapon_shotgun_double, CShotgunDouble);
 
 void CShotgunDouble::Spawn()
 {
+	pev->classname = MAKE_STRING("weapon_shotgun"); // hack to allow for old names
 	Precache();
 	m_iId = WEAPON_SHOTGUN_DOUBLE;
 	SET_MODEL(ENT(pev), "models/w_shotgun.mdl");

@@ -25,7 +25,7 @@
 // special deathmatch shotgun spreads
 #define VECTOR_CONE_DM_SHOTGUN Vector(0.08716, 0.04362, 0.00)		// 10 degrees by 5 degrees
 
-LINK_ENTITY_TO_CLASS(weapon_shotgun, CShotgunSingle);
+LINK_ENTITY_TO_CLASS(weapon_shotgun_single, CShotgunSingle);
 
 void CShotgunSingle::Spawn()
 {
@@ -153,8 +153,8 @@ void CShotgunSingle::PrimaryAttack()
 
 	m_flPumpTime = gpGlobals->time + 0.5;
 
-	m_flNextPrimaryAttack = GetNextAttackDelay(0.75);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.75;
+	m_flNextPrimaryAttack = GetNextAttackDelay(0.66);
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.66;
 	if (m_iClip != 0)
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5.0;
 	else
