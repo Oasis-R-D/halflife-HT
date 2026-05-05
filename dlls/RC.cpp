@@ -106,7 +106,10 @@ void CRC::Spawn()
 void CRC::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
 	if (pActivator->Classify() != CLASS_PLAYER)
+	{
+		ExplodeThink(); // detonate when used by nonplayers)
 		return;
+	}
 
 	if (value == 2 && useType == USE_SET)
 	{
@@ -278,6 +281,7 @@ void CRC::DriveThink()
 		pev->velocity.z += RC_SPEED_JUMP;
 	}
 
+	// keep camera here (may not like setting origin every frame)
 	m_pCamera->pev->origin = pev->origin + Vector(0, 0, 4);
 	m_pCamera->pev->angles = pev->angles;
 
@@ -287,7 +291,6 @@ void CRC::DriveThink()
 
 void CRC::ExplodeThink()
 {
-	UTIL_Remove(this);
 	if (m_Flare == RC_EXPLODE)
 	{
 		int iContents = UTIL_PointContents(pev->origin);
@@ -336,7 +339,7 @@ void CRC::ExplodeThink()
 			// position
 			WRITE_COORD(pev->origin.x);
 			WRITE_COORD(pev->origin.y);
-			WRITE_COORD(pev->origin.z+1);
+			WRITE_COORD(pev->origin.z+4);
 			// size
 			WRITE_COORD(8);
 			WRITE_COORD(8);
@@ -356,6 +359,8 @@ void CRC::ExplodeThink()
 		MESSAGE_END();
 	}
 
+	UTIL_Remove(this);
+	
 	if (!m_pController)
 		return;
 
