@@ -22,7 +22,7 @@
 #include "weapons/CEagle.h"
 #include "weapons/CPipewrench.h"
 #include "weapons/CM249.h"
-#include "weapons/CDisplacer.h"
+#include "weapons/CVortigun.h"
 #include "weapons/CShockRifle.h"
 #include "weapons/CSporeLauncher.h"
 #include "weapons/CSniperRifle.h"
