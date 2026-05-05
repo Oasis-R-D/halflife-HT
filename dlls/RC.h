@@ -17,8 +17,12 @@ enum
 	RC_GUN,			// shoots (almost) straight
 };
 
-// OVERLOADS SOME ENTVARS:
-// speed - the ideal magnitude of my velocity
+class CRCcamera : public CBaseEntity
+{
+public:
+	void Spawn() override;
+}
+
 class CRC : public CBaseMonster
 {
 	int m_iTrail;
