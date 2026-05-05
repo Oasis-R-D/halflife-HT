@@ -262,7 +262,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\dlls\weapons.cpp" />
     <ClCompile Include="..\..\dlls\weapons\CGrapple.cpp" />
     <ClCompile Include="..\..\dlls\weapons\CGrappleTip.cpp" />
-    <ClCompile Include="..\..\dlls\weapons\CDisplacer.cpp" />
+    <ClCompile Include="..\..\dlls\weapons\CVortigun.cpp" />
     <ClCompile Include="..\..\dlls\weapons\CDisplacerBall.cpp" />
     <ClCompile Include="..\..\dlls\weapons\CEagle.cpp" />
     <ClCompile Include="..\..\dlls\weapons\CEagleLaser.cpp" />
@@ -384,7 +384,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClInclude Include="..\..\dlls\weapons.h" />
     <ClInclude Include="..\..\dlls\weapons\CGrapple.h" />
     <ClInclude Include="..\..\dlls\weapons\CGrappleTip.h" />
-    <ClInclude Include="..\..\dlls\weapons\CDisplacer.h" />
+    <ClInclude Include="..\..\dlls\weapons\CVortigun.h" />
     <ClInclude Include="..\..\dlls\weapons\CDisplacerBall.h" />
     <ClInclude Include="..\..\dlls\weapons\CEagle.h" />
     <ClInclude Include="..\..\dlls\weapons\CEagleLaser.h" />

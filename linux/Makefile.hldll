@@ -47,7 +47,7 @@ HLDLL_OBJS = \
 	$(ROPE_OBJ_DIR)/CRope.o \
 	$(ROPE_OBJ_DIR)/CRopeSample.o \
 	$(ROPE_OBJ_DIR)/CRopeSegment.o \
-	$(WEAPONS_OBJ_DIR)/CDisplacer.o \
+	$(WEAPONS_OBJ_DIR)/CVortigun.o \
 	$(WEAPONS_OBJ_DIR)/CDisplacerBall.o \
 	$(WEAPONS_OBJ_DIR)/CEagle.o \
 	$(WEAPONS_OBJ_DIR)/CEagleLaser.o \

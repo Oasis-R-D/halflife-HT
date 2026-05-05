@@ -91,7 +91,7 @@ HL1_PARTICLEMAN_OBJS = \
 	$(HL1_PARTICLEMAN_OBJ_DIR)/IParticleMan_Active.o \
 	
 DLL_OBJS = \
-	$(WEAPONS_OBJ_DIR)/CDisplacer.o \
+	$(WEAPONS_OBJ_DIR)/CVortigun.o \
 	$(WEAPONS_OBJ_DIR)/CEagle.o \
 	$(WEAPONS_OBJ_DIR)/CGrapple.o \
 	$(WEAPONS_OBJ_DIR)/CGrappleTip.o \

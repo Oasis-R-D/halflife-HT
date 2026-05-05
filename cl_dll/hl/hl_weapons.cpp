@@ -22,7 +22,7 @@
 #include "weapons/CEagle.h"
 #include "weapons/CPipewrench.h"
 #include "weapons/CM249.h"
-#include "weapons/CDisplacer.h"
+#include "weapons/CVortigun.h"
 #include "weapons/CShockRifle.h"
 #include "weapons/CSporeLauncher.h"
 #include "weapons/CSniperRifle.h"
@@ -82,7 +82,7 @@ CGrapple g_Grapple;
 CEagle g_Eagle;
 CPipewrench g_Pipewrench;
 CM249 g_M249;
-CDisplacer g_Displacer;
+CVortigun g_Vortigun;
 CShockRifle g_ShockRifle;
 CSporeLauncher g_SporeLauncher;
 CSniperRifle g_SniperRifle;
@@ -512,7 +512,7 @@ void HUD_InitClientWeapons()
 	HUD_PrepEntity(&g_Eagle, &player);
 	HUD_PrepEntity(&g_Pipewrench, &player);
 	HUD_PrepEntity(&g_M249, &player);
-	HUD_PrepEntity(&g_Displacer, &player);
+	HUD_PrepEntity(&g_Vortigun, &player);
 	HUD_PrepEntity(&g_ShockRifle, &player);
 	HUD_PrepEntity(&g_SporeLauncher, &player);
 	HUD_PrepEntity(&g_SniperRifle, &player);
@@ -603,8 +603,8 @@ CBasePlayerWeapon* GetLocalWeapon(int id)
 		return &g_Pipewrench;
 	case WEAPON_M249:
 		return &g_M249;
-	case WEAPON_DISPLACER:
-		return &g_Displacer;
+	case WEAPON_VORTIGUN:
+		return &g_Vortigun;
 	case WEAPON_SHOCKRIFLE:
 		return &g_ShockRifle;
 	case WEAPON_SPORELAUNCHER:

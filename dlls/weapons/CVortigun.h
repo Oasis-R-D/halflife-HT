@@ -38,7 +38,7 @@ enum class DisplacerMode
 
 static const size_t DISPLACER_NUM_BEAMS = 2;
 
-class CDisplacer : public CBasePlayerWeapon
+class CVortigun : public CBasePlayerWeapon
 {
 public:
 	using BaseClass = CBasePlayerWeapon;

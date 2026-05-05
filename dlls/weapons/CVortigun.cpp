@@ -30,11 +30,12 @@
 
 #endif
 
-#include "CDisplacer.h"
+#include "CVortigun.h"
 
-LINK_ENTITY_TO_CLASS(weapon_displacer, CDisplacer);
+LINK_ENTITY_TO_CLASS(weapon_displacer, CVortigun);
+LINK_ENTITY_TO_CLASS(weapon_vortigun, CVortigun);
 
-void CDisplacer::Precache()
+void CVortigun::Precache()
 {
 	PRECACHE_MODEL("models/v_displacer.mdl");
 	PRECACHE_MODEL("models/w_displacer.mdl");
@@ -56,13 +57,13 @@ void CDisplacer::Precache()
 	m_usFireDisplacer = PRECACHE_EVENT(1, "events/displacer.sc");
 }
 
-void CDisplacer::Spawn()
+void CVortigun::Spawn()
 {
-	pev->classname = MAKE_STRING("weapon_displacer");
+	pev->classname = MAKE_STRING("weapon_displacer"); // Hack to allow for old weapon names
 
 	Precache();
 
-	m_iId = WEAPON_DISPLACER;
+	m_iId = WEAPON_VORTIGUN;
 
 	SET_MODEL(edict(), "models/w_displacer.mdl");
 
@@ -71,12 +72,12 @@ void CDisplacer::Spawn()
 	FallInit();
 }
 
-bool CDisplacer::Deploy()
+bool CVortigun::Deploy()
 {
 	return DefaultDeploy("models/v_displacer.mdl", "models/p_displacer.mdl", DISPLACER_DRAW, "egon");
 }
 
-void CDisplacer::Holster()
+void CVortigun::Holster()
 {
 	ClearBeams();
 
@@ -90,14 +91,14 @@ void CDisplacer::Holster()
 
 	SendWeaponAnim(DISPLACER_HOLSTER1);
 
-	if (m_pfnThink == &CDisplacer::SpinupThink)
+	if (m_pfnThink == &CVortigun::SpinupThink)
 	{
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 20;
 		SetThink(nullptr);
 	}
 }
 
-void CDisplacer::WeaponIdle()
+void CVortigun::WeaponIdle()
 {
 	ResetEmptySound();
 
@@ -127,11 +128,11 @@ void CDisplacer::WeaponIdle()
 	}
 }
 
-void CDisplacer::PrimaryAttack()
+void CVortigun::PrimaryAttack()
 {
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 20)
 	{
-		SetThink(&CDisplacer::SpinupThink);
+		SetThink(&CVortigun::SpinupThink);
 
 		pev->nextthink = gpGlobals->time;
 
@@ -149,12 +150,12 @@ void CDisplacer::PrimaryAttack()
 	}
 }
 
-void CDisplacer::Reload()
+void CVortigun::Reload()
 {
 	//Nothing
 }
 
-void CDisplacer::SpinupThink()
+void CVortigun::SpinupThink()
 {
 	if (m_Mode == DisplacerMode::STARTED)
 	{
@@ -196,7 +197,7 @@ void CDisplacer::SpinupThink()
 		{
 			m_Mode = DisplacerMode::SPINNING;
 
-			SetThink(&CDisplacer::FireThink);
+			SetThink(&CVortigun::FireThink);
 
 			pev->nextthink = gpGlobals->time + 0.1;
 		}
@@ -215,7 +216,7 @@ void CDisplacer::SpinupThink()
 //=========================================================
 // ZapBeam - heavy damage directly forward
 //=========================================================
-void CDisplacer::ZapBeam(Vector vecOrg)
+void CVortigun::ZapBeam(Vector vecOrg)
 {
 #ifndef CLIENT_DLL
 	Vector vecAim;
@@ -251,7 +252,7 @@ void CDisplacer::ZapBeam(Vector vecOrg)
 #endif
 }
 
-void CDisplacer::FireThink()
+void CVortigun::FireThink()
 {
 	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] -= 20;
 
@@ -305,23 +306,23 @@ void CDisplacer::FireThink()
 	}
 #endif
 	pev->nextthink = gpGlobals->time + 0.2;
-	SetThink(&CDisplacer::ClearThink);
+	SetThink(&CVortigun::ClearThink);
 
 	
 }
 
-void CDisplacer::ClearThink()
+void CVortigun::ClearThink()
 {
 	ClearBeams();
 	SetThink(nullptr);
 }
 
-int CDisplacer::iItemSlot()
+int CVortigun::iItemSlot()
 {
 	return 4;
 }
 
-bool CDisplacer::GetItemInfo(ItemInfo* p)
+bool CVortigun::GetItemInfo(ItemInfo* p)
 {
 	p->pszAmmo1 = "uranium";
 	p->iMaxAmmo1 = URANIUM_MAX_CARRY;
@@ -332,12 +333,12 @@ bool CDisplacer::GetItemInfo(ItemInfo* p)
 	p->iFlags = 0;
 	p->iSlot = 5;
 	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_DISPLACER;
+	p->iId = m_iId = WEAPON_VORTIGUN;
 	p->iWeight = DISPLACER_WEIGHT;
 	return true;
 }
 
-void CDisplacer::IncrementAmmo(CBasePlayer* pPlayer)
+void CVortigun::IncrementAmmo(CBasePlayer* pPlayer)
 {
 	if (pPlayer->GiveAmmo(1, "uranium", URANIUM_MAX_CARRY) >= 0)
 	{
@@ -349,7 +350,7 @@ void CDisplacer::IncrementAmmo(CBasePlayer* pPlayer)
 // ArmBeam - small beam from arm to nearby geometry
 //=========================================================
 
-void CDisplacer::ArmBeam()
+void CVortigun::ArmBeam()
 {
 #ifndef CLIENT_DLL
 	TraceResult tr;
@@ -397,7 +398,7 @@ void CDisplacer::ArmBeam()
 //=========================================================
 // ClearBeams - remove all beams
 //=========================================================
-void CDisplacer::ClearBeams()
+void CVortigun::ClearBeams()
 {
 #ifndef CLIENT_DLL
 	for (int i = 0; i < ISLAVE_MAX_BEAMS; i++)
@@ -418,7 +419,7 @@ void CDisplacer::ClearBeams()
 //=========================================================
 // BeamGlow - brighten all beams
 //=========================================================
-void CDisplacer::BeamGlow()
+void CVortigun::BeamGlow()
 {
 #ifndef CLIENT_DLL
 	int b = m_iBeams * 32;
