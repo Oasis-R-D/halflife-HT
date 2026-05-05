@@ -22,7 +22,6 @@
 #define RC_MAX_TURNSPEED 256
 #define RC_MAX_DRIVESPEED 256
 
-LINK_ENTITY_TO_CLASS(pl_rc_cam, CRCcamera);
 class CRCcamera : public CBaseEntity
 {
 public:
@@ -34,6 +33,7 @@ public:
 		UTIL_SetOrigin(pev, pev->origin);
 	}
 }
+LINK_ENTITY_TO_CLASS(pl_rc_cam, CRCcamera);
 
 // controllable RC car
 LINK_ENTITY_TO_CLASS(pl_rc, CRC);
@@ -73,7 +73,7 @@ void CRC::Spawn()
 	// spawn the camera
 	CRCcamera* pRCcam = GetClassPtr((CRCcamera*)NULL);
 	pRCcam->pev->classname = MAKE_STRING("pl_rc_cam");
-	pRCcam->pev->angles = m_direction
+	pRCcam->pev->angles = m_direction;
 	pRCcam->Spawn();
 	m_pCamera = pRCcam;
 
