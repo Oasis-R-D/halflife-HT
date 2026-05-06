@@ -346,7 +346,7 @@ void CRC::ExplodeThink()
 
 		RadiusDamage(pev->origin+4, pev, m_pController, pev->dmg, CLASS_NONE, DMG_BLAST);
 		*/
-		ExplosionCreate(pev->origin+4, gpGlobals->v_forward, m_pController->edict(), pev->dmg, true)
+		ExplosionCreate(pev->origin+4, gpGlobals->v_forward, m_pController->edict(), pev->dmg, true);
 	}
 	else // don't do both (optimization)
 	{
