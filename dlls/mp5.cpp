@@ -24,6 +24,7 @@
 #include "UserMessages.h"
 
 LINK_ENTITY_TO_CLASS(weapon_mp5, CMP5);
+LINK_ENTITY_TO_CLASS(weapon_mp5k, CMP5);
 LINK_ENTITY_TO_CLASS(weapon_9mmAR, CMP5);
 
 
@@ -33,7 +34,7 @@ void CMP5::Spawn()
 {
 	pev->classname = MAKE_STRING("weapon_9mmAR"); // hack to allow for old names
 	Precache();
-	SET_MODEL(ENT(pev), "models/w_9mmAR.mdl");
+	SET_MODEL(ENT(pev), "models/w_9mmARk.mdl");
 	m_iId = WEAPON_MP5K;
 
 	m_iDefaultAmmo = MP5_DEFAULT_GIVE;
@@ -48,6 +49,7 @@ void CMP5::Precache()
 {
 	PRECACHE_MODEL("models/v_9mmAR.mdl");
 	PRECACHE_MODEL("models/w_9mmAR.mdl");
+	PRECACHE_MODEL("models/w_9mmARk.mdl");
 	PRECACHE_MODEL("models/p_9mmAR.mdl");
 
 	m_iShell = PRECACHE_MODEL("models/shell.mdl"); // brass shellTE_MODEL
@@ -209,6 +211,30 @@ void CMP5::WeaponIdle()
 }
 
 
+class CMP5Drop : public CBasePlayerAmmo
+{
+	void Spawn() override
+	{
+		Precache();
+		SET_MODEL(ENT(pev), "models/w_9mmAR.mdl");
+		CBasePlayerAmmo::Spawn();
+	}
+	void Precache() override
+	{
+		PRECACHE_MODEL("models/w_9mmAR.mdl");
+		PRECACHE_SOUND("items/9mmclip1.wav");
+	}
+	bool AddAmmo(CBaseEntity* pOther) override
+	{
+		bool bResult = (pOther->GiveAmmo(30, "9mm", _9MM_MAX_CARRY) != -1);
+		if (bResult)
+		{
+			EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", 1, ATTN_NORM);
+		}
+		return bResult;
+	}
+};
+LINK_ENTITY_TO_CLASS(ammo_mp5drop, CMP5Drop);
 
 class CMP5AmmoClip : public CBasePlayerAmmo
 {

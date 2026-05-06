@@ -321,7 +321,7 @@ void CMOFAssassin::GibMonster()
 		CBaseEntity* pGun;
 		if (FBitSet(pev->weapons, MAssassinWeaponFlag::MP5))
 		{
-			pGun = DropItem("weapon_9mmAR", vecGunPos, vecGunAngles);
+			pGun = DropItem("ammo_mp5drop", vecGunPos, vecGunAngles);
 		}
 		else
 		{
@@ -844,7 +844,7 @@ void CMOFAssassin::HandleAnimEvent(MonsterEvent_t* pEvent)
 		// now spawn a gun.
 		if (FBitSet(pev->weapons, MAssassinWeaponFlag::MP5))
 		{
-			DropItem("weapon_9mmAR", vecGunPos, vecGunAngles);
+			DropItem("ammo_mp5drop", vecGunPos, vecGunAngles);
 		}
 		else
 		{

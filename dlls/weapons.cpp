@@ -306,6 +306,7 @@ void W_Precache()
 
 	// mp5
 	UTIL_PrecacheOtherWeapon("weapon_9mmAR");
+	UTIL_PrecacheOther("ammo_mp5drop");
 	UTIL_PrecacheOther("ammo_9mmAR");
 	UTIL_PrecacheOther("ammo_ARgrenades");
 
