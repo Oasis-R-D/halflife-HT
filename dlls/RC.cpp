@@ -6,6 +6,7 @@
 #include "player.h"
 #include "gamerules.h"
 #include "soundent.h"
+#include "explode.h"
 #include "RC.h"
 
 #define DT gpGlobals->frametime
@@ -301,8 +302,9 @@ void CRC::ExplodeThink()
 
 	pev->takedamage = DAMAGE_NO;
 
-	if (m_Flare == RC_EXPLODE)
+	if (m_Flare == RC_EXPLODE && m_pController)
 	{
+		/*
 		int iContents = UTIL_PointContents(pev->origin);
 
 		// VFX
@@ -340,7 +342,11 @@ void CRC::ExplodeThink()
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3.0);
 		
 		pev->owner = NULL; // can't traceline attack owner if this is set
-		RadiusDamage(pev->origin+4, pev, m_pController ? m_pController->pev : NULL, pev->dmg, CLASS_NONE, DMG_BLAST);
+		
+
+		RadiusDamage(pev->origin+4, pev, m_pController, pev->dmg, CLASS_NONE, DMG_BLAST);
+		*/
+		ExplosionCreate(pev->origin+4, gpGlobals->v_forward, m_pController->edict(), pev->dmg, true)
 	}
 	else // don't do both (optimization)
 	{
