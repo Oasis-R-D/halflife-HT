@@ -115,8 +115,7 @@ DLL_OBJS = \
 	$(HL1_SERVER_OBJ_DIR)/RC_weapon.o \
 	$(HL1_SERVER_OBJ_DIR)/rpg.o \
 	$(HL1_SERVER_OBJ_DIR)/satchel.o \
-	$(HL1_SERVER_OBJ_DIR)/shotgun_double.o \
-	$(HL1_SERVER_OBJ_DIR)/shotgun_single.o \
+	$(HL1_SERVER_OBJ_DIR)/shotgun.o \
 	$(HL1_SERVER_OBJ_DIR)/squeakgrenade.o \
 	$(HL1_SERVER_OBJ_DIR)/tripmine.o \
 	$(HL1_SERVER_OBJ_DIR)/weapons_shared.o \
