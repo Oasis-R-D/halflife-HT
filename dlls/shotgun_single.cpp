@@ -71,9 +71,9 @@ bool CShotgunSingle::GetItemInfo(ItemInfo* p)
 	p->iMaxAmmo1 = BUCKSHOT_MAX_CARRY;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = SHOTGUN_MAX_CLIP;
+	p->iMaxClip = SINGLESHOTGUN_MAX_CLIP;
 	p->iSlot = 2;
-	p->iPosition = 1;
+	p->iPosition = 2;
 	p->iFlags = 0;
 	p->iId = m_iId = WEAPON_SHOTGUN_SINGLE;
 	p->iWeight = SHOTGUN_WEIGHT;
@@ -91,7 +91,7 @@ void CShotgunSingle::IncrementAmmo(CBasePlayer* pPlayer)
 
 bool CShotgunSingle::Deploy()
 {
-	return DefaultDeploy("models/v_shotgun.mdl", "models/p_shotgun.mdl", SHOTGUN_DRAW, "shotgun");
+	return DefaultDeploy("models/v_shotgun.mdl", "models/p_shotgun.mdl", SHOTGUN_DRAW, "shotgunsingle");
 }
 
 void CShotgunSingle::PrimaryAttack()
@@ -104,7 +104,7 @@ void CShotgunSingle::PrimaryAttack()
 		return;
 	}
 
-	if (m_iClip <= 1)
+	if (m_iClip <= 0)
 	{
 		Reload();
 		if (m_iClip == 0)
@@ -142,7 +142,7 @@ void CShotgunSingle::PrimaryAttack()
 	else
 	{
 		// regular old, untouched spread.
-		vecDir = m_pPlayer->FireBulletsPlayer(6, vecSrc, vecAiming, VECTOR_CONE_10DEGREES, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
+		vecDir = m_pPlayer->FireBulletsPlayer(6, vecSrc, vecAiming, VECTOR_CONE_5DEGREES, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 	}
 
 	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usSingleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
@@ -164,7 +164,7 @@ void CShotgunSingle::PrimaryAttack()
 
 void CShotgunSingle::Reload()
 {
-	int maxClip = SHOTGUN_MAX_CLIP;
+	int maxClip = SINGLESHOTGUN_MAX_CLIP;
 
 	if ((m_pPlayer->m_iItems & CTFItem::Backpack) != 0)
 	{
@@ -240,7 +240,7 @@ void CShotgunSingle::WeaponIdle()
 		}
 		else if (m_fInSpecialReload != 0)
 		{
-			int maxClip = SHOTGUN_MAX_CLIP;
+			int maxClip = SINGLESHOTGUN_MAX_CLIP;
 
 			if ((m_pPlayer->m_iItems & CTFItem::Backpack) != 0)
 			{

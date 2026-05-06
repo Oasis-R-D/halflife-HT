@@ -216,7 +216,7 @@ void CM249::PrimaryAttack()
 	Vector vecDir = m_pPlayer->FireBulletsPlayer(
 		1,
 		vecSrc, vecAiming, vecSpread,
-		8192.0, BULLET_PLAYER_556, 2, 0,
+		8192.0, BULLET_PLAYER_M249, 2, 0,
 		m_pPlayer->pev, m_pPlayer->random_seed);
 
 	int flags;

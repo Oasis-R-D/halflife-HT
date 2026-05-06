@@ -25,7 +25,6 @@ public:
 
 class CRC : public CBaseMonster
 {
-	int m_iTrail;
 public:
 	static CRC* RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, int RCType); // add damage, spread and owner so entities calling this can give it the proper stuff
 	void Spawn() override;
@@ -62,4 +61,5 @@ public:
 protected:
 	CBasePlayer* m_pController;
 	EHANDLE m_pCamera;
+	bool m_bCamConnected;
 };

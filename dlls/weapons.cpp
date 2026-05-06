@@ -170,7 +170,7 @@ void DecalGunshot(TraceResult* pTrace, int iBulletType)
 
 		switch (iBulletType)
 		{
-		case BULLET_PLAYER_9MM:
+		case BULLET_PLAYER_GLOCK:
 		case BULLET_MONSTER_9MM:
 		case BULLET_PLAYER_MP5:
 		case BULLET_MONSTER_MP5:
@@ -345,26 +345,37 @@ void W_Precache()
 
 	//UTIL_PrecacheOtherWeapon("weapon_grapple");
 
+	// DESERT EAGLE
 	UTIL_PrecacheOtherWeapon("weapon_eagle");
 
+	// WRENCH
 	UTIL_PrecacheOtherWeapon("weapon_pipewrench");
 
+	// M249
 	UTIL_PrecacheOtherWeapon("weapon_m249");
 	UTIL_PrecacheOther("ammo_556");
 
+	// VORTIGUN
 	UTIL_PrecacheOtherWeapon("weapon_displacer");
 
 	//UTIL_PrecacheOtherWeapon("weapon_sporelauncher");
 	//UTIL_PrecacheOther("ammo_spore");
 
+	// SHOCKRIFLE
 	UTIL_PrecacheOtherWeapon("weapon_shockrifle");
 
+	// SL8
 	UTIL_PrecacheOtherWeapon("weapon_sniperrifle");
 	UTIL_PrecacheOther("ammo_223");
 
+	// COMBAT KNIFE
 	UTIL_PrecacheOtherWeapon("weapon_knife");
 
+	// RC CAR
 	UTIL_PrecacheOtherWeapon("weapon_rc");
+	
+	// AG36
+	UTIL_PrecacheOtherWeapon("weapon_556mmAR");
 
 	PRECACHE_SOUND("weapons/spore_hit1.wav");
 	PRECACHE_SOUND("weapons/spore_hit2.wav");
@@ -1454,25 +1465,15 @@ TYPEDESCRIPTION CRpgRocket::m_SaveData[] =
 };
 IMPLEMENT_SAVERESTORE(CRpgRocket, CGrenade);
 
-TYPEDESCRIPTION CShotgunDouble::m_SaveData[] =
+TYPEDESCRIPTION CShotgun::m_SaveData[] =
 	{
-		DEFINE_FIELD(CShotgunDouble, m_flNextReload, FIELD_TIME),
-		DEFINE_FIELD(CShotgunDouble, m_fInSpecialReload, FIELD_INTEGER),
-		DEFINE_FIELD(CShotgunDouble, m_flNextReload, FIELD_TIME),
-		// DEFINE_FIELD( CShotgunDouble, m_iShell, FIELD_INTEGER ),
-		DEFINE_FIELD(CShotgunDouble, m_flPumpTime, FIELD_TIME),
+		DEFINE_FIELD(CShotgun, m_flNextReload, FIELD_TIME),
+		DEFINE_FIELD(CShotgun, m_fInSpecialReload, FIELD_INTEGER),
+		DEFINE_FIELD(CShotgun, m_flNextReload, FIELD_TIME),
+		// DEFINE_FIELD( CShotgun, m_iShell, FIELD_INTEGER ),
+		DEFINE_FIELD(CShotgun, m_flPumpTime, FIELD_TIME),
 };
-IMPLEMENT_SAVERESTORE(CShotgunDouble, CBasePlayerWeapon);
-
-TYPEDESCRIPTION CShotgunSingle::m_SaveData[] =
-	{
-		DEFINE_FIELD(CShotgunSingle, m_flNextReload, FIELD_TIME),
-		DEFINE_FIELD(CShotgunSingle, m_fInSpecialReload, FIELD_INTEGER),
-		DEFINE_FIELD(CShotgunSingle, m_flNextReload, FIELD_TIME),
-		// DEFINE_FIELD( CShotgunSingle, m_iShell, FIELD_INTEGER ),
-		DEFINE_FIELD(CShotgunSingle, m_flPumpTime, FIELD_TIME),
-};
-IMPLEMENT_SAVERESTORE(CShotgunSingle, CBasePlayerWeapon);
+IMPLEMENT_SAVERESTORE(CShotgun, CBasePlayerWeapon);
 
 TYPEDESCRIPTION CGauss::m_SaveData[] =
 	{

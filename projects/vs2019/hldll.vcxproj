@@ -115,6 +115,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
   <ItemGroup>
     <ClCompile Include="..\..\common\mathlib.cpp" />
     <ClCompile Include="..\..\dlls\aflock.cpp" />
+    <ClCompile Include="..\..\dlls\ag36.cpp" />
     <ClCompile Include="..\..\dlls\agrunt.cpp" />
     <ClCompile Include="..\..\dlls\airtank.cpp" />
     <ClCompile Include="..\..\dlls\animating.cpp" />
@@ -238,8 +239,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\dlls\scripted.cpp" />
     <ClCompile Include="..\..\dlls\shockroach.cpp" />
     <ClCompile Include="..\..\dlls\shocktrooper.cpp" />
-    <ClCompile Include="..\..\dlls\shotgun_double.cpp" />
-    <ClCompile Include="..\..\dlls\shotgun_single.cpp" />
+    <ClCompile Include="..\..\dlls\shotgun.cpp" />
     <ClCompile Include="..\..\dlls\singleplay_gamerules.cpp" />
     <ClCompile Include="..\..\dlls\skeleton.cpp" />
     <ClCompile Include="..\..\dlls\skill.cpp" />

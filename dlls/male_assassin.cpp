@@ -808,7 +808,7 @@ void CMOFAssassin::Shoot()
 	else
 	{
 		//TODO: why is this 556? is 762 too damaging?
-		FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_1DEGREES, 2048, BULLET_PLAYER_556);
+		FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_1DEGREES, 2048, BULLET_PLAYER_M249);
 	}
 
 	pev->effects |= EF_MUZZLEFLASH;

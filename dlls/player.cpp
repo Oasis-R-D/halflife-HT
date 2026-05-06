@@ -3864,11 +3864,11 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 		GiveNamedItem("weapon_crowbar");
 		GiveNamedItem("weapon_9mmhandgun");
 		GiveNamedItem("ammo_9mmclip");
-		GiveNamedItem("weapon_shotgun_single");
-		GiveNamedItem("weapon_shotgun_double");
+		GiveNamedItem("weapon_shotgun");
 		GiveNamedItem("ammo_buckshot");
 		GiveNamedItem("weapon_9mmAR");
 		GiveNamedItem("ammo_9mmAR");
+		GiveNamedItem("weapon_556mmAR");
 		GiveNamedItem("ammo_ARgrenades");
 		GiveNamedItem("weapon_handgrenade");
 		GiveNamedItem("weapon_tripmine");

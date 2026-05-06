@@ -37,7 +37,8 @@ void Game_HookEvents()
 	gEngfuncs.pfnHookEvent("events/shotgun1.sc", EV_FireShotGunSingle);
 	gEngfuncs.pfnHookEvent("events/shotgun2.sc", EV_FireShotGunDouble);
 	gEngfuncs.pfnHookEvent("events/mp5.sc", EV_FireMP5);
-	gEngfuncs.pfnHookEvent("events/mp52.sc", EV_FireMP52);
+	gEngfuncs.pfnHookEvent("events/ag36.sc", EV_FireAG36);
+	gEngfuncs.pfnHookEvent("events/ag36_2.sc", EV_FireAG36_2);
 	gEngfuncs.pfnHookEvent("events/python.sc", EV_FirePython);
 	gEngfuncs.pfnHookEvent("events/gauss.sc", EV_FireGauss);
 	gEngfuncs.pfnHookEvent("events/gaussspin.sc", EV_SpinGauss);

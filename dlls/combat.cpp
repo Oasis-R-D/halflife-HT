@@ -1518,7 +1518,7 @@ void CBaseEntity::FireBullets(unsigned int cShots, Vector vecSrc, Vector vecDirS
 
 					break;
 
-				case BULLET_PLAYER_556:
+				case BULLET_PLAYER_M249:
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg556, vecDir, &tr, DMG_BULLET);
 					TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
 					DecalGunshot(&tr, iBulletType);
@@ -1611,12 +1611,16 @@ Vector CBaseEntity::FireBulletsPlayer(unsigned int cShots, Vector vecSrc, Vector
 				switch (iBulletType)
 				{
 				default:
-				case BULLET_PLAYER_9MM:
+				case BULLET_PLAYER_GLOCK:
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg9MM, vecDir, &tr, DMG_BULLET);
 					break;
 
 				case BULLET_PLAYER_MP5:
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgMP5, vecDir, &tr, DMG_BULLET);
+					break;
+
+				case BULLET_PLAYER_AG36:
+					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgAG36, vecDir, &tr, DMG_BULLET);
 					break;
 
 				case BULLET_PLAYER_BUCKSHOT:
@@ -1628,7 +1632,7 @@ Vector CBaseEntity::FireBulletsPlayer(unsigned int cShots, Vector vecSrc, Vector
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg357, vecDir, &tr, DMG_BULLET);
 					break;
 
-				case BULLET_PLAYER_556:
+				case BULLET_PLAYER_M249:
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg556, vecDir, &tr, DMG_BULLET);
 					break;
 

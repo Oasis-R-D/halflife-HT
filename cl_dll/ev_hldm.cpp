@@ -309,13 +309,13 @@ void EV_HLDM_DecalGunshot(pmtrace_t* pTrace, int iBulletType)
 	{
 		switch (iBulletType)
 		{
-		case BULLET_PLAYER_9MM:
+		case BULLET_PLAYER_GLOCK:
 		case BULLET_MONSTER_9MM:
 		case BULLET_PLAYER_MP5:
 		case BULLET_MONSTER_MP5:
 		case BULLET_PLAYER_BUCKSHOT:
 		case BULLET_PLAYER_357:
-		case BULLET_PLAYER_556:
+		case BULLET_PLAYER_M249:
 		case BULLET_PLAYER_223:
 		case BULLET_PLAYER_EAGLE:
 		default:
@@ -356,7 +356,7 @@ void EV_HLDM_CheckTracer(int idx, float* vecSrc, float* end, float* forward, flo
 		case BULLET_MONSTER_MP5:
 		case BULLET_MONSTER_9MM:
 		case BULLET_MONSTER_12MM:
-		case BULLET_PLAYER_556:
+		case BULLET_PLAYER_M249:
 		case BULLET_PLAYER_223:
 		case BULLET_PLAYER_EAGLE:
 		default:
@@ -439,7 +439,7 @@ void EV_HLDM_FireBullets(int idx, float* forward, float* right, float* up, int c
 			switch (iBulletType)
 			{
 			default:
-			case BULLET_PLAYER_9MM:
+			case BULLET_PLAYER_GLOCK:
 
 				EV_HLDM_PlayTextureSound(idx, &tr, vecSrc, vecEnd, iBulletType);
 				EV_HLDM_DecalGunshot(&tr, iBulletType);
@@ -472,7 +472,7 @@ void EV_HLDM_FireBullets(int idx, float* forward, float* right, float* up, int c
 				EV_HLDM_DecalGunshot(&tr, iBulletType);
 				break;
 
-			case BULLET_PLAYER_556:
+			case BULLET_PLAYER_M249:
 				EV_HLDM_PlayTextureSound(idx, &tr, vecSrc, vecEnd, iBulletType);
 				EV_HLDM_DecalGunshot(&tr, iBulletType);
 				break;
@@ -528,7 +528,7 @@ void EV_FireGlock1(event_args_t* args)
 
 	VectorCopy(forward, vecAiming);
 
-	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_9MM, 0, &tracerCount[idx - 1], args->fparam1, args->fparam2);
+	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_GLOCK, 0, &tracerCount[idx - 1], args->fparam1, args->fparam2);
 }
 
 void EV_FireGlock2(event_args_t* args)
@@ -574,7 +574,7 @@ void EV_FireGlock2(event_args_t* args)
 
 	VectorCopy(forward, vecAiming);
 
-	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_9MM, 0, &tracerCount[idx - 1], args->fparam1, args->fparam2);
+	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_GLOCK, 0, &tracerCount[idx - 1], args->fparam1, args->fparam2);
 }
 //======================
 //	   GLOCK END
@@ -618,14 +618,14 @@ void EV_FireShotGunDouble(event_args_t* args) // SPAS-12
 
 	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHOTSHELL);
 
-	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/sbarrel1.wav", gEngfuncs.pfnRandomFloat(0.95, 1.0), ATTN_NORM, 0, 93 + gEngfuncs.pfnRandomLong(0, 0x1f));
+	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/sbarrel2.wav", gEngfuncs.pfnRandomFloat(0.95, 1.0), ATTN_NORM, 0, 93 + gEngfuncs.pfnRandomLong(0, 0x1f));
 
 	EV_GetGunPosition(args, vecSrc, origin);
 	VectorCopy(forward, vecAiming);
 
 	if (gEngfuncs.GetMaxClients() > 1)
 	{
-		EV_HLDM_FireBullets(idx, forward, right, up, 4, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.08716, 0.04362);
+		EV_HLDM_FireBullets(idx, forward, right, up, 4, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.04362*2, 0.04362);
 	}
 	else
 	{
@@ -675,11 +675,11 @@ void EV_FireShotGunSingle(event_args_t* args) // MOSSBERG
 
 	if (gEngfuncs.GetMaxClients() > 1)
 	{
-		EV_HLDM_FireBullets(idx, forward, right, up, 4, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.08716, 0.04362);
+		EV_HLDM_FireBullets(idx, forward, right, up, 4, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.04362, 0.04362/2);
 	}
 	else
 	{
-		EV_HLDM_FireBullets(idx, forward, right, up, 6, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.08716, 0.08716);
+		EV_HLDM_FireBullets(idx, forward, right, up, 6, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.04362, 0.04362);
 	}
 }
 //======================
@@ -739,10 +739,67 @@ void EV_FireMP5(event_args_t* args)
 
 	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_MP5, 2, &tracerCount[idx - 1], args->fparam1, args->fparam2);
 }
+//======================
+//		 MP5 END
+//======================
+
+//======================
+//	    AG36 START
+//======================
+void EV_FireAG36(event_args_t* args)
+{
+	int idx;
+	Vector origin;
+	Vector angles;
+	Vector velocity;
+
+	Vector ShellVelocity;
+	Vector ShellOrigin;
+	int shell;
+	Vector vecSrc, vecAiming;
+	Vector up, right, forward;
+
+	idx = args->entindex;
+	VectorCopy(args->origin, origin);
+	VectorCopy(args->angles, angles);
+	VectorCopy(args->velocity, velocity);
+
+	AngleVectors(angles, forward, right, up);
+
+	shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/saw_shell.mdl"); // brass shell
+
+	if (EV_IsLocal(idx))
+	{
+		// Add muzzle flash to current weapon model
+		EV_MuzzleFlash();
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(MP5_FIRE1 + gEngfuncs.pfnRandomLong(0, 2), 0);
+
+		V_PunchAxis(gEngfuncs.pfnRandomFloat(-0.8, 0.8), gEngfuncs.pfnRandomFloat(-1.25, 1.25));
+	}
+
+	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 8, -16, 4);
+
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
+
+	switch (gEngfuncs.pfnRandomLong(0, 1))
+	{
+	case 0:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/g36_fire1.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+		break;
+	case 1:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/g36_fire2.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+		break;
+	}
+
+	EV_GetGunPosition(args, vecSrc, origin);
+	VectorCopy(forward, vecAiming);
+
+	EV_HLDM_FireBullets(idx, forward, right, up, 1, vecSrc, vecAiming, 8192, BULLET_PLAYER_MP5, 2, &tracerCount[idx - 1], args->fparam1, args->fparam2);
+}
 
 // We only predict the animation and sound
 // The grenade is still launched from the server.
-void EV_FireMP52(event_args_t* args)
+void EV_FireAG36_2(event_args_t* args)
 {
 	int idx;
 	Vector origin;
@@ -767,7 +824,7 @@ void EV_FireMP52(event_args_t* args)
 	}
 }
 //======================
-//		 MP5 END
+//		AG36 END
 //======================
 
 //======================
@@ -1778,7 +1835,7 @@ void EV_FireM249(event_args_t* args)
 		1,
 		vecSrc, vecAiming,
 		8192.0,
-		BULLET_PLAYER_556,
+		BULLET_PLAYER_M249,
 		0, nullptr,
 		args->fparam1, args->fparam2);
 }

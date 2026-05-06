@@ -129,10 +129,7 @@
     <ClCompile Include="..\..\dlls\satchel.cpp">
       <Filter>Source Files\_hl\dlls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dlls\shotgun_double.cpp">
-      <Filter>Source Files\_hl\dlls</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dlls\shotgun_single.cpp">
+    <ClCompile Include="..\..\dlls\shotgun.cpp">
       <Filter>Source Files\_hl\dlls</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dlls\tripmine.cpp">
@@ -386,6 +383,9 @@
     </ClCompile>
     <ClCompile Include="..\..\dlls\RC_weapon.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\ag36.cpp">
+      <Filter>Source Files\_hl\dlls</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

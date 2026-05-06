@@ -374,6 +374,8 @@ public:
 	{
 		PRECACHE_MODEL("models/spore_ammo.mdl");
 		PRECACHE_SOUND("weapons/spore_ammo.wav");
+
+		UTIL_PrecacheOther("spore");
 	}
 
 	void Spawn() override

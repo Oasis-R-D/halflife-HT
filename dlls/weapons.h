@@ -112,7 +112,7 @@ public:
 #define SNARK_MAX_CARRY 15
 #define HORNET_MAX_CARRY 8
 #define M203_GRENADE_MAX_CARRY 10
-#define M249_MAX_CARRY 200
+#define M249_MAX_CARRY 150
 #define SPORELAUNCHER_MAX_CARRY 20
 #define SNIPERRIFLE_MAX_CARRY 20
 
@@ -122,9 +122,11 @@ public:
 //#define CROWBAR_MAX_CLIP		WEAPON_NOCLIP
 #define GLOCK_MAX_CLIP 17
 #define PYTHON_MAX_CLIP 6
-#define MP5_MAX_CLIP 50
+#define MP5_MAX_CLIP 40
+#define AG36_MAX_CLIP 30
 #define MP5_DEFAULT_AMMO 25
-#define SHOTGUN_MAX_CLIP 8
+#define SHOTGUN_MAX_CLIP 6
+#define SINGLESHOTGUN_MAX_CLIP 8
 #define CROSSBOW_MAX_CLIP 5
 #define RPG_MAX_CLIP 1
 #define GAUSS_MAX_CLIP WEAPON_NOCLIP
@@ -168,6 +170,7 @@ public:
 #define AMMO_GLOCKCLIP_GIVE GLOCK_MAX_CLIP
 #define AMMO_357BOX_GIVE PYTHON_MAX_CLIP
 #define AMMO_MP5CLIP_GIVE MP5_MAX_CLIP
+#define AMMO_AG36CLIP_GIVE AG36_MAX_CLIP
 #define AMMO_CHAINBOX_GIVE 200
 #define AMMO_M203BOX_GIVE 2
 #define AMMO_BUCKSHOTBOX_GIVE 12
@@ -184,7 +187,7 @@ public:
 typedef enum
 {
 	BULLET_NONE = 0,
-	BULLET_PLAYER_9MM,		// glock
+	BULLET_PLAYER_GLOCK,		// glock
 	BULLET_PLAYER_MP5,		// mp5
 	BULLET_PLAYER_357,		// python
 	BULLET_PLAYER_BUCKSHOT, // shotgun
@@ -194,9 +197,10 @@ typedef enum
 	BULLET_MONSTER_MP5,
 	BULLET_MONSTER_12MM,
 
-	BULLET_PLAYER_556,
+	BULLET_PLAYER_M249,
 	BULLET_PLAYER_223,
 	BULLET_PLAYER_EAGLE,
+	BULLET_PLAYER_AG36,
 } Bullet;
 
 
@@ -666,7 +670,6 @@ public:
 	void IncrementAmmo(CBasePlayer* pPlayer) override;
 
 	void PrimaryAttack() override;
-	void SecondaryAttack() override;
 	bool Deploy() override;
 	void Reload() override;
 	void WeaponIdle() override;
@@ -685,9 +688,39 @@ public:
 private:
 	float m_flNextGrenadeLoad;
 	unsigned short m_usMP5;
-	unsigned short m_usMP52;
 };
 
+class CAG36 : public CBasePlayerWeapon
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	int iItemSlot() override { return 3; }
+	bool GetItemInfo(ItemInfo* p) override;
+	void IncrementAmmo(CBasePlayer* pPlayer) override;
+
+	void PrimaryAttack() override;
+	void SecondaryAttack() override;
+	bool Deploy() override;
+	void Reload() override;
+	void WeaponIdle() override;
+	float m_flNextAnimTime;
+	int m_iShell;
+
+	bool UseDecrement() override
+	{
+#if defined(CLIENT_WEAPONS)
+		return UTIL_DefaultUseDecrement();
+#else
+		return false;
+#endif
+	}
+
+private:
+	float m_flNextGrenadeLoad;
+	unsigned short m_usAG36;
+	unsigned short m_usAG36_2;
+};
 enum crossbow_e
 {
 	CROSSBOW_IDLE1 = 0, // full
@@ -750,7 +783,7 @@ enum shotgun_e
 	SHOTGUN_IDLE_DEEP
 };
 
-class CShotgunSingle : public CBasePlayerWeapon
+class CShotgun : public CBasePlayerWeapon
 {
 public:
 #ifndef CLIENT_DLL
@@ -767,6 +800,7 @@ public:
 	void IncrementAmmo(CBasePlayer* pPlayer) override;
 
 	void PrimaryAttack() override;
+	void SecondaryAttack() override;
 	bool Deploy() override;
 	void Reload() override;
 	void WeaponIdle() override;
@@ -785,43 +819,6 @@ public:
 
 private:
 	unsigned short m_usSingleFire;
-};
-
-class CShotgunDouble : public CBasePlayerWeapon
-{
-public:
-#ifndef CLIENT_DLL
-	bool Save(CSave& save) override;
-	bool Restore(CRestore& restore) override;
-	static TYPEDESCRIPTION m_SaveData[];
-#endif
-
-
-	void Spawn() override;
-	void Precache() override;
-	int iItemSlot() override { return 3; }
-	bool GetItemInfo(ItemInfo* p) override;
-	void IncrementAmmo(CBasePlayer* pPlayer) override;
-
-	void PrimaryAttack() override;
-	//void SecondaryAttack() override;
-	bool Deploy() override;
-	void Reload() override;
-	void WeaponIdle() override;
-	void ItemPostFrame() override;
-	float m_flNextReload;
-	int m_iShell;
-
-	bool UseDecrement() override
-	{
-#if defined(CLIENT_WEAPONS)
-		return UTIL_DefaultUseDecrement();
-#else
-		return false;
-#endif
-	}
-
-private:
 	unsigned short m_usDoubleFire;
 };
 

@@ -22,12 +22,14 @@
 #define RC_MAX_TURNSPEED 256
 #define RC_MAX_DRIVESPEED 256
 
+#define RC_CAM_OFFSET 8
+
 LINK_ENTITY_TO_CLASS(pl_rc_cam, CRCcamera);
 void CRCcamera::Spawn()
 {
-	Precache();
+	SET_MODEL(ENT(pev), "models/rc.mdl"); // placeholder
 	pev->classname = MAKE_STRING("pl_rc_cam");
-	pev->movetype = MOVETYPE_NONE;
+	pev->movetype = MOVETYPE_NOCLIP;
 	pev->solid = SOLID_NOT;
 	UTIL_SetOrigin(pev, pev->origin);
 }
@@ -36,6 +38,13 @@ void CRCcamera::Spawn()
 LINK_ENTITY_TO_CLASS(pl_rc, CRC);
 CRC* CRC::RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, int RCType)
 {
+	// spawn the camera
+	CRCcamera* pRCcam = GetClassPtr((CRCcamera*)NULL);
+	pRCcam->pev->classname = MAKE_STRING("pl_rc_cam");
+	pRCcam->pev->origin = VecSpawnPos+Vector(0, 0, RC_CAM_OFFSET);
+	pRCcam->pev->angles = vecDir;
+	pRCcam->Spawn();
+
 	// Create a new entity with CRC private data
 	CRC* pRC = GetClassPtr((CRC*)NULL);
 	pRC->pev->classname = MAKE_STRING("pl_rc");
@@ -44,7 +53,7 @@ CRC* CRC::RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, in
 	pRC->m_direction = vecDir;
 	pRC->m_Flare = RCType; // tracer type
 	pRC->pev->owner = NULL;
-	
+	pRC->m_pCamera = pRCcam;
 	pRC->Spawn();
 	
 	return pRC;
@@ -67,13 +76,6 @@ int CRC::Classify()
 
 void CRC::Spawn()
 {
-	// spawn the camera
-	CRCcamera* pRCcam = GetClassPtr((CRCcamera*)NULL);
-	pRCcam->pev->classname = MAKE_STRING("pl_rc_cam");
-	pRCcam->pev->angles = m_direction;
-	pRCcam->Spawn();
-	m_pCamera = pRCcam;
-
 	Precache();
 
 	pev->movetype = MOVETYPE_STEP;
@@ -146,9 +148,12 @@ bool CRC::StartControl(CBasePlayer* pController)
 
 	m_pController->pev->maxspeed = 0.00001;
 
-	SET_VIEW(m_pController->edict(), m_pCamera->edict());
-	m_pController->m_hViewEntity = m_pCamera;
-
+	if (m_pCamera)
+	{
+		SET_VIEW(m_pController->edict(), m_pCamera->edict());
+		m_pController->m_hViewEntity = m_pCamera;
+		m_bCamConnected = true;
+	}
 	return true;
 }
 
@@ -206,7 +211,7 @@ void CRC::DriveThink()
 	// check attacks
 	if (AttackThink() == true) 
 		return; // was detonated by the player or water
-	
+
 	if (!m_pCamera)
 	{
 		ALERT(at_console, "no camera!\n");
@@ -282,15 +287,20 @@ void CRC::DriveThink()
 	}
 
 	// keep camera here (may not like setting origin every frame)
-	m_pCamera->pev->origin = pev->origin + Vector(0, 0, 4);
+	m_pCamera->pev->origin = pev->origin + Vector(0, 0, RC_CAM_OFFSET);
 	m_pCamera->pev->angles = pev->angles;
 
 	// report status
-	ALERT(at_console, "DRIVE: %d, TURN %d, JUMP %d, DT %f\n", drive, turn, jmp, DT);
+	ALERT(at_console, "DRIVE: %d, TURN %d, JUMP %d, DT %f, CAM %f %f %f\n", drive, turn, jmp, DT, m_pCamera->pev->origin.x, m_pCamera->pev->origin.y, m_pCamera->pev->origin.z);
 }
 
 void CRC::ExplodeThink()
 {
+	pev->model = iStringNull; //invisible
+	pev->solid = SOLID_NOT;	  // intangible
+
+	pev->takedamage = DAMAGE_NO;
+
 	if (m_Flare == RC_EXPLODE)
 	{
 		int iContents = UTIL_PointContents(pev->origin);
@@ -330,7 +340,7 @@ void CRC::ExplodeThink()
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3.0);
 		
 		pev->owner = NULL; // can't traceline attack owner if this is set
-		RadiusDamage(pev->origin, pev, m_pController ? m_pController->pev : NULL, pev->dmg, CLASS_NONE, DMG_BLAST);
+		RadiusDamage(pev->origin+4, pev, m_pController ? m_pController->pev : NULL, pev->dmg, CLASS_NONE, DMG_BLAST);
 	}
 	else // don't do both (optimization)
 	{
@@ -373,6 +383,7 @@ void CRC::ExplodeThink()
 	ALERT(at_console, "stopped using RC\n");
 
 	m_pController->m_iHideHUD &= ~HIDEHUD_WEAPONS;
+	UTIL_Remove(m_pCamera);
 }
 
 void CRC::Impact(CBaseEntity* pOther)

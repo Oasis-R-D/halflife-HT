@@ -390,6 +390,8 @@ cvar_t sk_plr_9mmAR_bullet1 = {"sk_plr_9mmAR_bullet1", "0"};
 cvar_t sk_plr_9mmAR_bullet2 = {"sk_plr_9mmAR_bullet2", "0"};
 cvar_t sk_plr_9mmAR_bullet3 = {"sk_plr_9mmAR_bullet3", "0"};
 
+// AG36 Round
+DECLARE_SKILL_CVARS(plr_556mmAR_bullet);
 
 // M203 grenade
 cvar_t sk_plr_9mmAR_grenade1 = {"sk_plr_9mmAR_grenade1", "0"};
@@ -991,6 +993,8 @@ void GameDLLInit()
 	CVAR_REGISTER(&sk_plr_9mmAR_bullet2); // {"sk_plr_9mmAR_bullet2","0"};
 	CVAR_REGISTER(&sk_plr_9mmAR_bullet3); // {"sk_plr_9mmAR_bullet3","0"};
 
+	// AG36 Round
+	REGISTER_SKILL_CVARS(plr_556mmAR_bullet);
 
 	// M203 grenade
 	CVAR_REGISTER(&sk_plr_9mmAR_grenade1); // {"sk_plr_9mmAR_grenade1","0"};

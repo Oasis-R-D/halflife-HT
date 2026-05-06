@@ -2853,7 +2853,7 @@ void CHGruntAlly::ShootSaw()
 	}
 	}
 
-	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_5DEGREES, 8192, BULLET_PLAYER_556, 2); // shoot +-5 degrees
+	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_5DEGREES, 8192, BULLET_PLAYER_M249, 2); // shoot +-5 degrees
 
 	switch (RANDOM_LONG(0, 2))
 	{
