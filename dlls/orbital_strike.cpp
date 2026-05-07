@@ -23,19 +23,15 @@
 #include "gamerules.h"
 #include "UserMessages.h"
 
-LINK_ENTITY_TO_CLASS(weapon_mp5, CMP5);
-LINK_ENTITY_TO_CLASS(weapon_mp5k, CMP5);
-LINK_ENTITY_TO_CLASS(weapon_9mmAR, CMP5);
-
+LINK_ENTITY_TO_CLASS(weapon_skystrike, COrbStrike);
 
 //=========================================================
 //=========================================================
-void CMP5::Spawn()
+void COrbStrike::Spawn()
 {
-	pev->classname = MAKE_STRING("weapon_9mmAR"); // hack to allow for old names
 	Precache();
-	SET_MODEL(ENT(pev), "models/w_9mmARk.mdl");
-	m_iId = WEAPON_MP5K;
+	SET_MODEL(ENT(pev), "models/w_satchel.mdl");
+	m_iId = WEAPON_ORBITALSTRIKE;
 
 	m_iDefaultAmmo = MP5_DEFAULT_GIVE;
 
@@ -43,31 +39,19 @@ void CMP5::Spawn()
 }
 
 
-void CMP5::Precache()
+void COrbStrike::Precache()
 {
-	PRECACHE_MODEL("models/v_9mmAR.mdl");
-	PRECACHE_MODEL("models/w_9mmAR.mdl");
-	PRECACHE_MODEL("models/w_9mmARk.mdl");
-	PRECACHE_MODEL("models/p_9mmAR.mdl");
-
-	m_iShell = PRECACHE_MODEL("models/shell.mdl"); // brass shellTE_MODEL
-
+	PRECACHE_MODEL("models/v_satchel_radio.mdl");
+	PRECACHE_MODEL("models/w_satchel.mdl");
+	PRECACHE_MODEL("models/p_satchel_radio.mdl");
+	
 	PRECACHE_MODEL("models/w_9mmARclip.mdl");
 	PRECACHE_SOUND("items/9mmclip1.wav");
 
-	PRECACHE_SOUND("items/clipinsert1.wav");
-	PRECACHE_SOUND("items/cliprelease1.wav");
-
-	PRECACHE_SOUND("weapons/hks1.wav"); // H to the K
-	PRECACHE_SOUND("weapons/hks2.wav"); // H to the K
-	PRECACHE_SOUND("weapons/hks3.wav"); // H to the K
-
 	PRECACHE_SOUND("weapons/357_cock1.wav");
-
-	m_usMP5 = PRECACHE_EVENT(1, "events/mp5.sc");
 }
 
-bool CMP5::GetItemInfo(ItemInfo* p)
+bool COrbStrike::GetItemInfo(ItemInfo* p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "9mm";
@@ -84,7 +68,7 @@ bool CMP5::GetItemInfo(ItemInfo* p)
 	return true;
 }
 
-void CMP5::IncrementAmmo(CBasePlayer* pPlayer)
+void COrbStrike::IncrementAmmo(CBasePlayer* pPlayer)
 {
 	if (pPlayer->GiveAmmo(1, "9mm", _9MM_MAX_CARRY) >= 0)
 	{
@@ -92,22 +76,13 @@ void CMP5::IncrementAmmo(CBasePlayer* pPlayer)
 	}
 }
 
-bool CMP5::Deploy()
+bool COrbStrike::Deploy()
 {
-	return DefaultDeploy("models/v_9mmAR.mdl", "models/p_9mmAR.mdl", MP5_DEPLOY, "mp5");
+	return DefaultDeploy("models/v_satchel_radio.mdl", "models/p_satchel_radio.mdl", SATCHEL_RADIO_DRAW, "orbital");
 }
 
-
-void CMP5::PrimaryAttack()
+void COrbStrike::PrimaryAttack()
 {
-	// don't fire underwater
-	if (m_pPlayer->pev->waterlevel == 3)
-	{
-		PlayEmptySound();
-		m_flNextPrimaryAttack = 0.15;
-		return;
-	}
-
 	if (m_iClip <= 0)
 	{
 		PlayEmptySound();
@@ -115,13 +90,9 @@ void CMP5::PrimaryAttack()
 		return;
 	}
 
-	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
-	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
-
 	m_iClip--;
 
-
-	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
+	SendWeaponAnim(SATCHEL_RADIO_FIRE);
 
 	// player "shoot" animation
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -145,15 +116,6 @@ void CMP5::PrimaryAttack()
 		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, VECTOR_CONE_3DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 	}
 
-	int flags;
-#if defined(CLIENT_WEAPONS)
-	flags = UTIL_DefaultPlaybackFlags();
-#else
-	flags = 0;
-#endif
-
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usMP5, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
-
 	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);
@@ -166,44 +128,37 @@ void CMP5::PrimaryAttack()
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
 }
 
-void CMP5::Reload()
+void COrbStrike::Reload()
 {
-	if (m_pPlayer->ammo_9mm <= 0)
-		return;
-
-	DefaultReload(MP5_MAX_CLIP, MP5_RELOAD, 1.5);
+	DefaultReload(MP5_MAX_CLIP, SATCHEL_RADIO_DRAW, 1.5);
 }
 
 
-void CMP5::WeaponIdle()
+void COrbStrike::WeaponIdle()
 {
 	ResetEmptySound();
-
-	m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
 
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
 	int iAnim;
-	switch (RANDOM_LONG(0, 1))
+	switch (RANDOM_LONG(0, 4))
 	{
 	case 0:
-		iAnim = MP5_LONGIDLE;
+		iAnim = SATCHEL_RADIO_FIDGET1;
 		break;
 
 	default:
-	case 1:
-		iAnim = MP5_IDLE1;
+		iAnim = SATCHEL_RADIO_IDLE1;
 		break;
 	}
-
 	SendWeaponAnim(iAnim);
 
 	m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15); // how long till we do this again.
 }
 
 
-class CMP5Drop : public CBasePlayerAmmo
+class COrbStrikeDrop : public CBasePlayerAmmo
 {
 	void Spawn() override
 	{
@@ -226,9 +181,9 @@ class CMP5Drop : public CBasePlayerAmmo
 		return bResult;
 	}
 };
-LINK_ENTITY_TO_CLASS(ammo_mp5drop, CMP5Drop);
+LINK_ENTITY_TO_CLASS(ammo_mp5drop, COrbStrikeDrop);
 
-class CMP5AmmoClip : public CBasePlayerAmmo
+class COrbStrikeAmmoClip : public CBasePlayerAmmo
 {
 	void Spawn() override
 	{
@@ -251,12 +206,12 @@ class CMP5AmmoClip : public CBasePlayerAmmo
 		return bResult;
 	}
 };
-LINK_ENTITY_TO_CLASS(ammo_mp5clip, CMP5AmmoClip);
-LINK_ENTITY_TO_CLASS(ammo_9mmAR, CMP5AmmoClip);
+LINK_ENTITY_TO_CLASS(ammo_mp5clip, COrbStrikeAmmoClip);
+LINK_ENTITY_TO_CLASS(ammo_9mmAR, COrbStrikeAmmoClip);
 
 
 
-class CMP5Chainammo : public CBasePlayerAmmo
+class COrbStrikeChainammo : public CBasePlayerAmmo
 {
 	void Spawn() override
 	{
@@ -279,10 +234,10 @@ class CMP5Chainammo : public CBasePlayerAmmo
 		return bResult;
 	}
 };
-LINK_ENTITY_TO_CLASS(ammo_9mmbox, CMP5Chainammo);
+LINK_ENTITY_TO_CLASS(ammo_9mmbox, COrbStrikeChainammo);
 
 
-class CMP5AmmoGrenade : public CBasePlayerAmmo
+class COrbStrikeAmmoGrenade : public CBasePlayerAmmo
 {
 	void Spawn() override
 	{
@@ -306,5 +261,5 @@ class CMP5AmmoGrenade : public CBasePlayerAmmo
 		return bResult;
 	}
 };
-LINK_ENTITY_TO_CLASS(ammo_mp5grenades, CMP5AmmoGrenade);
-LINK_ENTITY_TO_CLASS(ammo_ARgrenades, CMP5AmmoGrenade);
+LINK_ENTITY_TO_CLASS(ammo_mp5grenades, COrbStrikeAmmoGrenade);
+LINK_ENTITY_TO_CLASS(ammo_ARgrenades, COrbStrikeAmmoGrenade);

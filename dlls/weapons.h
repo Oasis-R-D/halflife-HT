@@ -686,7 +686,6 @@ public:
 	}
 
 private:
-	float m_flNextGrenadeLoad;
 	unsigned short m_usMP5;
 };
 

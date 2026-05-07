@@ -28,7 +28,7 @@
 #define VECTOR_CONE_DM_SHOTGUN Vector(0.04362, 0.04362/2, 0.00)		// 10 degrees by 5 degrees
 #define VECTOR_CONE_DM_DOUBLESHOTGUN Vector(0.04362*2, 0.04362, 0.00) // 20 degrees by 5 degrees
 
-LINK_ENTITY_TO_CLASS(weapon_shotgun, CShotgun); // compatibility with HL1 maps
+LINK_ENTITY_TO_CLASS(weapon_shotgun, CShotgun);
 
 void CShotgun::Spawn()
 {
