@@ -49,7 +49,7 @@ CRC* CRC::RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, in
 	// Create a new entity with CRC private data
 	CRC* pRC = GetClassPtr((CRC*)NULL);
 	pRC->pev->classname = MAKE_STRING("pl_rc");
-	pRC->pev->dmg = RCDamage;
+	pRC->m_iDamage = RCDamage;
 	pRC->m_SpawnPos = VecSpawnPos;
 	pRC->m_direction = vecDir;
 	pRC->m_Flare = RCType; // tracer type
@@ -304,7 +304,6 @@ void CRC::ExplodeThink()
 
 	if (m_Flare == RC_EXPLODE && m_pController)
 	{
-		/*
 		int iContents = UTIL_PointContents(pev->origin);
 
 		// VFX
@@ -321,7 +320,7 @@ void CRC::ExplodeThink()
 			{
 				WRITE_SHORT(g_sModelIndexWExplosion);
 			}
-			WRITE_BYTE((pev->dmg - 50) * .60); // scale * 10
+			WRITE_BYTE((m_iDamage - 50) * .60); // scale * 10
 			WRITE_BYTE(15);					   // framerate
 			WRITE_BYTE(TE_EXPLFLAG_NONE);
 		MESSAGE_END();
@@ -343,10 +342,8 @@ void CRC::ExplodeThink()
 		
 		pev->owner = NULL; // can't traceline attack owner if this is set
 		
-
-		RadiusDamage(pev->origin+4, pev, m_pController, pev->dmg, CLASS_NONE, DMG_BLAST);
-		*/
-		ExplosionCreate(pev->origin+4, gpGlobals->v_forward, m_pController->edict(), pev->dmg, true);
+		RadiusDamage(pev->origin + Vector(0, 0, 4), pev, m_pController->pev, m_iDamage, CLASS_NONE, DMG_BLAST);
+		//ExplosionCreate(pev->origin+Vector(0, 0, 4), gpGlobals->v_forward, m_pController->edict(), m_iDamage, true);
 	}
 	else // don't do both (optimization)
 	{

@@ -86,8 +86,6 @@ void CRCWeapon::PrimaryAttack()
 	Throw(RC_EXPLODE);
 }
 
-
-
 void CRCWeapon::SecondaryAttack()
 {
 	Throw(RC_GUN); // TO-DO: should probably give the gun turret limited ammo

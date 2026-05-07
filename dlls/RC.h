@@ -57,6 +57,7 @@ public:
 	float m_fJumpDelay;
 	float m_fExplodeDelay;
 	int m_idShard;
+	int m_iDamage;
 
 protected:
 	CBasePlayer* m_pController;
