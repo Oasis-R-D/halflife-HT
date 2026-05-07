@@ -34,6 +34,7 @@
 #define ISLAVE_AE_ZAP_POWERUP (3)
 #define ISLAVE_AE_ZAP_SHOOT (4)
 #define ISLAVE_AE_ZAP_DONE (5)
+#define ISLAVE_AE_SHOCKWAVE (6)
 
 #define ISLAVE_MAX_BEAMS 8
 
@@ -47,6 +48,7 @@ public:
 	int Classify() override;
 	int IRelationship(CBaseEntity* pTarget) override;
 	void HandleAnimEvent(MonsterEvent_t* pEvent) override;
+	int IgnoreConditions() override;
 	bool CheckRangeAttack1(float flDot, float flDist) override;
 	bool CheckRangeAttack2(float flDot, float flDist) override;
 	void CallForHelp(const char* szClassname, float flDist, EHANDLE hEnemy, Vector& vecLocation);
@@ -437,6 +439,13 @@ void CISlave::HandleAnimEvent(MonsterEvent_t* pEvent)
 	case ISLAVE_AE_ZAP_DONE:
 	{
 		ClearBeams();
+	}
+	break;
+
+	case ISLAVE_AE_SHOCKWAVE:
+	{
+		// TO-DO: port Displacer ball shockwave effects
+		// TO-DO: override melee attack 1 check and add melee attack 2
 	}
 	break;
 
@@ -851,6 +860,19 @@ void CISlave::ClearBeams()
 	pev->skin = 0;
 
 	STOP_SOUND(ENT(pev), CHAN_WEAPON, "debris/zap4.wav");
+}
+
+int CISlave::IgnoreConditions()
+{
+	int iIgnore = CBaseMonster::IgnoreConditions();
+
+	// don't interrupt shockwave attack
+	if (m_Activity == ACT_MELEE_ATTACK2)
+	{
+		iIgnore |= (bits_COND_LIGHT_DAMAGE | bits_COND_HEAVY_DAMAGE);
+	}
+
+	return iIgnore;
 }
 
 //=========================================================
