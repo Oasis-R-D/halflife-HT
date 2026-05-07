@@ -25,7 +25,7 @@
 #include "rope/CRope.h"
 #include "ctf/CTFGoal.h"
 #include "ctf/CTFGoalFlag.h"
-
+#include "skill.h"
 #include "gamerules.h"
 
 #endif
