@@ -226,10 +226,9 @@ void CVortigun::ZapBeam(Vector vecOrg)
 	if (m_iBeams >= ISLAVE_MAX_BEAMS)
 		return;
 
-	vecOrg = m_pPlayer->pev->origin + gpGlobals->v_up * 36;
-	float deflection = 0.01;
-	vecAim = gpGlobals->v_forward + gpGlobals->v_right * RANDOM_FLOAT(-deflection, deflection) + gpGlobals->v_up * RANDOM_FLOAT(-deflection, deflection);
-	UTIL_TraceLine(vecOrg, vecOrg + vecAim * 1024, dont_ignore_monsters, ENT(pev), &tr);
+	vecOrg = m_pPlayer->GetGunPosition();
+	vecAim = m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
+	UTIL_TraceLine(vecOrg, vecOrg + vecAim * 2048, dont_ignore_monsters, ENT(pev), &tr);
 
 	m_pBeam[m_iBeams] = CBeam::BeamCreate("sprites/lgtning.spr", 50);
 	if (!m_pBeam[m_iBeams])
@@ -246,9 +245,11 @@ void CVortigun::ZapBeam(Vector vecOrg)
 	pEntity = CBaseEntity::Instance(tr.pHit);
 	if (pEntity != NULL && 0 != pEntity->pev->takedamage)
 	{
-		pEntity->TraceAttack(m_pPlayer->pev, 30, vecAim, &tr, DMG_SHOCK);
+		pEntity->TraceAttack(m_pPlayer->pev, gSkillData.plrDmg762, vecAim, &tr, DMG_SHOCK); // TO-DO: add separate skill value
 	}
 	UTIL_EmitAmbientSound(ENT(pev), tr.vecEndPos, "weapons/electro4.wav", 0.5, ATTN_NORM, 0, RANDOM_LONG(140, 160));
+
+	// TO-DO: might be interesting to make the Vortigun electricity jump between enemies
 #endif
 }
 
