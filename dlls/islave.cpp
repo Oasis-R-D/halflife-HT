@@ -49,6 +49,8 @@ public:
 	int IRelationship(CBaseEntity* pTarget) override;
 	void HandleAnimEvent(MonsterEvent_t* pEvent) override;
 	int IgnoreConditions() override;
+	bool CheckMeleeAttack1(float flDOt, float flDist) override;
+	bool CheckMeleeAttack2(float flDOt, float flDist) override;
 	bool CheckRangeAttack1(float flDot, float flDist) override;
 	bool CheckRangeAttack2(float flDot, float flDist) override;
 	void CallForHelp(const char* szClassname, float flDist, EHANDLE hEnemy, Vector& vecLocation);
@@ -92,6 +94,8 @@ public:
 	static const char* pAttackMissSounds[];
 	static const char* pPainSounds[];
 	static const char* pDeathSounds[];
+private:
+	int m_iTrail;
 };
 LINK_ENTITY_TO_CLASS(monster_alien_slave, CISlave);
 LINK_ENTITY_TO_CLASS(monster_vortigaunt, CISlave);
@@ -444,8 +448,46 @@ void CISlave::HandleAnimEvent(MonsterEvent_t* pEvent)
 
 	case ISLAVE_AE_SHOCKWAVE:
 	{
-		// TO-DO: port Displacer ball shockwave effects
-		// TO-DO: override melee attack 1 check and add melee attack 2
+		//"sprites/lgtning.spr"
+		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_BEAMCYLINDER);
+		WRITE_COORD_VECTOR(pev->origin); // coord coord coord (center position)
+		WRITE_COORD(pev->origin.x);		 // coord coord coord (axis and radius)
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z + 800.0);
+		WRITE_SHORT(m_iTrail); // short (sprite index) // TO-DO: proper sprite
+		WRITE_BYTE(0);		   // byte (starting frame)
+		WRITE_BYTE(0);		   // byte (frame rate in 0.1's)
+		WRITE_BYTE(3);		   // byte (life in 0.1's)
+		WRITE_BYTE(16);		   // byte (line width in 0.1's)
+		WRITE_BYTE(0);		   // byte (noise amplitude in 0.01's)
+		WRITE_BYTE(255);	   // byte,byte,byte (color)
+		WRITE_BYTE(255);
+		WRITE_BYTE(255);
+		WRITE_BYTE(255); // byte (brightness)
+		WRITE_BYTE(0);	 // byte (scroll speed in 0.1's)
+		MESSAGE_END();
+		
+		/*
+		CBaseEntity* pEntity = NULL;
+
+		while ((pEntity = UTIL_FindEntityByClassname(pEntity, "monster_alien_slave")) != NULL)
+		{
+			TraceResult tr;
+
+			UTIL_TraceLine(EyePosition(), pEntity->EyePosition(), ignore_monsters, ENT(pev), &tr);
+			if (tr.flFraction == 1.0 || tr.pHit == pEntity->edict())
+			{
+				if (FClassnameIs(pEntity->pev, "monster_alien_slave"))
+					continue;
+				pEntity->TakeDamage(pev, pev, 10, DMG_SONIC);
+				if (pEntity->BloodColor() != DONT_BLEED || FClassnameIs(pEntity->pev, "func_pushable"))
+				{
+					// push away
+				}
+			}
+		}
+		*/
 	}
 	break;
 
@@ -454,6 +496,32 @@ void CISlave::HandleAnimEvent(MonsterEvent_t* pEvent)
 		break;
 	}
 }
+
+//=========================================================
+// Check Melee
+//=========================================================
+bool CISlave::CheckMeleeAttack1(float flDot, float flDist)
+{
+	// Decent fix to keep folks from kicking/punching hornets and snarks is to check the onground flag(sjb)
+	if (flDist <= 64 && flDot >= 0.7 && m_hEnemy != NULL && FBitSet(m_hEnemy->pev->flags, FL_ONGROUND))
+	{
+		return true;
+	}
+	return false;
+}
+
+//=========================================================
+// Check Shockwave
+//=========================================================
+bool CISlave::CheckMeleeAttack2(float flDot, float flDist)
+{
+	if (flDist <= 160 && flDist > 64 && m_hEnemy != NULL)
+	{
+		return true;
+	}
+	return false;
+}
+
 
 //=========================================================
 // CheckRangeAttack1 - normal beam attack
@@ -556,7 +624,7 @@ void CISlave::Spawn()
 void CISlave::Precache()
 {
 	PRECACHE_MODEL("models/islave.mdl");
-	PRECACHE_MODEL("sprites/lgtning.spr");
+	m_iTrail = PRECACHE_MODEL("sprites/lgtning.spr");
 	PRECACHE_SOUND("debris/zap1.wav");
 	PRECACHE_SOUND("debris/zap4.wav");
 	PRECACHE_SOUND("weapons/electro4.wav");
@@ -671,7 +739,7 @@ Schedule_t* CISlave::GetSchedule()
 
 		if (pev->health < 20 || m_iBravery < 0)
 		{
-			if (!HasConditions(bits_COND_CAN_MELEE_ATTACK1))
+			if (!HasConditions(bits_COND_CAN_MELEE_ATTACK1) && !HasConditions(bits_COND_CAN_MELEE_ATTACK2)
 			{
 				m_failSchedule = SCHED_CHASE_ENEMY;
 				if (HasConditions(bits_COND_LIGHT_DAMAGE | bits_COND_HEAVY_DAMAGE))
@@ -699,6 +767,10 @@ Schedule_t* CISlave::GetScheduleOfType(int Type)
 		if (HasConditions(bits_COND_CAN_MELEE_ATTACK1))
 		{
 			return CSquadMonster::GetScheduleOfType(SCHED_MELEE_ATTACK1);
+		}
+		else if (HasConditions(bits_COND_CAN_MELEE_ATTACK2))
+		{
+			return CSquadMonster::GetScheduleOfType(SCHED_MELEE_ATTACK2);
 		}
 		break;
 	case SCHED_RANGE_ATTACK1:
