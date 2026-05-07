@@ -23,8 +23,6 @@
 #ifndef CLIENT_DLL
 #include "effects.h"
 #include "rope/CRope.h"
-#include "ctf/CTFGoal.h"
-#include "ctf/CTFGoalFlag.h"
 #include "skill.h"
 #include "gamerules.h"
 
@@ -181,7 +179,7 @@ void CVortigun::SpinupThink()
 		WRITE_BYTE(255);				 // r
 		WRITE_BYTE(180);				 // g
 		WRITE_BYTE(96);					 // b
-		WRITE_BYTE(10); // time * 10
+		WRITE_BYTE(10); 				 // time * 10
 		WRITE_BYTE(0);					 // decay * 0.1
 		MESSAGE_END();
 
@@ -193,7 +191,7 @@ void CVortigun::SpinupThink()
 
 	if (m_Mode <= DisplacerMode::SPINNING_UP)
 	{
-		if (gpGlobals->time > m_flStartTime + 0.9)
+		if (m_iBeams >= ISLAVE_MAX_BEAMS)
 		{
 			m_Mode = DisplacerMode::SPINNING;
 
@@ -210,13 +208,13 @@ void CVortigun::SpinupThink()
 
 	m_iSoundState = 128;
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1875;
 }
 
 //=========================================================
 // ZapBeam - heavy damage directly forward
 //=========================================================
-void CVortigun::ZapBeam(Vector vecOrg)
+void CVortigun::ZapBeam()
 {
 #ifndef CLIENT_DLL
 	Vector vecAim;
@@ -293,7 +291,7 @@ void CVortigun::FireThink()
 	ClearBeams();
 	ClearMultiDamage();
 
-	ZapBeam(vecSrc);
+	ZapBeam();
 
 	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "hassault/hw_shoot1.wav", 1, ATTN_NORM, 0, RANDOM_LONG(130, 160));
 	// STOP_SOUND( ENT(pev), CHAN_WEAPON, "debris/zap4.wav" );
@@ -308,8 +306,6 @@ void CVortigun::FireThink()
 #endif
 	pev->nextthink = gpGlobals->time + 0.2;
 	SetThink(&CVortigun::ClearThink);
-
-	
 }
 
 void CVortigun::ClearThink()
@@ -367,7 +363,7 @@ void CVortigun::ArmBeam()
 	{
 		Vector vecAim = gpGlobals->v_right * RANDOM_FLOAT(-1, 1) + gpGlobals->v_up * RANDOM_FLOAT(-1, 1);
 		TraceResult tr1;
-		UTIL_TraceLine(vecSrc, vecSrc + vecAim * 512, dont_ignore_monsters, ENT(pev), &tr1);
+		UTIL_TraceLine(vecSrc, vecSrc + vecAim * 512, dont_ignore_monsters, ENT(pev),	 &tr1);
 		if (flDist > tr1.flFraction)
 		{
 			tr = tr1;

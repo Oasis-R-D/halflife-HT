@@ -78,7 +78,7 @@ public:
 	}
 
 	void ClearBeams();
-	void ZapBeam(Vector vecOrg);
+	void ZapBeam();
 	void BeamGlow();
 	void ArmBeam();
 private:
