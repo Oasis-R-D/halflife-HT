@@ -739,7 +739,7 @@ Schedule_t* CISlave::GetSchedule()
 
 		if (pev->health < 20 || m_iBravery < 0)
 		{
-			if (!HasConditions(bits_COND_CAN_MELEE_ATTACK1) && !HasConditions(bits_COND_CAN_MELEE_ATTACK2)
+			if (!HasConditions(bits_COND_CAN_MELEE_ATTACK1) && !HasConditions(bits_COND_CAN_MELEE_ATTACK2))
 			{
 				m_failSchedule = SCHED_CHASE_ENEMY;
 				if (HasConditions(bits_COND_LIGHT_DAMAGE | bits_COND_HEAVY_DAMAGE))

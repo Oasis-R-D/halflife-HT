@@ -217,7 +217,7 @@ void CVortigun::SpinupThink()
 void CVortigun::ZapBeam()
 {
 #ifndef CLIENT_DLL
-	Vector vecAim;
+	Vector vecOrg, vecAim;
 	TraceResult tr;
 	CBaseEntity* pEntity;
 
