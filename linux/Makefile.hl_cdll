@@ -102,6 +102,7 @@ DLL_OBJS = \
 	$(WEAPONS_OBJ_DIR)/CShockRifle.o \
 	$(WEAPONS_OBJ_DIR)/CSniperRifle.o \
 	$(WEAPONS_OBJ_DIR)/CSporeLauncher.o \
+	$(HL1_SERVER_OBJ_DIR)/ag36.o \
 	$(HL1_SERVER_OBJ_DIR)/crossbow.o \
 	$(HL1_SERVER_OBJ_DIR)/crowbar.o \
 	$(HL1_SERVER_OBJ_DIR)/ehandle.o \
