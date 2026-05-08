@@ -35,7 +35,7 @@ LINK_ENTITY_TO_CLASS(weapon_vortigun, CVortigun);
 
 void CVortigun::Precache()
 {
-	PRECACHE_MODEL("models/v_displacer.mdl");
+	PRECACHE_MODEL("models/v_vortigun.mdl");
 	PRECACHE_MODEL("models/w_displacer.mdl");
 	PRECACHE_MODEL("models/p_displacer.mdl");
 
@@ -72,7 +72,7 @@ void CVortigun::Spawn()
 
 bool CVortigun::Deploy()
 {
-	return DefaultDeploy("models/v_displacer.mdl", "models/p_displacer.mdl", DISPLACER_DRAW, "egon");
+	return DefaultDeploy("models/v_vortigun.mdl", "models/p_displacer.mdl", DISPLACER_DRAW, "egon");
 }
 
 void CVortigun::Holster()
@@ -189,9 +189,23 @@ void CVortigun::SpinupThink()
 		m_iSoundState = 0;
 	}
 
-	if (m_Mode <= DisplacerMode::SPINNING_UP)
+	// recreates the anim events
+	switch (m_iSoundState)
 	{
-		if (m_iBeams >= ISLAVE_MAX_BEAMS)
+		default:
+		break;
+		case 0:
+		case 3: // not 0.2666!!
+		case 8:
+		case 12:
+		{
+			ArmBeam();
+			ArmBeam();
+			BeamGlow();
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "debris/zap4.wav", 1, ATTN_NORM, 0, 100 + m_iBeams * 10);
+		}
+		break;
+		case 17: // not 1.4!!
 		{
 			m_Mode = DisplacerMode::SPINNING;
 
@@ -199,16 +213,12 @@ void CVortigun::SpinupThink()
 
 			pev->nextthink = gpGlobals->time + 0.1;
 		}
+		break;
 	}
+	
+	m_iSoundState++;
 
-	// TO-DO: time properly
-	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "debris/zap4.wav", 1, ATTN_NORM, 0, 100 + m_iBeams * 10);
-	ArmBeam();
-	BeamGlow();
-
-	m_iSoundState = 128;
-
-	pev->nextthink = gpGlobals->time + 0.1875;
+	pev->nextthink = gpGlobals->time + 0.083333;
 }
 
 //=========================================================
@@ -247,6 +257,8 @@ void CVortigun::ZapBeam()
 	}
 	UTIL_EmitAmbientSound(ENT(pev), tr.vecEndPos, "weapons/electro4.wav", 0.5, ATTN_NORM, 0, RANDOM_LONG(140, 160));
 
+	// TO-DO: custom decal?
+	DecalGunshot(&tr, BULLET_PLAYER_GLOCK);
 	// TO-DO: might be interesting to make the Vortigun electricity jump between enemies
 #endif
 }
