@@ -229,37 +229,104 @@ void CVortigun::ZapBeam()
 #ifndef CLIENT_DLL
 	Vector vecOrg, vecAim;
 	TraceResult tr;
-	CBaseEntity* pEntity;
-
-	if (m_iBeams >= ISLAVE_MAX_BEAMS)
-		return;
+	CBaseEntity* pEntity;;
 
 	vecOrg = m_pPlayer->GetGunPosition();
 	vecAim = m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
-	UTIL_TraceLine(vecOrg, vecOrg + vecAim * 2048, dont_ignore_monsters, ENT(pev), &tr);
+	UTIL_TraceLine(vecOrg, vecOrg + vecAim * 2048, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 	m_pBeam[m_iBeams] = CBeam::BeamCreate("sprites/lgtning.spr", 50);
-	if (!m_pBeam[m_iBeams])
-		return;
-
-	m_pBeam[m_iBeams]->PointEntInit(tr.vecEndPos, m_pPlayer->entindex());
-	m_pBeam[m_iBeams]->SetEndAttachment(1);
-	m_pBeam[m_iBeams]->SetColor(180, 255, 96);
-	m_pBeam[m_iBeams]->SetBrightness(255);
-	m_pBeam[m_iBeams]->SetNoise(20);
-	m_pBeam[m_iBeams]->pev->spawnflags |= SF_BEAM_TEMPORARY; // Flag these to be destroyed on save/restore or level transition
+		m_pBeam[m_iBeams]->PointEntInit(tr.vecEndPos, m_pPlayer->entindex());
+		m_pBeam[m_iBeams]->SetEndAttachment(1);
+		m_pBeam[m_iBeams]->SetColor(180, 255, 96);
+		m_pBeam[m_iBeams]->SetBrightness(255);
+		m_pBeam[m_iBeams]->SetNoise(20);
+		m_pBeam[m_iBeams]->pev->spawnflags |= SF_BEAM_TEMPORARY; // Flag these to be destroyed on save/restore or level transition
 	m_iBeams++;
 
 	pEntity = CBaseEntity::Instance(tr.pHit);
-	if (pEntity != NULL && 0 != pEntity->pev->takedamage)
+	if (pEntity != NULL)
 	{
 		pEntity->TraceAttack(m_pPlayer->pev, gSkillData.plrDmg762, vecAim, &tr, DMG_SHOCK); // TO-DO: add separate skill value
+
+		TraceResult tr2 = tr;
+		CBaseEntity* pTrack = NULL;
+		CBaseEntity* pNearest = NULL;
+		CBaseEntity* pHit[ISLAVE_MAX_BEAMS];
+		int hitAmnt = 0;
+
+		pHit[hitAmnt] = pEntity;
+
+		vecOrg = tr.vecEndPos;
+		// only can bounce around ISLAVE_MAX_BEAMS times
+		for (int i = 2; i < ISLAVE_MAX_BEAMS; i++)
+		{
+			float dist, closest;
+
+			closest = 1024;
+
+			while ((pTrack = UTIL_FindEntityInSphere(pTrack, pev->origin, 1024)) != NULL)
+			{
+				// only bounce to living things
+				if ((pTrack->pev->flags & (FL_CLIENT | FL_MONSTER)) == 0)
+					continue;
+
+				// only hit visible enemies
+				if (!pTrack->FVisible(vecOrg))
+					continue;
+
+				// dont hit an enemy twice
+				bool cont = false;
+				for (const auto& ent : pHit)
+				{
+					if (ent == pTrack)
+						cont = true;
+				}
+
+				if (cont)
+					continue;
+
+				// don't hit firer
+				if (pTrack == m_pPlayer)
+					continue;
+
+				dist = (pev->origin - pTrack->pev->origin).Length();
+				if (dist < closest)
+				{
+					closest = dist;
+					pNearest = pTrack;
+				}
+			}
+
+			if (!pNearest)
+				break;
+
+			hitAmnt++;
+			pHit[hitAmnt] = pNearest;
+
+
+			UTIL_TraceLine(vecOrg, pNearest->EyePosition(), dont_ignore_monsters, ENT(pHit[hitAmnt-1]->pev), &tr2);
+			m_pBeam[m_iBeams] = CBeam::BeamCreate("sprites/lgtning.spr", 50);
+				m_pBeam[m_iBeams]->PointsInit(vecOrg, tr2.vecEndPos);
+				m_pBeam[m_iBeams]->SetColor(180, 255, 96);
+				m_pBeam[m_iBeams]->SetBrightness(255);
+				m_pBeam[m_iBeams]->SetNoise(20);
+				m_pBeam[m_iBeams]->pev->spawnflags |= SF_BEAM_TEMPORARY; // Flag these to be destroyed on save/restore or level transition
+			m_iBeams++;
+
+			pNearest->TraceAttack(m_pPlayer->pev, gSkillData.plrDmg762, (vecOrg - tr2.vecEndPos).Normalize(), &tr2, DMG_SHOCK); // TO-DO: add separate skill value
+			
+			vecOrg = tr2.vecEndPos;
+
+			// reset these to prevent hitting same enemy multiple times
+			pTrack = NULL;
+			pNearest = NULL;
+		}
 	}
 	UTIL_EmitAmbientSound(ENT(pev), tr.vecEndPos, "weapons/electro4.wav", 0.5, ATTN_NORM, 0, RANDOM_LONG(140, 160));
 
 	// TO-DO: custom decal?
 	DecalGunshot(&tr, BULLET_PLAYER_GLOCK);
-	// TO-DO: might be interesting to make the Vortigun electricity jump between enemies
 #endif
 }
 
