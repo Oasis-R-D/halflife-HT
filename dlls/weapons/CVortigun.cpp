@@ -233,7 +233,7 @@ void CVortigun::ZapBeam()
 
 	vecOrg = m_pPlayer->GetGunPosition();
 	vecAim = m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
-	UTIL_TraceLine(vecOrg, vecOrg + vecAim * 2048, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+	UTIL_TraceLine(vecOrg, vecOrg + vecAim * 2048, dont_ignore_monsters, dont_ignore_glass, ENT(m_pPlayer->pev), &tr);
 
 	m_pBeam[m_iBeams] = CBeam::BeamCreate("sprites/lgtning.spr", 50);
 		m_pBeam[m_iBeams]->PointEntInit(tr.vecEndPos, m_pPlayer->entindex());
@@ -263,9 +263,9 @@ void CVortigun::ZapBeam()
 		{
 			float dist, closest;
 
-			closest = 1024;
+			closest = 768;
 
-			while ((pTrack = UTIL_FindEntityInSphere(pTrack, pev->origin, 1024)) != NULL)
+			while ((pTrack = UTIL_FindEntityInSphere(pTrack, pev->origin, 768)) != NULL)
 			{
 				// only bounce to living things
 				if ((pTrack->pev->flags & (FL_CLIENT | FL_MONSTER)) == 0)
@@ -305,7 +305,7 @@ void CVortigun::ZapBeam()
 			pHit[hitAmnt] = pNearest;
 
 
-			UTIL_TraceLine(vecOrg, pNearest->EyePosition(), dont_ignore_monsters, ENT(pHit[hitAmnt-1]->pev), &tr2);
+			UTIL_TraceLine(vecOrg, pNearest->EyePosition(), dont_ignore_monsters, dont_ignore_glass, ENT(pHit[hitAmnt-1]->pev), &tr2);
 			m_pBeam[m_iBeams] = CBeam::BeamCreate("sprites/lgtning.spr", 50);
 				m_pBeam[m_iBeams]->PointsInit(vecOrg, tr2.vecEndPos);
 				m_pBeam[m_iBeams]->SetColor(180, 255, 96);

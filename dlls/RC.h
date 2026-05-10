@@ -21,6 +21,7 @@ class CRCcamera : public CBaseEntity
 {
 public:
 	void Spawn() override;
+	void FireSound();
 };
 
 class CRC : public CBaseMonster

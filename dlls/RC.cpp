@@ -12,12 +12,12 @@
 #define DT gpGlobals->frametime
 #define RC_SPEED_DRIVE 1600
 #define RC_SPEED_TURN 800
-#define RC_SPEED_JUMP 192
+#define RC_SPEED_JUMP 256
 
 #define RC_ATTACK_DELAY 0.1
 #define RC_JUMP_DELAY 0.25
 
-#define RC_TURN_FRICTION 0.75
+#define RC_TURN_FRICTION 2
 
 // values clamped to this
 #define RC_MAX_TURNSPEED 256
@@ -33,6 +33,13 @@ void CRCcamera::Spawn()
 	pev->movetype = MOVETYPE_NOCLIP;
 	pev->solid = SOLID_NOT;
 	UTIL_SetOrigin(pev, pev->origin);
+}
+
+void CRCcamera::FireSound()
+{
+	char wpnsnd2[256];
+	sprintf(wpnsnd2, "weapons/hks%d.wav", RANDOM_LONG(1, 3));
+	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, wpnsnd2, 1.0, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 10));
 }
 
 // controllable RC car
@@ -171,18 +178,15 @@ bool CRC::AttackThink()
 		if ((m_pController->pev->button & IN_ATTACK) != 0 && m_fAttackDelay < gpGlobals->time)
 		{
 			// shoot
-			char wpnsnd2[256];
-			sprintf(wpnsnd2, "weapons/hks%d.wav", RANDOM_LONG(1, 3));
-			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, wpnsnd2, 1.0, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 10));
-
 			UTIL_MakeVectors(pev->angles); // has to be called or else it follows mouse (which the camera doesn't)
 
 			Vector vecSrc = pev->origin + gpGlobals->v_up * 4 + gpGlobals->v_right * 4;
 			Vector vecEnd = vecSrc + gpGlobals->v_forward * 32 + gpGlobals->v_up * 2; // angle up
 			Vector vecAiming = (vecEnd - vecSrc).Normalize();
 
-			FireBullets(RANDOM_LONG(1, 2), vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 1, 0, pev);
+			FireBullets(RANDOM_LONG(1, 2), vecSrc, vecAiming, VECTOR_CONE_6DEGREES, 8192, BULLET_PLAYER_MP5, 1, 0, m_pController->pev);
 			
+			m_pCamera.Entity<CRCcamera>()->FireSound();
 			CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, 384, 0.3);
 
 			m_fAttackDelay = gpGlobals->time + RC_ATTACK_DELAY;
@@ -192,12 +196,14 @@ bool CRC::AttackThink()
 	return false;
 }
 
-static void clamp(float &x, float value)
-{
+template <typename T>
+static T clamp(T &x, double value) {
 	if (x > value)
 		x = value;
 	else if (x < -value)
 		x = -value;
+
+	return x;
 }
 
 void CRC::DriveThink()
@@ -218,10 +224,13 @@ void CRC::DriveThink()
 		ALERT(at_console, "no camera!\n");
 		return;
 	}
+	
+	//---------------------------------
+	//	INPUT HANDLING
+	//---------------------------------
 
 	const bool onGround = FBitSet(pev->flags, FL_ONGROUND);
-	
-	// input handling
+
 	int ft = 0, bk = 0, rt = 0, lf = 0, jmp = 0;
 
 	if (onGround)
@@ -248,28 +257,38 @@ void CRC::DriveThink()
 
 		if (m_fJumpDelay == -1)
 			m_fJumpDelay = gpGlobals->time + RC_JUMP_DELAY;
-		else if ((m_pController->m_afButtonPressed & IN_JUMP) != 0 && m_fJumpDelay < gpGlobals->time) // TO-DO: check on ground, add delay
+		else if ((m_pController->m_afButtonPressed & IN_JUMP) != 0 && m_fJumpDelay < gpGlobals->time)
 		{
 			m_fJumpDelay = -1; // set once we are on ground
 			jmp = 1;
 		}
-
-		
 	}
+
+	//---------------------------------
+	//	APPLY TURNING FRICTION
+	//---------------------------------
 
 	float movespeed = pev->velocity.Length();
 	clamp(movespeed, RC_MAX_DRIVESPEED);
 
-	float frictionMult = RC_TURN_FRICTION + (1 - (movespeed / RC_MAX_DRIVESPEED));
-	clamp(frictionMult, 1.0);
-	pev->avelocity = pev->avelocity - (frictionMult * pev->avelocity * DT); // TO-DO: more friction when speed is lower?
+	float turnfric = (RC_TURN_FRICTION + (1 - (movespeed / RC_MAX_DRIVESPEED))) * DT;
+	pev->avelocity = pev->avelocity - (pev->avelocity * clamp(turnfric, 1.0));
 
 	pev->angles = pev->angles + pev->avelocity * DT; // avelocity doesn't work in step movetype
 	UTIL_MakeVectors(pev->angles);
 
-	int turn = lf + rt; 	// make it into 1 value, -1 if left, 1 if right, 0 if none or both
-	int drive = ft + bk;	// make it into 1 value, -1 if reverse, 1 if forward, 0 if none or both
+
+	//---------------------------------
+	//	MOVE BASED ON INPUTS
+	//---------------------------------
+
+	int turn = lf + rt; 		// make it into 1 value, -1 if left, 1 if right, 0 if none or both
+	const int drive = ft + bk;	// make it into 1 value, -1 if reverse, 1 if forward, 0 if none or both (const because it can be)
 	
+	// simulate front wheel turning
+	if (drive == -1)
+		turn *= -1;
+
 	// move the RC car
 	if (turn != 0)
 	{
@@ -287,7 +306,10 @@ void CRC::DriveThink()
 		pev->velocity.z += RC_SPEED_JUMP;
 	}
 
-	// keep camera here (may not like setting origin every frame)
+	//---------------------------------
+	//	KEEP CAMERA UPDATED
+	//---------------------------------
+
 	m_pCamera->pev->origin = pev->origin + Vector(0, 0, RC_CAM_OFFSET);
 	m_pCamera->pev->angles = pev->angles;
 
