@@ -650,11 +650,12 @@ private:
 
 enum mp5_e
 {
-	MP5_LONGIDLE = 0,
-	MP5_IDLE1,
-	MP5_LAUNCH,
+	MP5_IDLE1 = 0,
+	MP5_LONGIDLE,
 	MP5_RELOAD,
+	MP5_RELOADEMPTY,
 	MP5_DEPLOY,
+	MP5_HOLSTER,
 	MP5_FIRE1,
 	MP5_FIRE2,
 	MP5_FIRE3,
@@ -687,6 +688,18 @@ public:
 
 private:
 	unsigned short m_usMP5;
+};
+
+enum ag36_e
+{
+	AG36_LONGIDLE = 0,
+	AG36_IDLE1,
+	AG36_LAUNCH,
+	AG36_RELOAD,
+	AG36_DEPLOY,
+	AG36_FIRE1,
+	AG36_FIRE2,
+	AG36_FIRE3,
 };
 
 class CAG36 : public CBasePlayerWeapon

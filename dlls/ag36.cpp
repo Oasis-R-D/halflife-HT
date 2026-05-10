@@ -36,7 +36,7 @@ void CAG36::Spawn()
 	SET_MODEL(ENT(pev), "models/w_9mmAR.mdl");
 	m_iId = WEAPON_AG36;
 
-	m_iDefaultAmmo = MP5_DEFAULT_GIVE;
+	m_iDefaultAmmo = AG36_MAX_CLIP;
 
 	m_flNextGrenadeLoad = gpGlobals->time;
 
@@ -106,7 +106,7 @@ void CAG36::IncrementAmmo(CBasePlayer* pPlayer)
 
 bool CAG36::Deploy()
 {
-	return DefaultDeploy("models/v_556mmAR.mdl", "models/p_9mmAR.mdl", MP5_DEPLOY, "ag36");
+	return DefaultDeploy("models/v_556mmAR.mdl", "models/p_9mmAR.mdl", AG36_DEPLOY, "ag36");
 }
 
 
@@ -234,7 +234,7 @@ void CAG36::SecondaryAttack()
 
 void CAG36::Reload()
 {
-	DefaultReload(AG36_MAX_CLIP, MP5_RELOAD, 1.5);
+	DefaultReload(AG36_MAX_CLIP, AG36_RELOAD, 1.5);
 }
 
 
@@ -251,12 +251,12 @@ void CAG36::WeaponIdle()
 	switch (RANDOM_LONG(0, 1))
 	{
 	case 0:
-		iAnim = MP5_LONGIDLE;
+		iAnim = AG36_LONGIDLE;
 		break;
 
 	default:
 	case 1:
-		iAnim = MP5_IDLE1;
+		iAnim = AG36_IDLE1;
 		break;
 	}
 
