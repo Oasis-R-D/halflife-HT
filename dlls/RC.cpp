@@ -23,7 +23,7 @@
 #define RC_MAX_TURNSPEED 256
 #define RC_MAX_DRIVESPEED 256
 
-#define RC_CAM_OFFSET 8
+#define RC_CAM_OFFSET 10
 
 LINK_ENTITY_TO_CLASS(pl_rc_cam, CRCcamera);
 void CRCcamera::Spawn()
@@ -72,6 +72,10 @@ void CRC::Precache()
 	PRECACHE_SOUND("weapons/hks1.wav");
 	PRECACHE_SOUND("weapons/hks3.wav");
 	PRECACHE_SOUND("weapons/hks2.wav");
+
+	PRECACHE_SOUND("rc/drive_loop2.wav");
+	PRECACHE_SOUND("rc/power_jump.wav");
+
 	PRECACHE_MODEL("models/rc.mdl");
 
 	m_idShard = PRECACHE_MODEL("models/metalplategibs.mdl");
@@ -79,7 +83,7 @@ void CRC::Precache()
 
 int CRC::Classify()
 {
-	return CLASS_PLAYER_ALLY; // TO-DO: this prob doesn't anger friendly NPCs when friendly fire occurs
+	return CLASS_MACHINE; // TO-DO: this prob doesn't anger friendly NPCs when friendly fire occurs
 }
 
 void CRC::Spawn()
@@ -92,7 +96,7 @@ void CRC::Spawn()
 	pev->angles = m_direction;
 
 	SET_MODEL(ENT(pev), "models/rc.mdl"); // placeholder
-	//UTIL_SetSize(pev, Vector(-4, -4, 0), Vector(4, 4, 8));
+	UTIL_SetSize(pev, Vector(-4, -10, 0), Vector(4, 10, 8));
 
 	UTIL_SetOrigin(pev, m_SpawnPos);
 
@@ -277,6 +281,18 @@ void CRC::DriveThink()
 	pev->angles = pev->angles + pev->avelocity * DT; // avelocity doesn't work in step movetype
 	UTIL_MakeVectors(pev->angles);
 
+	//---------------------------------
+	//	PLAY DRIVE SOUNDS
+	//---------------------------------
+		
+	if (abs(movespeed) > 0 && onGround)
+	{
+		EMIT_SOUND_DYN(edict(), CHAN_ITEM, "rc/drive_loop2.wav", movespeed / RC_MAX_DRIVESPEED, ATTN_NORM, SND_CHANGE_PITCH | SND_CHANGE_VOL, 75 + (movespeed / RC_MAX_DRIVESPEED) * 0.25);
+	}
+	else if (abs(movespeed) == 0 || !onGround)
+	{
+		STOP_SOUND(edict(), CHAN_ITEM, "rc/drive_loop2.wav");
+	}
 
 	//---------------------------------
 	//	MOVE BASED ON INPUTS
@@ -304,6 +320,7 @@ void CRC::DriveThink()
 	if (jmp != 0)
 	{
 		pev->velocity.z += RC_SPEED_JUMP;
+		EMIT_SOUND(edict(), CHAN_ITEM, "rc/power_jump.wav", 1.0, ATTN_NORM); 
 	}
 
 	//---------------------------------
@@ -312,7 +329,6 @@ void CRC::DriveThink()
 
 	m_pCamera->pev->origin = pev->origin + Vector(0, 0, RC_CAM_OFFSET);
 	m_pCamera->pev->angles = pev->angles;
-
 	// report status
 	ALERT(at_console, "DRIVE: %d, TURN %d, JUMP %d, DT %f, CAM %f %f %f\n", drive, turn, jmp, DT, m_pCamera->pev->origin.x, m_pCamera->pev->origin.y, m_pCamera->pev->origin.z);
 }
@@ -323,6 +339,8 @@ void CRC::ExplodeThink()
 	pev->solid = SOLID_NOT;	  // intangible
 
 	pev->takedamage = DAMAGE_NO;
+
+	STOP_SOUND(edict(), CHAN_ITEM, "rc/drive_loop2.wav");
 
 	if (m_Flare == RC_EXPLODE && m_pController)
 	{
