@@ -57,11 +57,11 @@ bool COrbStrike::GetItemInfo(ItemInfo* p)
 	p->iMaxAmmo1 = _9MM_MAX_CARRY;
 	p->pszAmmo2 = nullptr;
 	p->iMaxAmmo2 = WEAPON_NOCLIP;
-	p->iMaxClip = MP5_MAX_CLIP;
+	p->iMaxClip = WEAPON_NOCLIP;
 	p->iSlot = 2;
 	p->iPosition = 1;
 	p->iFlags = 0;
-	p->iId = m_iId = WEAPON_MP5K;
+	p->iId = m_iId = WEAPON_ORBITALSTRIKE;
 	p->iWeight = MP5_WEIGHT;
 
 	return true;
@@ -165,5 +165,4 @@ class COrbStrikeAmmoClip : public CBasePlayerAmmo
 		return bResult;
 	}
 };
-LINK_ENTITY_TO_CLASS(ammo_mp5clip, COrbStrikeAmmoClip);
-LINK_ENTITY_TO_CLASS(ammo_9mmAR, COrbStrikeAmmoClip);
+LINK_ENTITY_TO_CLASS(ammo_skystrike, COrbStrikeAmmoClip);
