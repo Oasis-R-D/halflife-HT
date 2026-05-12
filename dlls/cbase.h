@@ -403,6 +403,8 @@ public:
 	int m_fireState;
 };
 
+#define ammo_metal ammo_uranium
+
 inline bool FNullEnt(CBaseEntity* ent) { return (ent == NULL) || FNullEnt(ent->edict()); }
 
 

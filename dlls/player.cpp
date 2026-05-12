@@ -3884,7 +3884,6 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 		GiveNamedItem("weapon_satchel");
 		GiveNamedItem("weapon_snark");
 		GiveNamedItem("weapon_hornetgun");
-
 		GiveNamedItem("weapon_eagle");
 		//GiveNamedItem("weapon_sporelauncher");
 		GiveNamedItem("weapon_shockrifle");
@@ -3895,6 +3894,7 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 		GiveNamedItem("weapon_sniperrifle");
 		GiveNamedItem("weapon_displacer");
 		GiveNamedItem("weapon_rc");
+		GiveNamedItem("weapon_skystrike");
 
 		//TODO: not given
 		//GiveNamedItem( "ammo_223" );

@@ -591,6 +591,12 @@
     <ClCompile Include="..\..\dlls\ag36.cpp">
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dlls\orbital_strike.cpp">
+      <Filter>Source Files\dlls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\sentry.cpp">
+      <Filter>Source Files\dlls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dlls\doors.h">
@@ -963,6 +969,9 @@
       <Filter>Header Files\public</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dlls\RC.h">
+      <Filter>Header Files\dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\sentry.h">
       <Filter>Header Files\dlls</Filter>
     </ClInclude>
   </ItemGroup>

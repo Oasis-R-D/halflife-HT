@@ -214,6 +214,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\dlls\nuclearbomb.cpp" />
     <ClCompile Include="..\..\dlls\observer.cpp" />
     <ClCompile Include="..\..\dlls\op4mortar.cpp" />
+    <ClCompile Include="..\..\dlls\orbital_strike.cpp" />
     <ClCompile Include="..\..\dlls\osprey.cpp" />
     <ClCompile Include="..\..\dlls\otis.cpp" />
     <ClCompile Include="..\..\dlls\pathcorner.cpp" />
@@ -237,6 +238,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\dlls\schedule.cpp" />
     <ClCompile Include="..\..\dlls\scientist.cpp" />
     <ClCompile Include="..\..\dlls\scripted.cpp" />
+    <ClCompile Include="..\..\dlls\sentry.cpp" />
     <ClCompile Include="..\..\dlls\shockroach.cpp" />
     <ClCompile Include="..\..\dlls\shocktrooper.cpp" />
     <ClCompile Include="..\..\dlls\shotgun.cpp" />
@@ -371,6 +373,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClInclude Include="..\..\dlls\schedule.h" />
     <ClInclude Include="..\..\dlls\scripted.h" />
     <ClInclude Include="..\..\dlls\scriptevent.h" />
+    <ClInclude Include="..\..\dlls\sentry.h" />
     <ClInclude Include="..\..\dlls\skill.h" />
     <ClInclude Include="..\..\dlls\soundent.h" />
     <ClInclude Include="..\..\dlls\spectator.h" />

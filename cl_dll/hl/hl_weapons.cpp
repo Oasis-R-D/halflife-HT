@@ -88,6 +88,7 @@ CSporeLauncher g_SporeLauncher;
 CSniperRifle g_SniperRifle;
 CKnife g_Knife;
 CRCWeapon g_RC;
+COrbStrike g_OrbitalStrike;
 
 /*
 ======================
@@ -518,6 +519,7 @@ void HUD_InitClientWeapons()
 	HUD_PrepEntity(&g_SniperRifle, &player);
 	HUD_PrepEntity(&g_Knife, &player);
 	HUD_PrepEntity(&g_RC, &player);
+	HUD_PrepEntity(&g_OrbitalStrike, &player);
 }
 
 /*
@@ -615,6 +617,8 @@ CBasePlayerWeapon* GetLocalWeapon(int id)
 		return &g_Knife;
 	case WEAPON_RC:
 		return &g_RC;
+	case WEAPON_ORBITALSTRIKE:
+		return &g_OrbitalStrike;
 	default:
 		return nullptr;
 	}

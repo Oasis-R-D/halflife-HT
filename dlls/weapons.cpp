@@ -292,6 +292,7 @@ void W_Precache()
 	UTIL_PrecacheOther("item_security");
 	UTIL_PrecacheOther("item_longjump");
 	UTIL_PrecacheOther("item_longjump");
+	UTIL_PrecacheOther("tf_sentry");
 
 	// shotgun
 	UTIL_PrecacheOtherWeapon("weapon_shotgun");

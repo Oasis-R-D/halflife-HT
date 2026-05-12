@@ -906,6 +906,23 @@ private:
 	unsigned short m_usRpg;
 };
 
+class CSentryRocket : public CGrenade
+{
+public:
+	bool Save(CSave& save) override;
+	bool Restore(CRestore& restore) override;
+	static TYPEDESCRIPTION m_SaveData[];
+	void Spawn() override;
+	void Precache() override;
+	void EXPORT FollowThink();
+	void EXPORT IgniteThink();
+	void EXPORT RocketTouch(CBaseEntity* pOther);
+	static CSentryRocket* CreateRpgRocket(Vector vecOrigin, Vector vecAngles, CBaseEntity* pOwner);
+
+	int m_iTrail;
+	float m_flIgniteTime;
+};
+
 class CRpgRocket : public CGrenade
 {
 public:
@@ -1340,4 +1357,29 @@ public:
 #endif
 	}
 
+};
+
+class COrbStrike : public CBasePlayerWeapon
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	int iItemSlot() override { return 5; }
+	bool GetItemInfo(ItemInfo* p) override;
+	void IncrementAmmo(CBasePlayer* pPlayer) override;
+
+	void PrimaryAttack() override;
+	bool Deploy() override;
+	void WeaponIdle() override;
+	float m_flNextAnimTime;
+	int m_iShell;
+
+	bool UseDecrement() override
+	{
+#if defined(CLIENT_WEAPONS)
+		return UTIL_DefaultUseDecrement();
+#else
+		return false;
+#endif
+	}
 };

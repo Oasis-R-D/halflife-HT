@@ -6,7 +6,6 @@
 #include "player.h"
 #include "gamerules.h"
 #include "soundent.h"
-#include "explode.h"
 #include "RC.h"
 
 #define DT gpGlobals->frametime
