@@ -163,8 +163,6 @@ TYPEDESCRIPTION CBasePlayer::m_playerSaveData[] =
 
 LINK_ENTITY_TO_CLASS(player, CBasePlayer);
 
-
-
 void CBasePlayer::Pain()
 {
 	float flRndSound; //sound randomizer

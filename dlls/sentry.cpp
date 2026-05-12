@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright ï¿½ 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: Engineer's Sentrygun OMG
 //
@@ -87,7 +87,6 @@ void CSentryRocket::Precache()
 	m_iTrail = PRECACHE_MODEL("sprites/smoke.spr");
 	PRECACHE_SOUND("weapons/rocket1.wav");
 }
-
 
 void CSentryRocket::IgniteThink()
 {
@@ -265,31 +264,9 @@ TYPEDESCRIPTION CTFSentry::m_SaveData[] =
 
 IMPLEMENT_SAVERESTORE(CTFSentry, CActAnimatingSentry);
 
-/*
-IMPLEMENT_SERVERCLASS_ST(CTFSentry, DT_ObjectSentrygun)
-	SendPropInt(SENDINFO(m_iUpgradeLevel), 3),
-	SendPropInt(SENDINFO(m_iAmmo), 9, SPROP_CHANGES_OFTEN),
-	SendPropInt(SENDINFO(m_iAmmoRockets), 6, SPROP_CHANGES_OFTEN),
-	SendPropInt(SENDINFO(m_iState), Q_log2(SENTRY_NUM_STATES) + 1, SPROP_UNSIGNED),
-	SendPropInt(SENDINFO(m_iUpgradeMetal), 10),
-	m_flFieldOfView // SAVE VIEWCONE!!!!
-	SendPropDataTable("SentrygunLocalData", 0, &REFERENCE_SEND_TABLE(DT_SentrygunLocalData), SendProxy_SendLocalObjectDataTable),
-END_SEND_TABLE()
-*/ // save data
-
 LINK_ENTITY_TO_CLASS(tf_sentry, CTFSentry);
 
-/*
-ConVar tf_sentrygun_damage("tf_sentrygun_damage", "16", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY);
-ConVar tf_sentrygun_ammocheat("tf_sentrygun_ammocheat", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY);
-ConVar tf_sentrygun_upgrade_per_hit("tf_sentrygun_upgrade_per_hit", "25", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY);
-ConVar tf_sentrygun_newtarget_dist("tf_sentrygun_newtarget_dist", "200", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY);
-ConVar tf_sentrygun_metal_per_shell("tf_sentrygun_metal_per_shell", "1", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY);
-ConVar tf_sentrygun_metal_per_rocket("tf_sentrygun_metal_per_rocket", "2", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY);
-ConVar tf_sentrygun_notarget("tf_sentrygun_notarget", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY);
-
-extern ConVar tf_cheapobjects;
-*/
+#define SENTRY_GUN_DAMAGE 16
 
 #define SENTRY_METAL_PER_SHELL 1.0
 #define SENTRY_METAL_PER_ROCKET 2.0
@@ -969,7 +946,7 @@ bool CTFSentry::Fire()
 
 		pev->effects |= EF_MUZZLEFLASH;
 
-		FireBullets(1, vecSrc, vecAimDir, VECTOR_CONE_5DEGREES, flDistToTarget + 100, BULLET_MONSTER_MP5, 1, 16 /* // TO-DO: skill value*/, m_hBuilder != nullptr ? m_hBuilder.Entity<CBasePlayer>()->pev : pev); // TO-DO: add owner
+		FireBullets(1, vecSrc, vecAimDir, VECTOR_CONE_5DEGREES, flDistToTarget + 100, BULLET_MONSTER_MP5, 1, SENTRY_GUN_DAMAGE, m_hBuilder != nullptr ? m_hBuilder.Entity<CBasePlayer>()->pev : pev); // TO-DO: add owner
 
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_GUN_VOLUME, 3.0);
 
@@ -1168,12 +1145,38 @@ bool CTFSentry::MoveTurret()
 	return bMoved;
 }
 
+void CTFSentry::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+{
+	if (pev->dmgtime != gpGlobals->time || (RANDOM_LONG(0, 10) < 1))
+	{
+		UTIL_Ricochet(ptr->vecEndPos, RANDOM_FLOAT(1, 2));
+		pev->dmgtime = gpGlobals->time;
+	}
+
+	AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
+}
+
 // note last damage time
 bool CTFSentry::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
 	if (flDamage > 0)
 	{
 		m_flLastAttackedTime = gpGlobals->time;
+
+		pev->health -= flDamage;
+		if (pev->health <= 0)
+		{
+			pev->takedamage = DAMAGE_NO;
+
+			ClearBits(pev->flags, FL_MONSTER); // why are they set in the first place???
+
+			SetUse(NULL);
+			SetThink(NULL);
+			ExplodeSentry();
+
+			return false;
+		}
+
 		return true;
 	}
 
@@ -1183,7 +1186,7 @@ bool CTFSentry::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, floa
 //-----------------------------------------------------------------------------
 // Purpose: Called when this object is destroyed
 //-----------------------------------------------------------------------------
-void CTFSentry::Killed(entvars_t* pevAttacker, int iGib)
+void CTFSentry::ExplodeSentry()
 {
 	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
 		WRITE_BYTE(TE_BREAKMODEL);

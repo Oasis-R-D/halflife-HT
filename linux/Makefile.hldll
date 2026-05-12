@@ -148,6 +148,7 @@ HLDLL_OBJS = \
 	$(HLDLL_OBJ_DIR)/nuclearbomb.o \
 	$(HLDLL_OBJ_DIR)/observer.o \
 	$(HLDLL_OBJ_DIR)/op4mortar.o \
+	$(HLDLL_OBJ_DIR)/orbital_strike.o \
 	$(HLDLL_OBJ_DIR)/osprey.o \
 	$(HLDLL_OBJ_DIR)/otis.o \
 	$(HLDLL_OBJ_DIR)/pathcorner.o \
@@ -167,6 +168,7 @@ HLDLL_OBJS = \
 	$(HLDLL_OBJ_DIR)/schedule.o \
 	$(HLDLL_OBJ_DIR)/scientist.o \
 	$(HLDLL_OBJ_DIR)/scripted.o \
+	$(HLDLL_OBJ_DIR)/sentry.o \
 	$(HLDLL_OBJ_DIR)/shockroach.o \
 	$(HLDLL_OBJ_DIR)/shocktrooper.o \
 	$(HLDLL_OBJ_DIR)/shotgun.o \

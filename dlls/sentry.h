@@ -35,8 +35,11 @@ class CTFSentry : public CActAnimatingSentry
 	void Precache();
 	void OnGoActive();
 	int Classify() override;
+
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
-	void Killed(entvars_t* pevAttacker, int iGib) override;
+	void ExplodeSentry();
+
 	void SetModel(const char *pModel);
 	bool OnWrenchHit(CBasePlayer* pPlayer);
 
