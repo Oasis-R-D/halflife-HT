@@ -102,6 +102,30 @@ void COrbStrike::PrimaryAttack()
 
 	vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, VECTOR_CONE_3DEGREES, 8192, BULLET_PLAYER_MP5, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 
+	TraceResult tr1, tr2;
+
+	UTIL_TraceLine(vecSrc, vecSrc + vecAiming*2048, dont_ignore_monsters, ignore_glass, m_pPlayer->edict(), &tr1);
+
+	if (UTIL_PointContents(tr1.vecEndPos) == CONTENTS_SKY)
+	{
+		EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "buttons/button11.wav", RANDOM_FLOAT(0.8, 0.9), ATTN_NORM);
+
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5;
+
+		return;
+	}
+
+	UTIL_TraceLine(tr1.vecEndPos, tr1.vecEndPos + gpGlobals->v_up*2048, ignore_monsters, ignore_glass, m_pPlayer->edict(), &tr2);
+
+	if (UTIL_PointContents(tr2.vecEndPos) != CONTENTS_SKY)
+	{
+		EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "buttons/button11.wav", RANDOM_FLOAT(0.8, 0.9), ATTN_NORM);
+
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5;
+
+		return;
+	}
+
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 0)
 	{
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", SUIT_SENTENCE, SUIT_REPEAT_OK);
