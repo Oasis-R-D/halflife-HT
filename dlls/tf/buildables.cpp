@@ -21,8 +21,8 @@ void CBuildable::Spawn()
 	Precache();
 
 	// NPCs attack it
-	SetBits(pev->flags, FL_MONSTER);
-	pev->flags |= FL_MONSTER; // extraneous? // TO-DO: add FL_BUILDING flag
+	SetBits(pev->flags, FL_MONSTER | FL_BUILDING);
+	pev->flags |= FL_MONSTER | FL_BUILDING; // extraneous?
 	pev->takedamage = DAMAGE_YES;
 	pev->solid = SOLID_BBOX;
 

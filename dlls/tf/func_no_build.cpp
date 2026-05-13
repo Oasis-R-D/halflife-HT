@@ -85,13 +85,11 @@ void CFuncNoBuild::Touch(CBaseEntity* pOther)
 {
 	if (m_bDestroyBuildingsOnActive)
 	{
-		/*
-		if ((pOther->pev->flags & FL_BUILDABLE) != 0)
+		if ((pOther->pev->flags & FL_BUILDING) != 0)
 		{
 		 	CBuildable* building = dynamic_cast<CBuildable*>(pOther);
 			building->DetonateBuilding();
 		}
-		*/
 	}
 	// TO-DO: flag to detect a buildable, baseclass for buildable to make detonation easier
 }
