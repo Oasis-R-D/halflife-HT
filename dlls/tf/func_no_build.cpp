@@ -100,5 +100,5 @@ bool CFuncNoBuild::KeyValue(KeyValueData* pkvd)
 		return true;
 	}
 
-	return CBaseTrigger::KeyValue(pkvd);
+	return CBaseToggle::KeyValue(pkvd);
 }
