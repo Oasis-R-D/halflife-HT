@@ -12,24 +12,23 @@ void CBuildable::Precache()
 {
 	m_idShard = PRECACHE_MODEL("models/metalplategibs.mdl");
 
+	// precache individual buildable
 	PrecacheBuildable();
 }
-
 
 void CBuildable::Spawn()
 {
 	Precache();
 
-	// set needed flags and stuff
-
 	// NPCs attack it
 	SetBits(pev->flags, FL_MONSTER);
-	pev->flags |= FL_MONSTER; // extraneous?
+	pev->flags |= FL_MONSTER; // extraneous? // TO-DO: add FL_BUILDING flag
 	pev->takedamage = DAMAGE_YES;
 	pev->solid = SOLID_BBOX;
 
 	m_bloodColor = DONT_BLEED;
 
+	// run individual buildable spawn code
     SpawnBuildable();
 }
 

@@ -1,11 +1,3 @@
-//========= Copyright � 1996-2005, Valve Corporation, All rights reserved. ============//
-//
-// Purpose: Engineer's Sentrygun OMG
-//
-// $NoKeywords: $
-//=============================================================================//
-
-#include "buildables.h"
 #include "sentry.h"
 
 #pragma region ROCKET
@@ -1209,17 +1201,6 @@ bool CTFSentry::MoveTurret()
 	}
 
 	return bMoved;
-}
-
-void CTFSentry::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
-{
-	if (pev->dmgtime != gpGlobals->time || (RANDOM_LONG(0, 10) < 1))
-	{
-		UTIL_Ricochet(ptr->vecEndPos, RANDOM_FLOAT(1, 2));
-		pev->dmgtime = gpGlobals->time;
-	}
-
-	AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
 }
 
 //-----------------------------------------------------------------------------

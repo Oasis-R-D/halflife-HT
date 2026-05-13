@@ -1,12 +1,4 @@
 #pragma once
-#include "extdll.h"
-#include "util.h"
-#include "cbase.h"
-#include "monsters.h"
-#include "weapons.h"
-#include "player.h"
-#include "gamerules.h"
-#include "soundent.h"
 #include "buildables.h"
 
 // ROCKET CLASS DEFINED IN 'weapons.h' ABOVE 'CRpgRocket'
