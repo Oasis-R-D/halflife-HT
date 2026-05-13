@@ -15,6 +15,7 @@ GAME_SHARED_OBJ_DIR=$(HLDLL_OBJ_DIR)/game_shared
 PUBLIC_OBJ_DIR=$(HLDLL_OBJ_DIR)/public
 COMMON_OBJ_DIR=$(HLDLL_OBJ_DIR)/common
 CTF_OBJ_DIR=$(HLDLL_OBJ_DIR)/ctf
+TF_OBJ_DIR=$(HLDLL_OBJ_DIR)/tf
 ROPE_OBJ_DIR=$(HLDLL_OBJ_DIR)/rope
 WEAPONS_OBJ_DIR=$(HLDLL_OBJ_DIR)/weapons
 
@@ -29,6 +30,7 @@ DO_CC=$(CPLUS) $(INCLUDEDIRS) $(CFLAGS) -o $@ -c $<
 #####################################################################
 
 HLDLL_OBJS = \
+	$(TF_OBJ_DIR)/sentry.o \
 	$(CTF_OBJ_DIR)/CHUDIconTrigger.o \
 	$(CTF_OBJ_DIR)/CItemAcceleratorCTF.o \
 	$(CTF_OBJ_DIR)/CItemBackpackCTF.o \
@@ -168,7 +170,6 @@ HLDLL_OBJS = \
 	$(HLDLL_OBJ_DIR)/schedule.o \
 	$(HLDLL_OBJ_DIR)/scientist.o \
 	$(HLDLL_OBJ_DIR)/scripted.o \
-	$(HLDLL_OBJ_DIR)/sentry.o \
 	$(HLDLL_OBJ_DIR)/shockroach.o \
 	$(HLDLL_OBJ_DIR)/shocktrooper.o \
 	$(HLDLL_OBJ_DIR)/shotgun.o \

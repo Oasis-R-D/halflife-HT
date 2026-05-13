@@ -1308,6 +1308,8 @@ void CTFSentry::ExplodeSentry()
 	m_hBuilder.Entity<CBasePlayer>()->m_hSentryGun = nullptr;
 
 	Vector pos = Center();
+
+	// breakmodel
 	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pos);
 		WRITE_BYTE(TE_BREAKMODEL);
 		// position
@@ -1332,6 +1334,25 @@ void CTFSentry::ExplodeSentry()
 		WRITE_BYTE(BREAK_SMOKE); // flags
 	MESSAGE_END();
 
+	// explosion
+	MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_EXPLOSION);	// This makes a dynamic light and the explosion sprites/sound
+		WRITE_COORD(pev->origin.x); // Send to PAS because of the sound
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		if (iContents != CONTENTS_WATER)
+		{
+			WRITE_SHORT(g_sModelIndexFireball);
+		}
+		else
+		{
+			WRITE_SHORT(g_sModelIndexWExplosion);
+		}
+		WRITE_BYTE((100 - 50) * .60); // scale * 10
+		WRITE_BYTE(15);					   // framerate
+		WRITE_BYTE(TE_EXPLFLAG_NONE);
+	MESSAGE_END();
+
 	switch (RANDOM_LONG(0, 2))
 	{
 	case 0:
@@ -1347,7 +1368,7 @@ void CTFSentry::ExplodeSentry()
 
 	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pos, QUIET_GUN_VOLUME, 3.0);
 
-	::RadiusDamage(pos, pev, m_hBuilder != nullptr ? m_hBuilder->pev : pev, 30, 96, CLASS_NONE, DMG_BLAST);
+	::RadiusDamage(pos, pev, m_hBuilder != nullptr ? m_hBuilder->pev : pev, 48, 96, CLASS_NONE, DMG_BLAST);
 
 	if (m_hBase)
 		UTIL_Remove(m_hBase);
