@@ -225,6 +225,8 @@ void CActAnimatingSentry::SetActivity(Activity act)
 #define BONE_PITCH	1
 #define BONE_YAW	0
 
+#define SENTRYGUN_ROTBOUND 50
+
 #define SENTRY_SOUND_IDLE		"buildings/turridle.wav"
 #define SENTRY_SOUND_SPOT		"buildings/turrspot.wav"
 #define SENTRY_SOUND_SET		"buildings/turrset.wav"
@@ -428,12 +430,12 @@ void CTFSentry::Spawn()
 	Vector angles = pev->angles;
 
 	m_vecCurAngles.y = UTIL_AngleMod(angles.y);
-	m_iRightBound = UTIL_AngleMod((int)angles.y - 50);
-	m_iLeftBound = UTIL_AngleMod((int)angles.y + 50);
+	m_iRightBound = UTIL_AngleMod((int)angles.y - SENTRYGUN_ROTBOUND);
+	m_iLeftBound = UTIL_AngleMod((int)angles.y + SENTRYGUN_ROTBOUND);
 	if (m_iRightBound > m_iLeftBound)
 	{
 		m_iRightBound = m_iLeftBound;
-		m_iLeftBound = UTIL_AngleMod((int)angles.y - 50);
+		m_iLeftBound = UTIL_AngleMod((int)angles.y - SENTRYGUN_ROTBOUND);
 	}
 
 	// Start it rotating
@@ -935,6 +937,14 @@ void CTFSentry::Attack()
 		angToTarget.x = 50;
 	else if (angToTarget.x < -50)
 		angToTarget.x = -50;
+
+	// pin to turret limitations to [-50...50]
+	// delete these 2 ifs to make it attack in full 360
+	if (angToTarget.y > SENTRYGUN_ROTBOUND)
+		angToTarget.y = SENTRYGUN_ROTBOUND;
+	else if (angToTarget.y < -SENTRYGUN_ROTBOUND)
+		angToTarget.y = -SENTRYGUN_ROTBOUND;
+
 	m_vecGoalAngles.y = angToTarget.y;
 	m_vecGoalAngles.x = angToTarget.x;
 
