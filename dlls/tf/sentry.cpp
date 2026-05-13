@@ -253,7 +253,6 @@ TYPEDESCRIPTION CTFSentry::m_SaveData[] =
 		DEFINE_FIELD(CTFSentry, m_fYaw, FIELD_FLOAT),
 
 		DEFINE_FIELD(CTFSentry, m_hEnemy, FIELD_EHANDLE),
-		DEFINE_FIELD(CTFSentry, m_hBuilder, FIELD_EHANDLE),
 		DEFINE_FIELD(CTFSentry, m_hBase, FIELD_EHANDLE),
 };
 
@@ -348,8 +347,6 @@ void CTFSentryBase::Precache()
 
 void CTFSentry::SpawnBuildable()
 {
-	Precache();
-
 	m_hBuilder.Entity<CBasePlayer>()->m_hSentryGun = this;
 
 	SetModel(SENTRY_MODEL_LEVEL_1);
@@ -357,17 +354,9 @@ void CTFSentry::SpawnBuildable()
 	m_fPitch = 0;
 	m_fYaw = 0;
 
-	// NPCs attack it
-	SetBits(pev->flags, FL_MONSTER);
-	pev->flags |= FL_MONSTER; // extraneous?
-	pev->takedamage = DAMAGE_YES;
-	pev->solid = SOLID_BBOX;
-
 	pev->health = SENTRYGUN_MAX_HEALTH; // TO-DO: skill cvar
 
 	UTIL_SetOrigin(pev, pev->origin);
-
-	m_bloodColor = DONT_BLEED;
 
 	m_iUpgradeLevel = 1;
 	m_iUpgradeMetal = 0;
@@ -382,7 +371,6 @@ void CTFSentry::SpawnBuildable()
 	m_flFieldOfView = VIEW_FIELD_NARROW;
 
 	// Give the Gun some ammo
-	
 	m_iMaxAmmo = SENTRYGUN_MAX_SHELLS_1;
 	m_iMaxAmmoRockets = SENTRYGUN_MAX_ROCKETS;
 	m_iAmmo = m_iMaxAmmo;
@@ -485,8 +473,6 @@ void CTFSentry::Precache()
 	PRECACHE_SOUND(SENTRY_SOUND_SPOT);
 	PRECACHE_SOUND(SENTRY_SOUND_SET);
 	PRECACHE_SOUND(SENTRY_SOUND_EMPTY);
-
-	m_idShard = PRECACHE_MODEL("models/metalplategibs.mdl");
 }
 
 //-----------------------------------------------------------------------------
@@ -1241,35 +1227,10 @@ void CTFSentry::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDi
 	AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
 }
 
-// note last damage time
-bool CTFSentry::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
-{
-	if (flDamage > 0)
-	{
-		pev->health -= flDamage;
-		if (pev->health <= 0)
-		{
-			pev->takedamage = DAMAGE_NO;
-
-			ClearBits(pev->flags, FL_MONSTER); // why are they set in the first place???
-
-			SetUse(NULL);
-			SetThink(NULL);
-			ExplodeSentry();
-
-			return false;
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: Called when this object is destroyed
 //-----------------------------------------------------------------------------
-void CTFSentry::ExplodeSentry()
+void CTFSentry::DetonateBuilding()
 {
 	ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_destroyed");
 	m_hBuilder.Entity<CBasePlayer>()->m_hSentryGun = nullptr;

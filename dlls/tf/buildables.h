@@ -16,7 +16,9 @@ public:
     virtual void SpawnBuildable();
 
     bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
-    virtual void Detonate();
+    virtual void DetonateBuilding();
+
+	virtual bool OnWrenchHit(CBasePlayer* pPlayer) {return false;};
 
 	void SetActivity(Activity act);
 	inline Activity GetActivity() { return m_Activity; }
@@ -27,6 +29,11 @@ public:
 	bool Restore(CRestore& restore) override;
 	static TYPEDESCRIPTION m_SaveData[];
 
+	EHANDLE m_hBuilder;
+
 protected:
 	Activity m_Activity;
+
+private:
+	int m_idShard;
 };

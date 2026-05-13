@@ -46,18 +46,16 @@ public:
 	int Classify() override;
 
 	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
-	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
-	void ExplodeSentry();
+	void DetonateBuilding() override;
 
 	void SetModel(const char *pModel);
-	bool OnWrenchHit(CBasePlayer* pPlayer);
+	bool OnWrenchHit(CBasePlayer* pPlayer) override;
 
 	bool Save(CSave& save) override;
 	bool Restore(CRestore& restore) override;
 	static TYPEDESCRIPTION m_SaveData[];
 
 	EHANDLE m_hBase;
-	EHANDLE m_hBuilder;
 
 private:
 	// Main think
@@ -81,7 +79,6 @@ private:
 	// Attack
 	void Attack(void);
 	bool Fire(void);
-	//void MakeTracer(const Vector &vecTracerSrc, const TraceResult &tr, int iTracerType);
 	
 	int m_iState;
 
