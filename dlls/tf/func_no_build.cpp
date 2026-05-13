@@ -12,9 +12,7 @@
 #include "saverestore.h"
 #include "gamerules.h"
 #include "skill.h"
-
-// BUILDABLES
-#include "sentry.h"
+#include "buildables.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Defines an area where objects cannot be built
@@ -22,6 +20,7 @@
 class CFuncNoBuild : public CBaseTrigger
 {
 public:
+	void Spawn() override;
     bool KeyValue(KeyValueData* pkvd) override;
     void Touch(CBaseEntity* pOther) override;
     
@@ -33,9 +32,27 @@ private:
 };
 
 LINK_ENTITY_TO_CLASS( func_nobuild, CFuncNoBuild);
+void CFuncNoBuild::Spawn()
+{
+	InitTrigger();
+
+
+	SetUse(&CFuncNoBuild::ToggleUse);
+	SetTouch(&CFuncNoBuild::Touch);
+}
 
 void CFuncNoBuild::Touch(CBaseEntity* pOther)
 {
+	if (m_bDestroyBuildingsOnActive)
+	{
+		/*
+		if ((pOther->pev->flags & FL_BUILDABLE) != 0)
+		{
+		 	CBuildable* building = dynamic_cast<CBuildable*>(pOther);
+			building->DetonateBuilding();
+		}
+		*/
+	}
 	// TO-DO: flag to detect a buildable, baseclass for buildable to make detonation easier
 }
 
