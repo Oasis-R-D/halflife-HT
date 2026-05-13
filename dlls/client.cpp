@@ -53,7 +53,7 @@
 #include "ctf/ctfplay_gamerules.h"
 
 // TFC
-#include "sentry.h"
+#include "tf/sentry.h"
 
 extern DLL_GLOBAL unsigned int g_ulModelIndexPlayer;
 extern DLL_GLOBAL bool g_fGameOver;
@@ -693,7 +693,7 @@ void ClientCommand(edict_t* pEntity)
 		else if (player->m_iTeamNum == CTFTeam::OpposingForce)
 			colormap = 1;
 		else
-			colormap = pev->colormap;
+			colormap = player->pev->colormap;
 
 		EMIT_SOUND(player->edict(), CHAN_ITEM, "buildings/building.wav", 1.0, ATTN_IDLE);
 		CTFSentryBase::Sentry_Create(SpawnPos, Vector(0, pev->angles.y, 0), player, colormap);

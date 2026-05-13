@@ -64,6 +64,12 @@
     <Filter Include="Header Files\public">
       <UniqueIdentifier>{ccda2445-0302-44ae-a537-be89f5811329}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\dlls\tf">
+      <UniqueIdentifier>{2848517b-79c1-4755-91c8-b0d114fdceb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dlls\tf">
+      <UniqueIdentifier>{643571be-800a-4da0-a778-37b660da39c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dlls\aflock.cpp">
@@ -594,8 +600,8 @@
     <ClCompile Include="..\..\dlls\orbital_strike.cpp">
       <Filter>Source Files\dlls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dlls\sentry.cpp">
-      <Filter>Source Files\dlls</Filter>
+    <ClCompile Include="..\..\dlls\tf\sentry.cpp">
+      <Filter>Source Files\dlls\tf</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -973,6 +979,9 @@
     </ClInclude>
     <ClInclude Include="..\..\dlls\sentry.h">
       <Filter>Header Files\dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\tf\sentry.h">
+      <Filter>Header Files\dlls\tf</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

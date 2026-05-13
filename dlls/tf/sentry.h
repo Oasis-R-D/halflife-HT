@@ -41,9 +41,9 @@ public:
 
 	bool m_bMapPlaced = true;
 
-	int colormap;
-
 	EHANDLE m_pSentry;
+	
+	int colormap;
 
 	bool Save(CSave& save) override;
 	bool Restore(CRestore& restore) override;

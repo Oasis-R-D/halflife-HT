@@ -290,6 +290,8 @@ IMPLEMENT_SAVERESTORE(CTFSentry, CActAnimatingSentry);
 TYPEDESCRIPTION CTFSentryBase::m_SaveData[] =
 	{
 		DEFINE_FIELD(CTFSentryBase, m_pSentry, FIELD_EHANDLE),
+		DEFINE_FIELD(CTFSentryBase, colormap, FIELD_INTEGER),
+		DEFINE_FIELD(CTFSentryBase, m_bMapPlaced, FIELD_BOOLEAN),
 };
 
 IMPLEMENT_SAVERESTORE(CTFSentryBase, CBaseEntity);
@@ -307,7 +309,7 @@ CTFSentryBase* CTFSentryBase::Sentry_Create(Vector VecSpawnPos, Vector vecDir, C
 	pSentry->pev->angles = vecDir;
 	pSentry->pev->owner = pOwner->edict();
 	pSentry->pev->spawnflags |= SF_NORESPAWN | SF_MONSTER_FALL_TO_GROUND;
-	pSentry->pev->colormap = colormap;
+	pSentry->colormap = colormap;
 	pSentry->m_bMapPlaced = false;
 	pSentry->Spawn();
 
@@ -329,7 +331,7 @@ void CTFSentryBase::Spawn()
 		pRCcam->pev->angles = pev->angles;
 		if (pev->owner)
 			pRCcam->m_hBuilder = CBaseEntity::Instance(pev->owner);
-		pRCcam->pev->colormap = pev->colormap;
+		pRCcam->pev->colormap = colormap;
 		pRCcam->m_hBase = this;
 		pRCcam->Spawn();
 		m_pSentry = pRCcam;
@@ -356,7 +358,7 @@ void CTFSentryBase::FinishConstruction()
 	pRCcam->pev->angles = pev->angles;
 	if (pev->owner)
 		pRCcam->m_hBuilder = CBaseEntity::Instance(pev->owner);
-	pRCcam->pev->colormap = pev->colormap;
+	pRCcam->pev->colormap = colormap;
 	pRCcam->m_hBase = this;
 	pRCcam->Spawn();
 	
@@ -407,10 +409,11 @@ void CTFSentry::Spawn()
 	m_flFieldOfView = VIEW_FIELD_NARROW;
 
 	// Give the Gun some ammo
-	m_iAmmo = m_iMaxAmmo;
-	m_iAmmoRockets = 0;
+	
 	m_iMaxAmmo = SENTRYGUN_MAX_SHELLS_1;
 	m_iMaxAmmoRockets = SENTRYGUN_MAX_ROCKETS;
+	m_iAmmo = m_iMaxAmmo;
+	m_iAmmoRockets = m_iMaxAmmoRockets;
 
 	// Start searching for enemies
 	m_hEnemy = NULL;
