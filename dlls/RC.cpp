@@ -157,7 +157,7 @@ bool CRC::StartControl(CBasePlayer* pController)
 
 	m_pController->m_iHideHUD |= HIDEHUD_WEAPONS;
 
-	m_pController->pev->maxspeed = 0.00001;
+	m_pController->m_bNoMove_RC = true;
 
 	if (m_pCamera)
 	{
@@ -416,7 +416,7 @@ void CRC::ExplodeThink()
 	if (!m_pController)
 		return;
 
-	m_pController->pev->maxspeed = 0;
+	m_pController->m_bNoMove_RC = false;
 
 	SET_VIEW(m_pController->edict(), m_pController->edict());
 	m_pController->EquipWeapon();

@@ -34,6 +34,18 @@ class CTFSentryBase : public CBaseEntity
 public:
 	void Spawn() override;
 	void Precache();
+
+	static CTFSentryBase* Sentry_Create(Vector VecSpawnPos, Vector vecDir, CBaseEntity* pOwner = NULL, int colormap = 0);
+
+	void EXPORT FinishConstruction();
+
+	bool m_bMapPlaced = true;
+
+	EHANDLE m_pSentry;
+
+	bool Save(CSave& save) override;
+	bool Restore(CRestore& restore) override;
+	static TYPEDESCRIPTION m_SaveData[];
 };
 
 // --------------------------------------------------------------
@@ -44,7 +56,6 @@ class CTFSentry : public CActAnimatingSentry
 public:
 	void Spawn();
 	void Precache();
-	void OnGoActive();
 	int Classify() override;
 
 	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;

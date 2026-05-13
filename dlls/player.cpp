@@ -135,6 +135,13 @@ TYPEDESCRIPTION CBasePlayer::m_playerSaveData[] =
 		DEFINE_FIELD(CBasePlayer, m_DisplacerReturn, FIELD_POSITION_VECTOR),
 		DEFINE_FIELD(CBasePlayer, m_DisplacerSndRoomtype, FIELD_INTEGER),
 
+		// TEAM FORTRESS
+		DEFINE_FIELD(CBasePlayer, m_hSentryGun, FIELD_EHANDLE),
+		DEFINE_FIELD(CBasePlayer, m_hBuilding, FIELD_EHANDLE),
+
+		// HT
+		DEFINE_FIELD(CBasePlayer, m_bNoMove_RC, FIELD_BOOLEAN),
+
 		//DEFINE_FIELD( CBasePlayer, m_fDeadTime, FIELD_FLOAT ), // only used in multiplayer games
 		//DEFINE_FIELD( CBasePlayer, m_fGameHUDInitialized, FIELD_INTEGER ), // only used in multiplayer games
 		//DEFINE_FIELD( CBasePlayer, m_flStopExtraSoundTime, FIELD_TIME ),
@@ -158,7 +165,6 @@ TYPEDESCRIPTION CBasePlayer::m_playerSaveData[] =
 		//DEFINE_ARRAY( CBasePlayer, m_rgAmmoLast, FIELD_INTEGER, MAX_AMMO_SLOTS ), // Don't need to restore
 		//DEFINE_FIELD( CBasePlayer, m_fOnTarget, FIELD_BOOLEAN ), // Don't need to restore
 		//DEFINE_FIELD( CBasePlayer, m_nCustomSprayFrames, FIELD_INTEGER ), // Don't need to restore
-
 };
 
 LINK_ENTITY_TO_CLASS(player, CBasePlayer);
@@ -2173,6 +2179,15 @@ void CBasePlayer::PreThink()
 
 	// Clear out ladder pointer
 	m_hEnemy = NULL;
+
+	if (m_hBuilding || m_bNoMove_RC)
+	{
+		pev->maxspeed = 0.0001;
+	}
+	else
+	{
+		pev->maxspeed = 0;
+	}
 
 	if ((m_afPhysicsFlags & PFLAG_ONBARNACLE) != 0)
 	{

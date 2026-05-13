@@ -225,9 +225,9 @@ void CActAnimatingSentry::SetActivity(Activity act)
 #define BONE_PITCH	1
 #define BONE_YAW	0
 
-#define SENTRY_SOUND_IDLE		"sentry/turridle.wav"
-#define SENTRY_SOUND_SPOT		"sentry/turrspot.wav"
-#define SENTRY_SOUND_SET		"sentry/turrset.wav"
+#define SENTRY_SOUND_IDLE		"buildings/turridle.wav"
+#define SENTRY_SOUND_SPOT		"buildings/turrspot.wav"
+#define SENTRY_SOUND_SET		"buildings/turrset.wav"
 #define SENTRY_SOUND_EMPTY		"weapons/357_cock1.wav"
 
 enum states
@@ -281,32 +281,88 @@ TYPEDESCRIPTION CTFSentry::m_SaveData[] =
 
 		DEFINE_FIELD(CTFSentry, m_hEnemy, FIELD_EHANDLE),
 		DEFINE_FIELD(CTFSentry, m_hBuilder, FIELD_EHANDLE),
+		DEFINE_FIELD(CTFSentry, m_hBase, FIELD_EHANDLE),
 };
 
 IMPLEMENT_SAVERESTORE(CTFSentry, CActAnimatingSentry);
 
+
+TYPEDESCRIPTION CTFSentryBase::m_SaveData[] =
+	{
+		DEFINE_FIELD(CTFSentryBase, m_pSentry, FIELD_EHANDLE),
+};
+
+IMPLEMENT_SAVERESTORE(CTFSentryBase, CBaseEntity);
+
+
 LINK_ENTITY_TO_CLASS(tf_sentry_top, CTFSentry);
 
 LINK_ENTITY_TO_CLASS(tf_sentry, CTFSentryBase);
+
+CTFSentryBase* CTFSentryBase::Sentry_Create(Vector VecSpawnPos, Vector vecDir, CBaseEntity* pOwner, int colormap)
+{
+	CTFSentryBase* pSentry = GetClassPtr((CTFSentryBase*)NULL);
+	pSentry->pev->classname = MAKE_STRING("tf_sentry");
+	pSentry->pev->origin = VecSpawnPos;
+	pSentry->pev->angles = vecDir;
+	pSentry->pev->owner = pOwner->edict();
+	pSentry->pev->spawnflags |= SF_NORESPAWN | SF_MONSTER_FALL_TO_GROUND;
+	pSentry->pev->colormap = colormap;
+	pSentry->m_bMapPlaced = false;
+	pSentry->Spawn();
+
+	return pSentry;
+}
+
 void CTFSentryBase::Spawn()
 {
 	Precache();
 
 	SET_MODEL(ENT(pev), "models/base.mdl");
 	pev->classname = MAKE_STRING("tf_sentry");
-	pev->solid = SOLID_NOT;
+
+	if (m_bMapPlaced)
+	{
+		CTFSentry* pRCcam = GetClassPtr((CTFSentry*)NULL);
+		pRCcam->pev->classname = MAKE_STRING("tf_sentry_top");
+		pRCcam->pev->origin = pev->origin + Vector(0, 0, 21);
+		pRCcam->pev->angles = pev->angles;
+		if (pev->owner)
+			pRCcam->m_hBuilder = CBaseEntity::Instance(pev->owner);
+		pRCcam->pev->colormap = pev->colormap;
+		pRCcam->m_hBase = this;
+		pRCcam->Spawn();
+		m_pSentry = pRCcam;
+	}
+	else
+	{
+		pev->movetype = MOVETYPE_TOSS;
+		((CBasePlayer*)CBaseEntity::Instance(pev->owner))->m_hBuilding = this;
+		SetThink(&CTFSentryBase::FinishConstruction);
+		pev->nextthink = gpGlobals->time + 5;
+	}
+
+	UTIL_SetOrigin(pev, pev->origin);
+}
+
+void CTFSentryBase::FinishConstruction()
+{
+	pev->movetype = MOVETYPE_NONE;
 	UTIL_SetOrigin(pev, pev->origin);
 
-	// spawn the camera
 	CTFSentry* pRCcam = GetClassPtr((CTFSentry*)NULL);
 	pRCcam->pev->classname = MAKE_STRING("tf_sentry_top");
-	pRCcam->pev->origin = pev->origin+Vector(0, 0, 21);
+	pRCcam->pev->origin = pev->origin + Vector(0, 0, 21);
 	pRCcam->pev->angles = pev->angles;
 	if (pev->owner)
 		pRCcam->m_hBuilder = CBaseEntity::Instance(pev->owner);
 	pRCcam->pev->colormap = pev->colormap;
 	pRCcam->m_hBase = this;
 	pRCcam->Spawn();
+	
+	((CBasePlayer*)CBaseEntity::Instance(pev->owner))->m_hBuilding = nullptr;
+
+	SetThink(NULL);
 }
 
 void CTFSentryBase::Precache()
@@ -319,15 +375,20 @@ void CTFSentry::Spawn()
 {
 	Precache();
 
+	m_hBuilder.Entity<CBasePlayer>()->m_hSentryGun = this;
+
+	SetModel(SENTRY_MODEL_LEVEL_1);
+
 	m_fPitch = 0;
 	m_fYaw = 0;
 
-	SET_MODEL(edict(), SENTRY_MODEL_LEVEL_1);
+	// NPCs attack it
+	SetBits(pev->flags, FL_MONSTER);
+	pev->flags |= FL_MONSTER; // extraneous?
+	pev->takedamage = DAMAGE_YES;
+	pev->solid = SOLID_BBOX;
 
-	// don't show yet
-	pev->takedamage = DAMAGE_NO;
-	pev->solid = SOLID_NOT;
-	pev->effects |= EF_NODRAW;
+	pev->health = SENTRYGUN_MAX_HEALTH; // TO-DO: skill cvar
 
 	UTIL_SetOrigin(pev, pev->origin);
 
@@ -346,7 +407,7 @@ void CTFSentry::Spawn()
 	m_flFieldOfView = VIEW_FIELD_NARROW;
 
 	// Give the Gun some ammo
-	m_iAmmo = 0;
+	m_iAmmo = m_iMaxAmmo;
 	m_iAmmoRockets = 0;
 	m_iMaxAmmo = SENTRYGUN_MAX_SHELLS_1;
 	m_iMaxAmmoRockets = SENTRYGUN_MAX_ROCKETS;
@@ -358,9 +419,32 @@ void CTFSentry::Spawn()
 
 	pev->view_ofs = Vector(0, 0, 30);
 
-	m_iState = SENTRY_STATE_INACTIVE;
+	m_iState = (SENTRY_STATE_SEARCHING);
 
-	OnGoActive(); // TO-DO: remove
+	// Orient it
+	Vector angles = pev->angles;
+
+	m_vecCurAngles.y = UTIL_AngleMod(angles.y);
+	m_iRightBound = UTIL_AngleMod((int)angles.y - 50);
+	m_iLeftBound = UTIL_AngleMod((int)angles.y + 50);
+	if (m_iRightBound > m_iLeftBound)
+	{
+		m_iRightBound = m_iLeftBound;
+		m_iLeftBound = UTIL_AngleMod((int)angles.y - 50);
+	}
+
+	// Start it rotating
+	m_vecGoalAngles.y = m_iRightBound;
+	m_vecGoalAngles.x = m_vecCurAngles.x = 0;
+	m_bTurningRight = true;
+
+	EMIT_SOUND(edict(), CHAN_AUTO, SENTRY_SOUND_SET, 1.0, ATTN_IDLE);
+
+	// Init attachments for level 1 sentry gun
+	m_iAttachments[SENTRYGUN_ATTACHMENT_MUZZLE] = 0;
+	m_iAttachments[SENTRYGUN_ATTACHMENT_MUZZLE_ALT] = 1;
+	m_iAttachments[SENTRYGUN_ATTACHMENT_ROCKET_L] = 2;
+	m_iAttachments[SENTRYGUN_ATTACHMENT_ROCKET_R] = 3;
 
 	SetThink(&CTFSentry::SentryThink);
 	pev->nextthink = gpGlobals->time;
@@ -409,52 +493,6 @@ bool CTFSentry::StartBuilding(CBaseEntity* pBuilder)
 	m_fYaw = m_fPitch = 0.0;
 }
 */
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CTFSentry::OnGoActive()
-{
-	SetModel(SENTRY_MODEL_LEVEL_1);
-
-	pev->effects &= ~EF_NODRAW;
-	
-	// NPCs attack it
-	SetBits(pev->flags, FL_MONSTER);
-	pev->flags |= FL_MONSTER; // extraneous?
-	pev->takedamage = DAMAGE_YES;
-
-	UTIL_SetOrigin(pev, pev->origin);
-
-	m_iState = (SENTRY_STATE_SEARCHING);
-
-	// Orient it
-	Vector angles = pev->angles;
-
-	m_vecCurAngles.y = UTIL_AngleMod(angles.y);
-	m_iRightBound = UTIL_AngleMod((int)angles.y - 50);
-	m_iLeftBound = UTIL_AngleMod((int)angles.y + 50);
-	if (m_iRightBound > m_iLeftBound)
-	{
-		m_iRightBound = m_iLeftBound;
-		m_iLeftBound = UTIL_AngleMod((int)angles.y - 50);
-	}
-
-	// Start it rotating
-	m_vecGoalAngles.y = m_iRightBound;
-	m_vecGoalAngles.x = m_vecCurAngles.x = 0;
-	m_bTurningRight = true;
-
-	EMIT_SOUND(edict(), CHAN_AUTO, SENTRY_SOUND_SET, 1.0, ATTN_IDLE);
-
-	m_iAmmo = m_iMaxAmmo;
-
-	// Init attachments for level 1 sentry gun
-	m_iAttachments[SENTRYGUN_ATTACHMENT_MUZZLE] = 0;
-	m_iAttachments[SENTRYGUN_ATTACHMENT_MUZZLE_ALT] = 1;
-	m_iAttachments[SENTRYGUN_ATTACHMENT_ROCKET_L] = 2;
-	m_iAttachments[SENTRYGUN_ATTACHMENT_ROCKET_R] = 3;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1254,6 +1292,7 @@ bool CTFSentry::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, floa
 void CTFSentry::ExplodeSentry()
 {
 	ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_destroyed");
+	m_hBuilder.Entity<CBasePlayer>()->m_hSentryGun = nullptr;
 
 	Vector pos = Center();
 	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pos);

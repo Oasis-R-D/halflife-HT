@@ -398,6 +398,7 @@ void W_Precache()
 	g_sModelIndexLaser = PRECACHE_MODEL((char*)g_pModelNameLaser);
 	g_sModelIndexLaserDot = PRECACHE_MODEL("sprites/laserdot.spr");
 
+	PRECACHE_SOUND("buildings/building.wav"); // explosion aftermaths
 
 	// used by explosions
 	PRECACHE_MODEL("models/grenade.mdl");

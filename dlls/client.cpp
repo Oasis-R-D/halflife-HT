@@ -670,13 +670,16 @@ void ClientCommand(edict_t* pEntity)
 	}
 	else if (FStrEq(pcmd, "!BUILDSENTRY"))
 	{
+		// only 1 sentry, can't build multiple things at once, dont build if in a RC
+		if (player->m_hSentryGun || player->m_hBuilding || player->m_bNoMove_RC)
+			return;
+
 		UTIL_MakeVectors(Vector(0, pev->angles.y, 0));
 
 		// fetch spawn pos
 		Vector SpawnPos = pev->origin + gpGlobals->v_forward * 64;
 		TraceResult tr;
 		UTIL_TraceLine(SpawnPos, SpawnPos - Vector(0, 0, 64), dont_ignore_monsters, dont_ignore_glass, nullptr, &tr);
-		SpawnPos = tr.vecEndPos;
 
 		CBaseEntity* pList[1];
 		if (UTIL_EntitiesInBox(pList, 1, SpawnPos-SENTRYGUN_MINS, SpawnPos+SENTRYGUN_MAXS, FL_MONSTER | FL_CLIENT | FL_CONVEYOR) == 1 || !FBitSet(pev->flags, FL_ONGROUND) || tr.fAllSolid == true || tr.flFraction == 1.0)
@@ -684,24 +687,16 @@ void ClientCommand(edict_t* pEntity)
 			return;
 		}
 
-		CTFSentryBase* pSentry = GetClassPtr((CTFSentryBase*)NULL);
-		pSentry->pev->classname = MAKE_STRING("tf_sentry");
-		pSentry->pev->origin = SpawnPos;
-		pSentry->pev->angles.y = pev->angles.y;
-		pSentry->pev->angles.x = 0;
-		pSentry->pev->angles.z = 0;
-		pSentry->pev->owner = player->edict();
-		pSentry->pev->spawnflags |= SF_NORESPAWN;
-
-		// add colors :D
+		int colormap;
 		if (player->m_iTeamNum == CTFTeam::BlackMesa)
-			pSentry->pev->colormap = 1;
+			colormap = 1;
 		else if (player->m_iTeamNum == CTFTeam::OpposingForce)
-			pSentry->pev->colormap = 1;
+			colormap = 1;
 		else
-			pSentry->pev->colormap = pev->colormap;
-		
-		pSentry->Spawn();
+			colormap = pev->colormap;
+
+		EMIT_SOUND(player->edict(), CHAN_ITEM, "buildings/building.wav", 1.0, ATTN_IDLE);
+		CTFSentryBase::Sentry_Create(SpawnPos, Vector(0, pev->angles.y, 0), player, colormap);
 	}
 	else
 	{

@@ -224,6 +224,13 @@ public:
 	float m_flJumpTime;
 	float m_flNextChatTime;
 
+	// TEAM FORTRESS
+	EHANDLE m_hSentryGun;
+	EHANDLE m_hBuilding; // is building (sentry, dispenser, etc)
+
+	// HT
+	bool m_bNoMove_RC;
+
 	// usable player items
 	CBasePlayerItem* m_rgpPlayerItems[MAX_ITEM_TYPES];
 	CBasePlayerItem* m_pActiveItem;
