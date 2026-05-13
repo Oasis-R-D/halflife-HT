@@ -459,7 +459,7 @@ bool CTFSentry::StartBuilding(CBaseEntity* pBuilder)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTFSentry::Precache()
+void CTFSentry::PrecacheBuildable()
 {
 	// Models
 	PRECACHE_MODEL(SENTRY_MODEL_PLACEMENT);
@@ -636,11 +636,6 @@ bool CTFSentry::OnWrenchHit(CBasePlayer* pPlayer)
 	}
 
 	return bDidWork;
-}
-
-int CTFSentry::Classify()
-{
-	return CLASS_PLAYER_ALLY;
 }
 
 bool CTFSentry::AcquireEnemyFail(CBaseEntity* target)

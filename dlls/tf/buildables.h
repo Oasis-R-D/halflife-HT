@@ -13,8 +13,13 @@ class CBuildable : public CBaseMonster
 {
 public:
     void Spawn() override;
+	void Precache() override;
+	int Classify() override;
+
+	virtual void PrecacheBuildable();
     virtual void SpawnBuildable();
 
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
     bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
     virtual void DetonateBuilding();
 

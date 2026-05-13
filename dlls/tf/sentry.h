@@ -42,10 +42,8 @@ class CTFSentry : public CBuildable
 {
 public:
 	void SpawnBuildable() override;
-	void Precache();
-	int Classify() override;
+	void PrecacheBuildable() override;
 
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 	void DetonateBuilding() override;
 
 	void SetModel(const char *pModel);
@@ -73,12 +71,12 @@ private:
 	bool FInViewCone (CBaseEntity* pEntity ); // UNUSED (should probably use this???)
 
 	// Rotations
-	void SentryRotate(void);
-	bool MoveTurret(void);
+	void SentryRotate();
+	bool MoveTurret();
 
 	// Attack
-	void Attack(void);
-	bool Fire(void);
+	void Attack();
+	bool Fire();
 	
 	int m_iState;
 
