@@ -22,7 +22,7 @@ public:
 
 	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
     bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
-    virtual void DetonateBuilding();
+    virtual void DetonateBuilding() {};
 
 	virtual bool OnWrenchHit(CBasePlayer* pPlayer) {return false;};
 
