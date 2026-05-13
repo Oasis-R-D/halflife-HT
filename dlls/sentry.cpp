@@ -16,7 +16,7 @@
 #include "soundent.h"
 #include "sentry.h"
 
-#pragma region ROCKET
+#pragma region RANDOM SHI
 
 TYPEDESCRIPTION CSentryRocket::m_SaveData[] =
 	{
@@ -173,6 +173,25 @@ void CSentryRocket::FollowThink()
 	pev->nextthink = gpGlobals->time + 0.1;
 }
 
+TYPEDESCRIPTION CActAnimatingSentry::m_SaveData[] =
+	{
+		DEFINE_FIELD(CActAnimatingSentry, m_Activity, FIELD_INTEGER),
+};
+
+IMPLEMENT_SAVERESTORE(CActAnimatingSentry, CBaseAnimating);
+
+void CActAnimatingSentry::SetActivity(Activity act)
+{
+	int sequence = LookupActivity(act);
+	if (sequence != ACTIVITY_NOT_AVAILABLE)
+	{
+		pev->sequence = sequence;
+		m_Activity = act;
+		pev->frame = 0;
+		ResetSequenceInfo();
+	}
+}
+
 #pragma endregion
 
 // Ground placed version
@@ -185,8 +204,10 @@ void CSentryRocket::FollowThink()
 
 #define SENTRY_ROCKET_MODEL		"models/rpgrocket.mdl"
 
-#define SENTRYGUN_MINS			Vector(-20, -20, 0)
-#define SENTRYGUN_MAXS			Vector(20,  20, 66)
+#define SENTRY_GUN_DAMAGE 16
+
+#define SENTRY_METAL_PER_SHELL 1.0
+#define SENTRY_METAL_PER_ROCKET 2.0
 
 #define SENTRYGUN_MAX_ROCKETS	10
 #define SENTRYGUN_MAX_HEALTH	150
@@ -264,52 +285,56 @@ TYPEDESCRIPTION CTFSentry::m_SaveData[] =
 
 IMPLEMENT_SAVERESTORE(CTFSentry, CActAnimatingSentry);
 
-LINK_ENTITY_TO_CLASS(tf_sentry, CTFSentry);
+LINK_ENTITY_TO_CLASS(tf_sentry_top, CTFSentry);
 
-#define SENTRY_GUN_DAMAGE 16
-
-#define SENTRY_METAL_PER_SHELL 1.0
-#define SENTRY_METAL_PER_ROCKET 2.0
-
-TYPEDESCRIPTION CActAnimatingSentry::m_SaveData[] =
-	{
-		DEFINE_FIELD(CActAnimatingSentry, m_Activity, FIELD_INTEGER),
-};
-
-IMPLEMENT_SAVERESTORE(CActAnimatingSentry, CBaseAnimating);
-
-void CActAnimatingSentry::SetActivity(Activity act)
+LINK_ENTITY_TO_CLASS(tf_sentry, CTFSentryBase);
+void CTFSentryBase::Spawn()
 {
-	int sequence = LookupActivity(act);
-	if (sequence != ACTIVITY_NOT_AVAILABLE)
-	{
-		pev->sequence = sequence;
-		m_Activity = act;
-		pev->frame = 0;
-		ResetSequenceInfo();
-	}
+	Precache();
+
+	SET_MODEL(ENT(pev), "models/base.mdl");
+	pev->classname = MAKE_STRING("tf_sentry");
+	pev->solid = SOLID_NOT;
+	UTIL_SetOrigin(pev, pev->origin);
+
+	// spawn the camera
+	CTFSentry* pRCcam = GetClassPtr((CTFSentry*)NULL);
+	pRCcam->pev->classname = MAKE_STRING("tf_sentry_top");
+	pRCcam->pev->origin = pev->origin+Vector(0, 0, 21);
+	pRCcam->pev->angles = pev->angles;
+	pRCcam->pev->owner = pev->owner;
+	pRCcam->pev->colormap = pev->colormap;
+	pRCcam->m_hBase = this;
+	pRCcam->Spawn();
+}
+
+void CTFSentryBase::Precache()
+{
+	UTIL_PrecacheOther("tf_sentry_top");
+	UTIL_PrecacheOther("sentry_rocket");
 }
 
 void CTFSentry::Spawn()
 {
+	Precache();
+
 	m_fPitch = 0;
 	m_fYaw = 0;
 
 	SET_MODEL(edict(), SENTRY_MODEL_LEVEL_1);
 
-	pev->takedamage = DAMAGE_YES;
+	// don't show yet
+	pev->takedamage = DAMAGE_NO;
+	pev->solid = SOLID_NOT;
+	pev->effects |= EF_NODRAW;
 
-	pev->solid = SOLID_BBOX;
+	UTIL_SetOrigin(pev, pev->origin);
 
 	m_bloodColor = DONT_BLEED;
 
 	m_iUpgradeLevel = 1;
 	m_iUpgradeMetal = 0;
 	m_iUpgradeMetalRequired = SENTRYGUN_UPGRADE_METAL;
-
-	// NPCs attack it
-	SetBits(pev->flags, FL_MONSTER);
-	pev->flags |= FL_MONSTER; // extraneous?
 
 	pev->health = SENTRYGUN_MAX_HEALTH; // TO-DO: skill cvar
 
@@ -331,8 +356,6 @@ void CTFSentry::Spawn()
 	m_flLastAttackedTime = 0;
 
 	pev->view_ofs = Vector(0, 0, 30);
-
-	UTIL_SetSize(pev, SENTRYGUN_MINS, SENTRYGUN_MAXS);
 
 	m_iState = SENTRY_STATE_INACTIVE;
 
@@ -393,6 +416,15 @@ void CTFSentry::OnGoActive()
 {
 	SetModel(SENTRY_MODEL_LEVEL_1);
 
+	pev->effects &= ~EF_NODRAW;
+	
+	// NPCs attack it
+	SetBits(pev->flags, FL_MONSTER);
+	pev->flags |= FL_MONSTER; // extraneous?
+	pev->takedamage = DAMAGE_YES;
+
+	UTIL_SetOrigin(pev, pev->origin);
+
 	m_iState = (SENTRY_STATE_SEARCHING);
 
 	// Orient it
@@ -441,8 +473,6 @@ void CTFSentry::Precache()
 	PRECACHE_SOUND(SENTRY_SOUND_SET);
 	PRECACHE_SOUND(SENTRY_SOUND_EMPTY);
 
-	UTIL_PrecacheOther("sentry_rocket");
-
 	m_idShard = PRECACHE_MODEL("models/metalplategibs.mdl");
 }
 
@@ -452,11 +482,6 @@ void CTFSentry::Precache()
 bool CTFSentry::CanBeUpgraded(CBasePlayer* pPlayer)
 {
 	// only engineers
-	/*
-	if (!ClassCanBuild(pPlayer->GetPlayerClass()->GetClassIndex(), GetType()))
-	{
-		return false;
-	}*/
 
 	// max upgraded
 	if (m_iUpgradeLevel >= 3)
@@ -764,7 +789,7 @@ void CTFSentry::FoundTarget(CBaseEntity* pTarget, const Vector &vecSoundCenter)
 
 	// Update timers, we are attacking now!
 	m_iState = SENTRY_STATE_ATTACKING;
-	m_flNextAttack = gpGlobals->time + SENTRY_THINK_DELAY;
+	m_flNextAttack = gpGlobals->time + 0.5;
 	if (m_flNextRocketAttack < gpGlobals->time)
 	{
 		m_flNextRocketAttack = gpGlobals->time + 0.5;
@@ -805,6 +830,25 @@ void CTFSentry::Attack()
 
 	if (!FindTarget())
 	{
+		// this seems to fix the jumping that sometimes happens
+		// Switch rotation direction
+		if (m_bTurningRight)
+		{
+			m_bTurningRight = false;
+			m_vecGoalAngles.y = m_iLeftBound;
+		}
+		else
+		{
+			m_bTurningRight = true;
+			m_vecGoalAngles.y = m_iRightBound;
+		}
+
+		// Randomly look up and down a bit
+		if (RANDOM_FLOAT(0, 1) < 0.3)
+		{
+			m_vecGoalAngles.x = (int)RANDOM_LONG(-10,10);
+		}
+
 		m_iState = (SENTRY_STATE_SEARCHING);
 		m_hEnemy = NULL;
 		return;
@@ -830,7 +874,7 @@ void CTFSentry::Attack()
 		angToTarget.x = 50;
 	else if (angToTarget.x < -50)
 		angToTarget.x = -50;
-	m_vecGoalAngles.y = -angToTarget.y;
+	m_vecGoalAngles.y = angToTarget.y;
 	m_vecGoalAngles.x = angToTarget.x;
 
 	MoveTurret();
@@ -852,7 +896,7 @@ void CTFSentry::Attack()
 	}
 	else
 	{
-		// SetSentryAnim(TFTURRET_ANIM_SPIN);
+		// return to idle??
 	}
 }
 
@@ -903,10 +947,8 @@ bool CTFSentry::Fire()
 
 	if (m_iAmmo > 0)
 	{
-		if (m_Activity != ACT_RANGE_ATTACK1)
-		{
-			SetActivity(ACT_RANGE_ATTACK1);
-		}
+		SetActivity(ACT_RANGE_ATTACK1);
+
 		Vector vecSrc;
 		Vector vecAng;
 
@@ -959,10 +1001,8 @@ bool CTFSentry::Fire()
 	else
 	{
 		// could probably use a separate anim for dry fire
-		if (m_Activity == ACT_RANGE_ATTACK1)
-		{
-			SetActivity(ACT_IDLE);
-		}
+		SetActivity(ACT_IDLE);
+
 		// Out of ammo, play a click
 		EMIT_SOUND(edict(), CHAN_AUTO, SENTRY_SOUND_EMPTY, 1.0, ATTN_NORM);
 
@@ -1131,8 +1171,8 @@ bool CTFSentry::MoveTurret()
 		float flYaw = m_vecCurAngles.y - angles.y;
 
 		//SetPoseParameter(m_iYawPoseParameter, -flYaw);
-		SetBoneController(BONE_YAW, -flYaw);
-		m_fYaw = -flYaw;
+		SetBoneController(BONE_YAW, flYaw);
+		m_fYaw = flYaw;
 
 		bMoved = true;
 	}
@@ -1188,21 +1228,22 @@ bool CTFSentry::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, floa
 //-----------------------------------------------------------------------------
 void CTFSentry::ExplodeSentry()
 {
-	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+	Vector pos = Center();
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pos);
 		WRITE_BYTE(TE_BREAKMODEL);
 		// position
-		WRITE_COORD(pev->origin.x);
-		WRITE_COORD(pev->origin.y);
-		WRITE_COORD(pev->origin.z+4);
+		WRITE_COORD(pos.x);
+		WRITE_COORD(pos.y);
+		WRITE_COORD(pos.z-8);
 		// size
-		WRITE_COORD(8);
-		WRITE_COORD(8);
-		WRITE_COORD(8);
+		WRITE_COORD(32);
+		WRITE_COORD(32);
+		WRITE_COORD(32);
 		// velocity
-		WRITE_COORD(pev->velocity.x);
-		WRITE_COORD(pev->velocity.y);
-		WRITE_COORD(pev->velocity.z);
-		WRITE_BYTE(25); // randomization
+		WRITE_COORD(0);
+		WRITE_COORD(0);
+		WRITE_COORD(0);
+		WRITE_BYTE(35); // randomization
 		// Model
 		WRITE_SHORT(m_idShard); // model id#
 		// # of shards
@@ -1225,10 +1266,12 @@ void CTFSentry::ExplodeSentry()
 		break;
 	}
 
-	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, QUIET_GUN_VOLUME, 3.0);
+	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pos, QUIET_GUN_VOLUME, 3.0);
 
-	::RadiusDamage(pev->origin, pev, m_hBuilder != nullptr ? m_hBuilder->pev : pev, 30, 96, CLASS_NONE, DMG_BLAST);
+	::RadiusDamage(pos, pev, m_hBuilder != nullptr ? m_hBuilder->pev : pev, 30, 96, CLASS_NONE, DMG_BLAST);
 
+	if (m_hBase)
+		UTIL_Remove(m_hBase);
 	UTIL_Remove(this);
 }
 
@@ -1240,8 +1283,8 @@ void CTFSentry::SetModel(const char* pModel)
 	SET_MODEL(edict(), pModel);
 
 	// Reset this after model change
-	UTIL_SetSize(pev, SENTRYGUN_MINS, SENTRYGUN_MAXS);
 	pev->solid = SOLID_BBOX;
+	UTIL_SetSize(pev, SENTRYGUN_MINS, SENTRYGUN_MAXS);
 
 	// Restore pose parameters
 	//m_iPitchPoseParameter = LookupPoseParameter("aim_pitch");

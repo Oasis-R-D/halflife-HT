@@ -52,6 +52,9 @@
 #include "ctf/CTFGoalFlag.h"
 #include "ctf/ctfplay_gamerules.h"
 
+// TFC
+#include "sentry.h"
+
 extern DLL_GLOBAL unsigned int g_ulModelIndexPlayer;
 extern DLL_GLOBAL bool g_fGameOver;
 extern DLL_GLOBAL int g_iSkillLevel;
@@ -664,6 +667,41 @@ void ClientCommand(edict_t* pEntity)
 		{
 			DumpCTFFlagInfo(reinterpret_cast<CBasePlayer*>(GET_PRIVATE(pEntity)));
 		}
+	}
+	else if (FStrEq(pcmd, "!BUILDSENTRY"))
+	{
+		UTIL_MakeVectors(Vector(0, pev->angles.y, 0));
+
+		// fetch spawn pos
+		Vector SpawnPos = pev->origin + gpGlobals->v_forward * 64;
+		TraceResult tr;
+		UTIL_TraceLine(SpawnPos, SpawnPos - Vector(0, 0, 64), dont_ignore_monsters, dont_ignore_glass, nullptr, &tr);
+		SpawnPos = tr.vecEndPos;
+
+		CBaseEntity* pList[1];
+		if (UTIL_EntitiesInBox(pList, 1, SpawnPos-SENTRYGUN_MINS, SpawnPos+SENTRYGUN_MAXS, FL_MONSTER | FL_CLIENT | FL_CONVEYOR) == 1 || !FBitSet(pev->flags, FL_ONGROUND) || tr.fAllSolid == true || tr.flFraction == 1.0)
+		{
+			return;
+		}
+
+		CTFSentryBase* pSentry = GetClassPtr((CTFSentryBase*)NULL);
+		pSentry->pev->classname = MAKE_STRING("tf_sentry");
+		pSentry->pev->origin = SpawnPos;
+		pSentry->pev->angles.y = pev->angles.y;
+		pSentry->pev->angles.x = 0;
+		pSentry->pev->angles.z = 0;
+		//pSentry->pevowner = player->edict();
+		pSentry->pev->spawnflags |= SF_NORESPAWN;
+
+		// add colors :D
+		if (player->m_iTeamNum == CTFTeam::BlackMesa)
+			pSentry->pev->colormap = 1;
+		else if (player->m_iTeamNum == CTFTeam::OpposingForce)
+			pSentry->pev->colormap = 1;
+		else
+			pSentry->pev->colormap = pev->colormap;
+		
+		pSentry->Spawn();
 	}
 	else
 	{

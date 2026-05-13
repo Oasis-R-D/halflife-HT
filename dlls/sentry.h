@@ -10,6 +10,9 @@
 
 // ROCKET CLASS DEFINED IN 'weapons.h' ABOVE 'CRpgRocket'
 
+#define SENTRYGUN_MINS			Vector(-20, -20, 0)
+#define SENTRYGUN_MAXS			Vector(20,  20, 66)
+
 class CActAnimatingSentry : public CBaseMonster
 {
 public:
@@ -26,11 +29,19 @@ protected:
 	Activity m_Activity;
 };
 
+class CTFSentryBase : public CBaseEntity
+{
+public:
+	void Spawn() override;
+	void Precache();
+};
+
 // --------------------------------------------------------------
 // AI sentry gun
 // -------------------------------------------------------------
 class CTFSentry : public CActAnimatingSentry
 {
+public:
 	void Spawn();
 	void Precache();
 	void OnGoActive();
@@ -46,6 +57,8 @@ class CTFSentry : public CActAnimatingSentry
 	bool Save(CSave& save) override;
 	bool Restore(CRestore& restore) override;
 	static TYPEDESCRIPTION m_SaveData[];
+
+	EHANDLE m_hBase;
 
 private:
 	// Main think
