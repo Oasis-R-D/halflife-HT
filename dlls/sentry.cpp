@@ -302,7 +302,8 @@ void CTFSentryBase::Spawn()
 	pRCcam->pev->classname = MAKE_STRING("tf_sentry_top");
 	pRCcam->pev->origin = pev->origin+Vector(0, 0, 21);
 	pRCcam->pev->angles = pev->angles;
-	pRCcam->pev->owner = pev->owner;
+	if (pev->owner)
+		pRCcam->m_hBuilder = CBaseEntity::Instance(pev->owner);
 	pRCcam->pev->colormap = pev->colormap;
 	pRCcam->m_hBase = this;
 	pRCcam->Spawn();
@@ -660,9 +661,28 @@ bool CTFSentry::AcquireEnemyFail(CBaseEntity* target)
 	//if (!FInViewCone(target))
 		//return true;
 
-	if (IRelationship(target) <= R_NO)
+	// check for players team (don't check in SP, friendly to players)
+	// TO-DO: check for enemy turrets too?
+	if (target->IsPlayer() && g_pGameRules->IsMultiplayer())
 	{
-		return true;
+		CBaseEntity* bob = CBaseEntity::Instance(m_hBuilder.Get()); // the builder
+		if (g_pGameRules->IsDeathmatch())
+		{
+			// shoot everyone but builder
+			return target == bob;
+		}
+		else if (g_pGameRules->IsTeamplay() || g_pGameRules->IsCTF())
+		{
+			// don't shoot team mates
+			return UTIL_TeamsMatch(target->TeamID(), bob->TeamID());
+		}
+	}
+	else
+	{
+		if (IRelationship(target) <= R_NO)
+		{
+			return true;
+		}
 	}
 
 	return false;
@@ -997,6 +1017,11 @@ bool CTFSentry::Fire()
 		EMIT_SOUND_DYN(edict(), CHAN_WEAPON, wpnsnd2, 1.0, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 10));
 
 		m_iAmmo--;
+
+		if (m_iAmmo == 10)
+			ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_shellslow");
+		if (m_iAmmo == 0)
+			ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_shellsout");
 	}
 	else
 	{
@@ -1228,6 +1253,8 @@ bool CTFSentry::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, floa
 //-----------------------------------------------------------------------------
 void CTFSentry::ExplodeSentry()
 {
+	ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_destroyed");
+
 	Vector pos = Center();
 	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pos);
 		WRITE_BYTE(TE_BREAKMODEL);

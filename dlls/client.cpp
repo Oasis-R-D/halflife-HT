@@ -690,7 +690,7 @@ void ClientCommand(edict_t* pEntity)
 		pSentry->pev->angles.y = pev->angles.y;
 		pSentry->pev->angles.x = 0;
 		pSentry->pev->angles.z = 0;
-		//pSentry->pevowner = player->edict();
+		pSentry->pev->owner = player->edict();
 		pSentry->pev->spawnflags |= SF_NORESPAWN;
 
 		// add colors :D

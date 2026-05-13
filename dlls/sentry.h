@@ -59,6 +59,7 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 
 	EHANDLE m_hBase;
+	EHANDLE m_hBuilder;
 
 private:
 	// Main think
@@ -113,7 +114,6 @@ private:
 	float m_flNextRocketAttack;
 
 	EHANDLE m_hEnemy;
-	EHANDLE m_hBuilder;
 
 	int m_iAttachments[4];
 

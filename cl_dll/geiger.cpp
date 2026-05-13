@@ -73,6 +73,7 @@ bool CHudGeiger::Draw(float flTime)
 		// peicewise linear is better than continuous formula for this
 		if (m_iGeigerRange > 800)
 		{
+			flvol = 0.0;
 			pct = 0; // Con_Printf ( "range > 800\n");
 		}
 		else if (m_iGeigerRange > 600)
