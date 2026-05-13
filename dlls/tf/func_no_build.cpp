@@ -62,6 +62,25 @@ void CFuncNoBuild::Spawn()
 	SetTouch(&CFuncNoBuild::Touch);
 }
 
+//
+// ToggleUse - If this is the USE function for a trigger, its state will toggle every time it's fired
+//
+void CFuncNoBuild::ToggleUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
+{
+	if (pev->solid == SOLID_NOT)
+	{ // if the trigger is off, turn it on
+		pev->solid = SOLID_TRIGGER;
+
+		// Force retouch
+		gpGlobals->force_retouch++;
+	}
+	else
+	{ // turn the trigger off
+		pev->solid = SOLID_NOT;
+	}
+	UTIL_SetOrigin(pev, pev->origin);
+}
+
 void CFuncNoBuild::Touch(CBaseEntity* pOther)
 {
 	if (m_bDestroyBuildingsOnActive)
