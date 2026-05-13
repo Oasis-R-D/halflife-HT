@@ -5,18 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "extdll.h"
-#include "util.h"
-#include "cbase.h"
-#include "animation.h"
-#include "monsters.h"
-#include "weapons.h"
-#include "player.h"
-#include "gamerules.h"
-#include "soundent.h"
+#include "buildables.h"
 #include "sentry.h"
 
-#pragma region RANDOM SHI
+#pragma region ROCKET
 
 TYPEDESCRIPTION CSentryRocket::m_SaveData[] =
 	{
@@ -172,26 +164,6 @@ void CSentryRocket::FollowThink()
 
 	pev->nextthink = gpGlobals->time + 0.1;
 }
-
-TYPEDESCRIPTION CActAnimatingSentry::m_SaveData[] =
-	{
-		DEFINE_FIELD(CActAnimatingSentry, m_Activity, FIELD_INTEGER),
-};
-
-IMPLEMENT_SAVERESTORE(CActAnimatingSentry, CBaseAnimating);
-
-void CActAnimatingSentry::SetActivity(Activity act)
-{
-	int sequence = LookupActivity(act);
-	if (sequence != ACTIVITY_NOT_AVAILABLE)
-	{
-		pev->sequence = sequence;
-		m_Activity = act;
-		pev->frame = 0;
-		ResetSequenceInfo();
-	}
-}
-
 #pragma endregion
 
 // Ground placed version
@@ -271,7 +243,6 @@ TYPEDESCRIPTION CTFSentry::m_SaveData[] =
 
 		DEFINE_FIELD(CTFSentry, m_flNextAttack, FIELD_TIME),
 		DEFINE_FIELD(CTFSentry, m_flNextRocketAttack, FIELD_TIME),
-		DEFINE_FIELD(CTFSentry, m_flLastAttackedTime, FIELD_TIME),
 
 		DEFINE_FIELD(CTFSentry, m_flFieldOfView, FIELD_FLOAT),
 
@@ -286,7 +257,7 @@ TYPEDESCRIPTION CTFSentry::m_SaveData[] =
 		DEFINE_FIELD(CTFSentry, m_hBase, FIELD_EHANDLE),
 };
 
-IMPLEMENT_SAVERESTORE(CTFSentry, CActAnimatingSentry);
+IMPLEMENT_SAVERESTORE(CTFSentry, CBuildable);
 
 
 TYPEDESCRIPTION CTFSentryBase::m_SaveData[] =
@@ -375,7 +346,7 @@ void CTFSentryBase::Precache()
 	UTIL_PrecacheOther("sentry_rocket");
 }
 
-void CTFSentry::Spawn()
+void CTFSentry::SpawnBuildable()
 {
 	Precache();
 
@@ -419,8 +390,6 @@ void CTFSentry::Spawn()
 
 	// Start searching for enemies
 	m_hEnemy = NULL;
-
-	m_flLastAttackedTime = 0;
 
 	pev->view_ofs = Vector(0, 0, 30);
 
@@ -1277,8 +1246,6 @@ bool CTFSentry::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, floa
 {
 	if (flDamage > 0)
 	{
-		m_flLastAttackedTime = gpGlobals->time;
-
 		pev->health -= flDamage;
 		if (pev->health <= 0)
 		{

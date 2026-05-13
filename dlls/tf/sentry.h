@@ -7,27 +7,12 @@
 #include "player.h"
 #include "gamerules.h"
 #include "soundent.h"
+#include "buildables.h"
 
 // ROCKET CLASS DEFINED IN 'weapons.h' ABOVE 'CRpgRocket'
 
 #define SENTRYGUN_MINS			Vector(-20, -20, 0)
 #define SENTRYGUN_MAXS			Vector(20,  20, 66)
-
-class CActAnimatingSentry : public CBaseMonster
-{
-public:
-	void SetActivity(Activity act);
-	inline Activity GetActivity() { return m_Activity; }
-
-	int ObjectCaps() override { return CBaseAnimating::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
-
-	bool Save(CSave& save) override;
-	bool Restore(CRestore& restore) override;
-	static TYPEDESCRIPTION m_SaveData[];
-
-protected:
-	Activity m_Activity;
-};
 
 class CTFSentryBase : public CBaseEntity
 {
@@ -53,10 +38,10 @@ public:
 // --------------------------------------------------------------
 // AI sentry gun
 // -------------------------------------------------------------
-class CTFSentry : public CActAnimatingSentry
+class CTFSentry : public CBuildable
 {
 public:
-	void Spawn();
+	void SpawnBuildable() override;
 	void Precache();
 	int Classify() override;
 
@@ -132,8 +117,6 @@ private:
 
 	double m_fPitch;
 	double m_fYaw;
-
-	float m_flLastAttackedTime;
 
 	int m_idShard;
 };
