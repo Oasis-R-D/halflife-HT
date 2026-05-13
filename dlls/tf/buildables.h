@@ -8,6 +8,7 @@
 #include "gamerules.h"
 #include "soundent.h"
 #include "skill.h"
+#include "animation.h"
 
 class CBuildable : public CBaseMonster
 {

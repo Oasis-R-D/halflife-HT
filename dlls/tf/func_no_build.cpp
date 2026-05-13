@@ -17,13 +17,15 @@
 //-----------------------------------------------------------------------------
 // Purpose: Defines an area where objects cannot be built
 //-----------------------------------------------------------------------------
-class CFuncNoBuild : public CBaseTrigger
+class CFuncNoBuild : public CBaseToggle
 {
 public:
 	void Spawn() override;
     bool KeyValue(KeyValueData* pkvd) override;
     void Touch(CBaseEntity* pOther) override;
-    
+    void EXPORT ToggleUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
+	void InitTrigger();
+
 private:
 	bool	m_bAllowSentry;
 	bool	m_bAllowDispenser;
@@ -31,7 +33,26 @@ private:
 	bool	m_bDestroyBuildingsOnActive = false;
 };
 
-LINK_ENTITY_TO_CLASS( func_nobuild, CFuncNoBuild);
+LINK_ENTITY_TO_CLASS(func_no_build, CFuncNoBuild);
+
+/*
+================
+InitTrigger
+================
+*/
+void CFuncNoBuild::InitTrigger()
+{
+	// trigger angles are used for one-way touches.  An angle of 0 is assumed
+	// to mean no restrictions, so use a yaw of 360 instead.
+	if (pev->angles != g_vecZero)
+		SetMovedir(pev);
+	pev->solid = SOLID_TRIGGER;
+	pev->movetype = MOVETYPE_NONE;
+	SET_MODEL(ENT(pev), STRING(pev->model)); // set size and link into world
+	if (CVAR_GET_FLOAT("showtriggers") == 0)
+		SetBits(pev->effects, EF_NODRAW);
+}
+
 void CFuncNoBuild::Spawn()
 {
 	InitTrigger();
