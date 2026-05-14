@@ -882,19 +882,19 @@ void CTFSentry::Attack()
 		angToTarget.x = -50;
 
 	// pin to turret limitations to [-50...50]
-	// delete these 2 ifs to make it attack in full 360
+	// delete these 2 ifs and set goal ang y to ang to target y to make it attack in full 360
+	// also set angtotarget below to goal angles
 	if (angToTarget.y > SENTRYGUN_ROTBOUND)
-		angToTarget.y = SENTRYGUN_ROTBOUND;
+		m_vecGoalAngles.y = SENTRYGUN_ROTBOUND;
 	else if (angToTarget.y < -SENTRYGUN_ROTBOUND)
-		angToTarget.y = -SENTRYGUN_ROTBOUND;
+		m_vecGoalAngles.y = -SENTRYGUN_ROTBOUND;
 
-	m_vecGoalAngles.y = angToTarget.y;
 	m_vecGoalAngles.x = angToTarget.x;
 
 	MoveTurret();
 
 	// Fire on the target if it's within 10 units of being aimed right at it
-	if (m_flNextAttack <= gpGlobals->time && (m_vecGoalAngles - m_vecCurAngles).Length() <= 10)
+	if (m_flNextAttack <= gpGlobals->time && (angToTarget - m_vecCurAngles).Length() <= 10)
 	{
 		Fire();
 

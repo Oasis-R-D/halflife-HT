@@ -19,10 +19,24 @@
 #include "weapons.h"
 #include "gamerules.h"
 #include "UserMessages.h"
+#include "skill.h"
 
 #include "CSniperRifle.h"
 
 #ifndef CLIENT_DLL
+LINK_ENTITY_TO_CLASS(sniper_laser, CSniperLaser);
+//=========================================================
+//=========================================================
+CSniperLaser* CSniperLaser::CreateSpot()
+{
+	auto pSpot = GetClassPtr(reinterpret_cast<CSniperLaser*>(VARS(CREATE_NAMED_ENTITY(MAKE_STRING("sniper_laser")))));
+	pSpot->Spawn();
+
+	pSpot->pev->classname = MAKE_STRING("eagle_laser");
+
+	return pSpot;
+}
+
 TYPEDESCRIPTION CSniperRifle::m_SaveData[] =
 	{
 		DEFINE_FIELD(CSniperRifle, m_flReloadStart, FIELD_TIME),
@@ -70,11 +84,15 @@ void CSniperRifle::Spawn()
 
 bool CSniperRifle::Deploy()
 {
+	m_bSpotVisible = true;
+	m_flChargeTime = -1;
 	return BaseClass::DefaultDeploy("models/v_sniper.mdl", "models/p_m40a1.mdl", TFCRIFLE_DRAW, "bow");
 }
 
 void CSniperRifle::Holster()
 {
+	m_bSpotVisible = false;
+	m_flChargeTime = -1;
 	m_fInReload = false; // cancel any reload in progress.
 
 	if (m_pPlayer->m_iFOV != 0)
@@ -109,21 +127,94 @@ void CSniperRifle::WeaponIdle()
 	}
 }
 
-void CSniperRifle::PrimaryAttack()
+bool CanAttackSniper(float attack_time, float curtime, bool isPredicted)
 {
-	if (m_pPlayer->pev->waterlevel == WATERLEVEL_HEAD)
+#if defined(CLIENT_WEAPONS)
+	if (!isPredicted)
+#else
+	if (1)
+#endif
 	{
-		PlayEmptySound();
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0f;
-		return;
+		return (attack_time <= curtime) ? true : false;
 	}
-
-	if (0 == m_iClip)
+	else
 	{
-		PlayEmptySound();
-		return;
+		return ((static_cast<int>(std::floor(attack_time * 1000.0)) * 1000.0) <= 0.0) ? true : false;
 	}
+}
 
+void CSniperRifle::ItemPostFrame()
+{
+	if (m_flChargeTime < -0.1)
+	{
+		if ((m_pPlayer->pev->button & IN_ATTACK) != 0 && CanAttackSniper(m_flNextPrimaryAttack, gpGlobals->time, UseDecrement()))
+		{
+			if ((m_iClip > 0 && m_pPlayer->pev->waterlevel != WATERLEVEL_HEAD))
+			{
+				SendWeaponAnim(TFCRIFLE_AIM);
+				m_flChargeTime = 0;
+				return;
+			}
+		}
+	}
+	else if (m_flChargeTime >= 0)
+	{
+		m_flChargeTime += gpGlobals->frametime;
+
+		// reset
+		if (m_pPlayer->pev->waterlevel == WATERLEVEL_HEAD)
+		{
+			m_bLaserActive = false;
+			if (m_pLaser)
+			{
+				m_pLaser->Killed(nullptr, GIB_NEVER);
+
+				m_pLaser = nullptr;
+
+				EMIT_SOUND_DYN(edict(), CHAN_WEAPON, "weapons/desert_eagle_sight2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			}
+
+			m_flChargeTime = -1;
+			return;
+		}
+
+		// Only allow shooting after 0.1 seconds!
+		if (m_flChargeTime > 0.1)
+		{
+			ALERT(at_console, "3\n");
+			m_bLaserActive = true;
+
+#ifndef CLIENT_DLL
+			UpdateLaser();
+#endif
+
+			// SHOOT
+			if ((m_pPlayer->pev->button & IN_ATTACK) == 0)
+			{
+				if (m_iClip > 0)
+				{
+					Shoot(m_flChargeTime);
+				}
+				
+				m_bLaserActive = false;
+				if (m_pLaser)
+				{
+					m_pLaser->Killed(nullptr, GIB_NEVER);
+
+					m_pLaser = nullptr;
+
+					EMIT_SOUND_DYN(edict(), CHAN_WEAPON, "weapons/desert_eagle_sight2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+				m_flChargeTime = -1;
+			}
+		}
+	}
+	CBasePlayerWeapon::ItemPostFrame();
+	ALERT(at_console, "CHARGE: %f\n", m_flChargeTime);
+}
+
+void CSniperRifle::Shoot(double time)
+{
 	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 
 	--m_iClip;
@@ -138,9 +229,15 @@ void CSniperRifle::PrimaryAttack()
 	Vector vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_2DEGREES);
 
 	//TODO: 8192 constant should be defined somewhere - Solokiller
+	double charge = time;
+	if (charge > 5) // don't let it get too high
+		charge = 5;
+
+	float damage = pow(1.6 * charge, 3) + gSkillData.plrDmg762;
+
 	Vector vecShot = m_pPlayer->FireBulletsPlayer(1,
 		vecSrc, vecAiming, g_vecZero,
-		8192, BULLET_PLAYER_223, 0, 0,
+		8192, BULLET_PLAYER_223, 0, damage,
 		m_pPlayer->pev, m_pPlayer->random_seed);
 
 	PLAYBACK_EVENT_FULL(UTIL_DefaultPlaybackFlags(),
@@ -249,6 +346,41 @@ void CSniperRifle::ToggleZoom()
 	{
 		m_pPlayer->m_iFOV = 0;
 	}
+}
+
+void CSniperRifle::UpdateLaser()
+{
+#ifndef CLIENT_DLL
+	// Don't turn on the laser if we're in the middle of a reload.
+	if (m_fInReload)
+	{
+		return;
+	}
+
+	if (m_bLaserActive && m_bSpotVisible)
+	{
+		if (!m_pLaser)
+		{
+			m_pLaser = CSniperLaser::CreateSpot();
+
+			EMIT_SOUND_DYN(edict(), CHAN_WEAPON, "weapons/desert_eagle_sight.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		}
+
+		m_pLaser->pev->renderamt = 25.4 * m_flChargeTime + 128;
+
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+
+		Vector vecEnd = vecSrc + gpGlobals->v_forward * 8192.0;
+
+		TraceResult tr;
+
+		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
+
+		UTIL_SetOrigin(m_pLaser->pev, tr.vecEndPos);
+	}
+#endif
 }
 
 class CSniperRifleAmmo : public CBasePlayerAmmo

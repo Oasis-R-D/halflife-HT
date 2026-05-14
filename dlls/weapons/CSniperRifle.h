@@ -38,6 +38,19 @@ enum SniperRifleAnim
 };
 
 /**
+*	@brief Identical to CLaserSpot, different class to avoid RPG laser confusion logic. - Solokiller
+*/
+class CSniperLaser : public CLaserSpot
+{
+public:
+	using BaseClass = CLaserSpot;
+
+	static CSniperLaser* CreateSpot();
+};
+
+class CEagleLaser;
+
+/**
 *	@brief Opposing force sniper rifle
 */
 class CSniperRifle : public CBasePlayerWeapon
@@ -59,9 +72,10 @@ public:
 
 	void Holster() override;
 
+	void ItemPostFrame() override;
 	void WeaponIdle() override;
 
-	void PrimaryAttack() override;
+	void Shoot(double time);
 
 	void SecondaryAttack() override;
 
@@ -85,8 +99,16 @@ public:
 	void ToggleZoom();
 
 private:
+	void UpdateLaser();
+
+	bool m_bSpotVisible;
+	bool m_bLaserActive;
+	CSniperLaser* m_pLaser;
+
 	unsigned short m_usSniper;
 
 	bool m_bReloading;
 	float m_flReloadStart;
+
+	double m_flChargeTime;
 };
