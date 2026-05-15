@@ -160,7 +160,7 @@ void CSentryRocket::FollowThink()
 #pragma endregion
 
 // Ground placed version
-#define SENTRYGUN_UPGRADE_METAL 125 // around 130 in TFC
+#define SENTRYGUN_UPGRADE_METAL 130
 
 #define SENTRY_MODEL_PLACEMENT	"models/base.mdl"
 #define SENTRY_MODEL_LEVEL_1	"models/sentry1.mdl"
@@ -923,7 +923,7 @@ bool CTFSentry::Fire()
 		Vector vecAng;
 
 		// alternate between the 2 rocket launcher ports.
-		if (m_iAmmoRockets & 1)
+		if (bool(m_iAmmoRockets & 1))
 		{
 			GetAttachment(m_iAttachments[SENTRYGUN_ATTACHMENT_ROCKET_L], vecSrc, vecAng);
 		}

@@ -677,11 +677,11 @@ void ClientCommand(edict_t* pEntity)
 			return;
 
 		player->TabulateAmmo();
-		if (player->ammo_metal < 125)
+		if (player->ammo_metal < 130)
 			return;
 		
 		const int metal_ammo = player->GetAmmoIndex("uranium");
-		player->m_rgAmmo[metal_ammo] -= 125;
+		player->m_rgAmmo[metal_ammo] -= 130;
 
 		UTIL_MakeVectors(Vector(0, pev->angles.y, 0));
 
