@@ -416,6 +416,7 @@ void CTFSentry::SpawnBuildable()
 	m_fPitch = 0;
 	m_fYaw = 0;
 
+	pev->max_health = SENTRYGUN_MAX_HEALTH;
 	pev->health = SENTRYGUN_MAX_HEALTH; // TO-DO: skill cvar
 
 	UTIL_SetOrigin(pev, pev->origin);
@@ -944,7 +945,7 @@ void CTFSentry::Attack()
 
 	// Track enemy
 	Vector vecMid = EyePosition();
-	Vector vecMidEnemy = m_hEnemy->EyePosition();
+	Vector vecMidEnemy = m_hEnemy->Center();
 	Vector vecDirToEnemy = vecMidEnemy - vecMid;
 
 	Vector angToTarget;
@@ -1071,13 +1072,12 @@ bool CTFSentry::Fire()
 		// If we cannot see their Center (possible, as we do our target finding based
 		// on the eye position of the target) then fire at the eye position
 		TraceResult tr;
-		UTIL_TraceLine(vecSrc, vecMidEnemy, ignore_monsters, ignore_glass, edict(), &tr);
+		UTIL_TraceLine(vecSrc, vecMidEnemy, dont_ignore_monsters, ignore_glass, edict(), &tr);
 
 		if (!tr.pHit || CBaseEntity::Instance(tr.pHit)->IsBSPModel())
 		{
-			// Hack it lower a little bit..
-			// The eye position is not always within the hitboxes for a standing TF Player
-			vecMidEnemy = m_hEnemy->EyePosition() + Vector(0,0,-5);
+			// try retargetting to eyes instead
+			vecMidEnemy = m_hEnemy->EyePosition() - Vector(0, 0, 24);
 		}
 
 		vecAimDir = vecMidEnemy - vecSrc;
