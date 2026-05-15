@@ -647,9 +647,9 @@ bool CTFSentry::AcquireEnemyFail(CBaseEntity* target)
 	if ((target->pev->flags & FL_NOTARGET) != 0)
 		return true;
 
-	// TO-DO: fix this function
-	//if (!FInViewCone(target))
-		//return true;
+	// only detect enemies in front of us!
+	if (!FInViewCone(target))
+		return true;
 
 	// check for players team (don't check in SP, friendly to players)
 	// TO-DO: check for enemy turrets too?
@@ -725,7 +725,6 @@ bool CTFSentry::FindTarget()
 	// We have a target.
 	if (pTargetCurrent)
 	{
-		ALERT(at_console, "VALID TARGET!!!!");
 		if (pTargetCurrent != pTargetOld)
 		{
 			// flMinDist2 is the new target's distance
@@ -813,13 +812,12 @@ void CTFSentry::FoundTarget(CBaseEntity* pTarget, const Vector &vecSoundCenter)
 //-----------------------------------------------------------------------------
 bool CTFSentry::FInViewCone(CBaseEntity* pEntity)
 {
-	Vector forward, unused, unused2;
-	AngleVectors(m_vecCurAngles, &forward, &unused, &unused2);
+	UTIL_MakeVectors(m_vecCurAngles);
 
 	Vector2D vec2LOS = (pEntity->pev->origin - pev->origin).Make2D();
 	vec2LOS = vec2LOS.Normalize();
 
-	float flDot = DotProduct(vec2LOS, (forward.Make2D()));
+	float flDot = DotProduct(vec2LOS, (gpGlobals->v_forward.Make2D()));
 
 	if (flDot > m_flFieldOfView)
 	{
