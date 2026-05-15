@@ -67,7 +67,9 @@ void CTFDispenser::SpawnBuildable()
 	else
 	{
 		pev->movetype = MOVETYPE_TOSS;
-		m_hBuilder.Entity<CBasePlayer>()->m_hBuilding = this;
+		if (m_hBuilder)
+			m_hBuilder.Entity<CBasePlayer>()->m_hBuilding = this;
+
 		SetThink(&CTFDispenser::FinishConstruction);
 		pev->nextthink = gpGlobals->time + 2;
 	}
@@ -89,8 +91,12 @@ void CTFDispenser::FinishConstruction()
 
 	if (!m_bMapPlaced)
 	{
-		m_hBuilder.Entity<CBasePlayer>()->m_hBuilding = nullptr;
-		m_hBuilder.Entity<CBasePlayer>()->m_hDispenser = this;
+		if (m_hBuilder)
+		{
+			ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Dispenser_finish");
+			m_hBuilder.Entity<CBasePlayer>()->m_hBuilding = nullptr;
+			m_hBuilder.Entity<CBasePlayer>()->m_hDispenser = this;
+		}
 	}
 
 	SetThink(&CTFDispenser::DispenserThink);

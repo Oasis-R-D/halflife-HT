@@ -17,12 +17,13 @@ public:
 	void Precache() override;
 	int Classify() override;
 
-	virtual void PrecacheBuildable() {};
-    virtual void SpawnBuildable() {};
+	virtual void PrecacheBuildable()	{};
+    virtual void SpawnBuildable()		{};
 
 	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
     bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
-    virtual void DetonateBuilding() {};
+    virtual void DetonateBuilding()		{};
+	virtual void DismantleBuilding()	{};
 
 	bool Command_Repair(CBasePlayer* pActivator);
 	virtual bool OnWrenchHit(CBasePlayer* pPlayer);

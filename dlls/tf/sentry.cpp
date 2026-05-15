@@ -323,7 +323,11 @@ void CTFSentryBase::Precache()
 
 void CTFSentry::SpawnBuildable()
 {
-	m_hBuilder.Entity<CBasePlayer>()->m_hSentryGun = this;
+	if (m_hBuilder)
+	{
+		ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_finish");
+		m_hBuilder.Entity<CBasePlayer>()->m_hSentryGun = this;
+	}
 
 	SetModel(SENTRY_MODEL_LEVEL_1);
 
@@ -942,11 +946,13 @@ bool CTFSentry::Fire()
 			m_flNextRocketAttack = gpGlobals->time + 3;
 
 			m_iAmmoRockets--;
-
-			if (m_iAmmoRockets == 10)
-				ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_rocketslow");
-			if (m_iAmmoRockets == 0)
-				ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_rocketsout");
+			if (m_hBuilder)
+			{
+				if (m_iAmmoRockets == 10)
+					ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_rocketslow");
+				if (m_iAmmoRockets == 0)
+					ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_rocketsout");
+			}
 		}
 	}
 
@@ -1006,10 +1012,13 @@ bool CTFSentry::Fire()
 
 		m_iAmmo--;
 
-		if (m_iAmmo == 10)
-			ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_shellslow");
-		if (m_iAmmo == 0)
-			ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_shellsout");
+		if (m_hBuilder)
+		{
+			if (m_iAmmo == 10)
+				ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_shellslow");
+			if (m_iAmmo == 0)
+				ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_shellsout");
+		}
 	}
 	else
 	{
@@ -1205,8 +1214,11 @@ bool CTFSentry::MoveTurret()
 //-----------------------------------------------------------------------------
 void CTFSentry::DetonateBuilding()
 {
-	ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_destroyed");
-	m_hBuilder.Entity<CBasePlayer>()->m_hSentryGun = nullptr;
+	if (m_hBuilder)
+	{
+		ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_destroyed");
+		m_hBuilder.Entity<CBasePlayer>()->m_hSentryGun = nullptr;
+	}
 
 	Vector pos = Center();
 

@@ -672,12 +672,28 @@ void ClientCommand(edict_t* pEntity)
 #pragma region TF_SENTRY
 	else if (FStrEq(pcmd, "!BUILDSENTRY"))
 	{
-		// only 1 sentry, can't build multiple things at once, dont build if in a RC
-		if (player->m_hSentryGun || player->m_hBuilding || player->m_bNoMove_RC || !FBitSet(pev->flags, FL_ONGROUND))
+		// no prints for these
+		if (player->m_hBuilding || player->m_bNoMove_RC)
 			return;
 
+		if (player->m_hSentryGun)
+		{
+			ClientPrint(pev, HUD_PRINTNOTIFY, "#Build_onesentry");
+			return;
+		}
+		else if (!FBitSet(pev->flags, FL_ONGROUND))
+		{
+			ClientPrint(pev, HUD_PRINTNOTIFY, "#Build_air");
+			return;
+		}
+
 		player->TabulateAmmo();
-		if (player->ammo_metal < 130)
+		if (player->ammo_metal == 0)
+		{
+			ClientPrint(pev, HUD_PRINTNOTIFY, "#Build_nometal");
+			return;
+		}
+		else if (player->ammo_metal < 130)
 			return;
 		
 		const int metal_ammo = player->GetAmmoIndex("uranium");
@@ -691,8 +707,14 @@ void ClientCommand(edict_t* pEntity)
 		UTIL_TraceLine(SpawnPos, SpawnPos - Vector(0, 0, 64), dont_ignore_monsters, dont_ignore_glass, nullptr, &tr);
 
 		CBaseEntity* pList[1];
-		if (UTIL_EntitiesInBox(pList, 1, SpawnPos-SENTRYGUN_MINS, SpawnPos+SENTRYGUN_MAXS, FL_MONSTER | FL_CLIENT | FL_CONVEYOR) == 1 || tr.fAllSolid == true || tr.flFraction == 1.0)
+		if (UTIL_EntitiesInBox(pList, 1, SpawnPos-SENTRYGUN_MINS, SpawnPos+SENTRYGUN_MAXS, FL_MONSTER | FL_CLIENT | FL_CONVEYOR) == 1 || (bool)tr.fAllSolid == true || (bool)tr.fStartSolid == true)
 		{
+			ClientPrint(pev, HUD_PRINTNOTIFY, "#Build_noroom");
+			return;
+		}
+		else if (tr.flFraction == 1.0)
+		{
+			ClientPrint(pev, HUD_PRINTNOTIFY, "#Build_air");
 			return;
 		}
 
@@ -718,12 +740,28 @@ void ClientCommand(edict_t* pEntity)
 #pragma region TF_DISPENSER
 	else if (FStrEq(pcmd, "!BUILDDISPENSER"))
 	{
-		// only 1 dispenser, can't build multiple things at once, dont build if in a RC
-		if (player->m_hDispenser || player->m_hBuilding || player->m_bNoMove_RC || !FBitSet(pev->flags, FL_ONGROUND))
+		// no prints for these
+		if (player->m_hBuilding || player->m_bNoMove_RC)
 			return;
 
+		if (player->m_hDispenser)
+		{
+			ClientPrint(pev, HUD_PRINTNOTIFY, "#Build_onedispenser");
+			return;
+		}
+		else if (!FBitSet(pev->flags, FL_ONGROUND))
+		{
+			ClientPrint(pev, HUD_PRINTNOTIFY, "#Build_air");
+			return;
+		}
+
 		player->TabulateAmmo();
-		if (player->ammo_metal < 100)
+		if (player->ammo_metal == 0)
+		{
+			ClientPrint(pev, HUD_PRINTNOTIFY, "#Build_nometal");
+			return;
+		}
+		else if (player->ammo_metal < 100)
 			return;
 		
 		const int metal_ammo = player->GetAmmoIndex("uranium");
@@ -737,8 +775,14 @@ void ClientCommand(edict_t* pEntity)
 		UTIL_TraceLine(SpawnPos, SpawnPos - Vector(0, 0, 64), dont_ignore_monsters, dont_ignore_glass, nullptr, &tr);
 
 		CBaseEntity* pList[1];
-		if (UTIL_EntitiesInBox(pList, 1, SpawnPos-DISPENSER_MINS, SpawnPos+DISPENSER_MAXS, FL_MONSTER | FL_CLIENT | FL_CONVEYOR) == 1 || tr.fAllSolid == true || tr.flFraction == 1.0)
+		if (UTIL_EntitiesInBox(pList, 1, SpawnPos-DISPENSER_MINS, SpawnPos+DISPENSER_MAXS, FL_MONSTER | FL_CLIENT | FL_CONVEYOR) == 1 || (bool)tr.fAllSolid == true || (bool)tr.fStartSolid == true)
 		{
+			ClientPrint(pev, HUD_PRINTNOTIFY, "#Build_noroom");
+			return;
+		}
+		else if (tr.flFraction == 1.0)
+		{
+			ClientPrint(pev, HUD_PRINTNOTIFY, "#Build_air");
 			return;
 		}
 
