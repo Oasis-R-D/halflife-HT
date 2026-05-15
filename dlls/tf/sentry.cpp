@@ -932,7 +932,7 @@ bool CTFSentry::Fire()
 			GetAttachment(m_iAttachments[SENTRYGUN_ATTACHMENT_ROCKET_R], vecSrc, vecAng);
 		}
 
-		vecAimDir = m_hEnemy->Center() - vecSrc;
+		vecAimDir = m_hEnemy->EyePosition() - vecSrc; // aim at bottom
 		vecAimDir = vecAimDir.Normalize();
 
 		// TO-DO: add rocket fire sound
@@ -942,7 +942,7 @@ bool CTFSentry::Fire()
 		
 		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, LOUD_GUN_VOLUME, 3.0);
 
-		CSentryRocket::CreateRpgRocket(vecSrc, vecAimDir, m_hBuilder != nullptr ? m_hBuilder.Entity<CBaseEntity>() : this);
+		CSentryRocket::CreateRpgRocket(vecSrc, angAimDir, m_hBuilder != nullptr ? m_hBuilder.Entity<CBaseEntity>() : this);
 
 		m_flNextRocketAttack = gpGlobals->time + 3;
 
