@@ -37,6 +37,7 @@ public:
 	[[nodiscard]] constexpr Vector2D operator/(float fl) const { return Vector2D(x / fl, y / fl); }
 
 	[[nodiscard]] float Length() const { return static_cast<float>(sqrt(x * x + y * y)); }
+	[[nodiscard]] float LengthSquared() const { return static_cast<float>(x * x + y * y); }
 
 	[[nodiscard]] Vector2D Normalize() const
 	{

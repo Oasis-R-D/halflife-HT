@@ -742,7 +742,7 @@ void ClientCommand(edict_t* pEntity)
 			return;
 		}
 
-		EMIT_SOUND(player->edict(), CHAN_ITEM, "buildings/building.wav", 1.0, ATTN_IDLE);
+		EMIT_SOUND(player->edict(), CHAN_VOICE, "buildings/building.wav", 1.0, ATTN_IDLE);
 		CTFDispenser::Dispenser_Create(SpawnPos, Vector(0, pev->angles.y, 0), player);
 	}
 	else if (FStrEq(pcmd, "!DETONATEDISPENSER"))

@@ -32,7 +32,7 @@ void CSentryRocket::Spawn()
 {
 	Precache();
 	// motor
-	pev->movetype = MOVETYPE_BOUNCE;
+	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_BBOX;
 
 	SET_MODEL(ENT(pev), "models/rpgrocket.mdl");
@@ -41,43 +41,10 @@ void CSentryRocket::Spawn()
 
 	pev->classname = MAKE_STRING("sentry_rocket");
 
-	SetThink(&CSentryRocket::IgniteThink);
 	SetTouch(&CSentryRocket::ExplodeTouch);
 
-	pev->angles.x -= 30;
-	UTIL_MakeVectors(pev->angles);
-	pev->angles.x = -(pev->angles.x + 30);
-
-	pev->velocity = gpGlobals->v_forward * 250;
-	pev->gravity = 0.5;
-
-	pev->nextthink = gpGlobals->time + 0.4;
-
 	pev->dmg = 100; // TO-DO: skill value
-}
 
-//=========================================================
-//=========================================================
-void CSentryRocket::RocketTouch(CBaseEntity* pOther)
-{
-	STOP_SOUND(edict(), CHAN_VOICE, "weapons/rocket1.wav");
-	ExplodeTouch(pOther);
-}
-
-//=========================================================
-//=========================================================
-void CSentryRocket::Precache()
-{
-	PRECACHE_MODEL("models/rpgrocket.mdl");
-	m_iTrail = PRECACHE_MODEL("sprites/smoke.spr");
-	PRECACHE_SOUND("weapons/rocket1.wav");
-}
-
-void CSentryRocket::IgniteThink()
-{
-	// pev->movetype = MOVETYPE_TOSS;
-
-	pev->movetype = MOVETYPE_FLY;
 	pev->effects |= EF_LIGHT;
 
 	// make rocket sound
@@ -103,6 +70,23 @@ void CSentryRocket::IgniteThink()
 	// set to follow laser spot
 	SetThink(&CSentryRocket::FollowThink);
 	pev->nextthink = gpGlobals->time + 0.1;
+}
+
+//=========================================================
+//=========================================================
+void CSentryRocket::RocketTouch(CBaseEntity* pOther)
+{
+	STOP_SOUND(edict(), CHAN_VOICE, "weapons/rocket1.wav");
+	ExplodeTouch(pOther);
+}
+
+//=========================================================
+//=========================================================
+void CSentryRocket::Precache()
+{
+	PRECACHE_MODEL("models/rpgrocket.mdl");
+	m_iTrail = PRECACHE_MODEL("sprites/smoke.spr");
+	PRECACHE_SOUND("weapons/rocket1.wav");
 }
 
 void CSentryRocket::FollowThink()
@@ -836,9 +820,10 @@ void CTFSentry::Attack()
 {
 	StudioFrameAdvance();
 
+	CBaseEntity* OldEnemy = m_hEnemy;
 	if (!FindTarget())
 	{
-		// this seems to fix the jumping that sometimes happens
+		// this seems to fix the jumping that sometimes happens after killing an enemy
 		// Switch rotation direction
 		if (m_bTurningRight)
 		{
@@ -857,10 +842,15 @@ void CTFSentry::Attack()
 			m_vecGoalAngles.x = (int)RANDOM_LONG(-10,10);
 		}
 
+		SetActivity(ACT_IDLE);
 		m_iState = (SENTRY_STATE_SEARCHING);
 		m_hEnemy = NULL;
 		return;
 	}
+
+	// don't shoot while turning to face a new enemy!
+	if (OldEnemy != m_hEnemy)
+		SetActivity(ACT_IDLE);
 
 	// Track enemy
 	Vector vecMid = EyePosition();
@@ -903,9 +893,10 @@ void CTFSentry::Attack()
 			m_flNextAttack = gpGlobals->time + 0.1;
 		}
 	}
-	else
+	else if ((m_vecGoalAngles - m_vecCurAngles).Length() > 10)
 	{
-		// return to idle??
+		// Won't be able to fire for a bit
+		SetActivity(ACT_IDLE);
 	}
 }
 
@@ -932,26 +923,31 @@ bool CTFSentry::Fire()
 			GetAttachment(m_iAttachments[SENTRYGUN_ATTACHMENT_ROCKET_R], vecSrc, vecAng);
 		}
 
-		vecAimDir = m_hEnemy->EyePosition() - vecSrc; // aim at bottom
-		vecAimDir = vecAimDir.Normalize();
+		vecAimDir = m_hEnemy->Center() - vecSrc; // aim at bottom
 
-		// TO-DO: add rocket fire sound
+		// Don't hit self!!
+		if (vecAimDir.Make2D().LengthSquared() > 102400)
+		{
+			vecAimDir = vecAimDir.Normalize();
 
-		Vector angAimDir;
-		VectorAngles(vecAimDir, angAimDir);
-		
-		CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, LOUD_GUN_VOLUME, 3.0);
+			// TO-DO: add rocket fire sound
 
-		CSentryRocket::CreateRpgRocket(vecSrc, angAimDir, m_hBuilder != nullptr ? m_hBuilder.Entity<CBaseEntity>() : this);
+			Vector angAimDir;
+			VectorAngles(vecAimDir, angAimDir);
 
-		m_flNextRocketAttack = gpGlobals->time + 3;
+			CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, LOUD_GUN_VOLUME, 3.0);
 
-		m_iAmmoRockets--;
+			CSentryRocket::CreateRpgRocket(vecSrc, angAimDir, m_hBuilder != nullptr ? m_hBuilder.Entity<CBaseEntity>() : this);
 
-		if (m_iAmmoRockets == 10)
-			ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_rocketslow");
-		if (m_iAmmoRockets == 0)
-			ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_rocketsout");
+			m_flNextRocketAttack = gpGlobals->time + 3;
+
+			m_iAmmoRockets--;
+
+			if (m_iAmmoRockets == 10)
+				ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_rocketslow");
+			if (m_iAmmoRockets == 0)
+				ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_rocketsout");
+		}
 	}
 
 	if (m_iAmmo > 0)
@@ -1021,7 +1017,7 @@ bool CTFSentry::Fire()
 		SetActivity(ACT_IDLE);
 
 		// Out of ammo, play a click
-		EMIT_SOUND(edict(), CHAN_AUTO, SENTRY_SOUND_EMPTY, 1.0, ATTN_NORM);
+		EMIT_SOUND(edict(), CHAN_WEAPON, SENTRY_SOUND_EMPTY, 1.0, ATTN_NORM);
 
 		m_flNextAttack = gpGlobals->time + 0.2;
 	}

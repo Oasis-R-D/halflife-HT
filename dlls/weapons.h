@@ -917,7 +917,6 @@ public:
 	void Spawn() override;
 	void Precache() override;
 	void EXPORT FollowThink();
-	void EXPORT IgniteThink();
 	void EXPORT RocketTouch(CBaseEntity* pOther);
 	static CSentryRocket* CreateRpgRocket(Vector vecOrigin, Vector vecAngles, CBaseEntity* pOwner);
 
