@@ -1136,7 +1136,7 @@ void CBasePlayer::TabulateAmmo()
 	ammo_bolts = AmmoInventory(GetAmmoIndex("bolts"));
 	ammo_buckshot = AmmoInventory(GetAmmoIndex("buckshot"));
 	ammo_rockets = AmmoInventory(GetAmmoIndex("rockets"));
-	ammo_uranium = AmmoInventory(GetAmmoIndex("uranium"));
+	ammo_metal = AmmoInventory(GetAmmoIndex("uranium"));
 	ammo_hornets = AmmoInventory(GetAmmoIndex("Hornets"));
 	ammo_spores = AmmoInventory(GetAmmoIndex("spores"));
 	ammo_223 = AmmoInventory(GetAmmoIndex("223"));

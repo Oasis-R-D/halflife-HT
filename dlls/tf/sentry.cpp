@@ -1275,7 +1275,11 @@ void CTFSentry::DetonateBuilding()
 
 	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pos, QUIET_GUN_VOLUME, 3.0);
 
-	::RadiusDamage(pos, pev, m_hBuilder != nullptr ? m_hBuilder->pev : pev, 48, 96, CLASS_NONE, DMG_BLAST);
+	// deal more damage if we have tons of ammo
+	float ammoMult		 = (m_iAmmo / m_iMaxAmmo) * 64;
+	float ammoRocketMult = m_iUpgradeLevel > 2 ? (m_iAmmoRockets / m_iMaxAmmoRockets) * 128 : 0;
+
+	RadiusDamage(pos, pev, m_hBuilder != nullptr ? m_hBuilder->pev : pev, 32+ammoMult+ammoRocketMult, CLASS_NONE, DMG_BLAST);
 
 	if (m_hBase)
 		UTIL_Remove(m_hBase);

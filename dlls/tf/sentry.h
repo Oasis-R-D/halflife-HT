@@ -104,6 +104,4 @@ private:
 
 	double m_fPitch;
 	double m_fYaw;
-
-	int m_idShard;
 };

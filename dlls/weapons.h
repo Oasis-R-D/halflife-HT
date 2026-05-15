@@ -115,7 +115,7 @@ public:
 #define M249_MAX_CARRY 200
 #define SPORELAUNCHER_MAX_CARRY 20
 #define SNIPERRIFLE_MAX_CARRY 20
-#define METAL_MAX_CARRY 250
+#define METAL_MAX_CARRY 200
 
 // the maximum amount of ammo each weapon's clip can hold
 #define WEAPON_NOCLIP -1

@@ -41,6 +41,5 @@ public:
 protected:
 	Activity m_Activity;
 
-private:
 	int m_idShard;
 };

@@ -54,6 +54,7 @@
 
 // TFC
 #include "tf/sentry.h"
+#include "tf/dispenser.h"
 
 extern DLL_GLOBAL unsigned int g_ulModelIndexPlayer;
 extern DLL_GLOBAL bool g_fGameOver;
@@ -672,7 +673,7 @@ void ClientCommand(edict_t* pEntity)
 	else if (FStrEq(pcmd, "!BUILDSENTRY"))
 	{
 		// only 1 sentry, can't build multiple things at once, dont build if in a RC
-		if (player->m_hSentryGun || player->m_hBuilding || player->m_bNoMove_RC)
+		if (player->m_hSentryGun || player->m_hBuilding || player->m_bNoMove_RC || !FBitSet(pev->flags, FL_ONGROUND))
 			return;
 
 		player->TabulateAmmo();
@@ -690,7 +691,7 @@ void ClientCommand(edict_t* pEntity)
 		UTIL_TraceLine(SpawnPos, SpawnPos - Vector(0, 0, 64), dont_ignore_monsters, dont_ignore_glass, nullptr, &tr);
 
 		CBaseEntity* pList[1];
-		if (UTIL_EntitiesInBox(pList, 1, SpawnPos-SENTRYGUN_MINS, SpawnPos+SENTRYGUN_MAXS, FL_MONSTER | FL_CLIENT | FL_CONVEYOR) == 1 || !FBitSet(pev->flags, FL_ONGROUND) || tr.fAllSolid == true || tr.flFraction == 1.0)
+		if (UTIL_EntitiesInBox(pList, 1, SpawnPos-SENTRYGUN_MINS, SpawnPos+SENTRYGUN_MAXS, FL_MONSTER | FL_CLIENT | FL_CONVEYOR) == 1 || tr.fAllSolid == true || tr.flFraction == 1.0)
 		{
 			return;
 		}
@@ -712,6 +713,44 @@ void ClientCommand(edict_t* pEntity)
 			return;
 		
 		player->m_hSentryGun.Entity<CTFSentry>()->DetonateBuilding();
+	}
+#pragma endregion
+#pragma region TF_DISPENSER
+	else if (FStrEq(pcmd, "!BUILDDISPENSER"))
+	{
+		// only 1 dispenser, can't build multiple things at once, dont build if in a RC
+		if (player->m_hDispenser || player->m_hBuilding || player->m_bNoMove_RC || !FBitSet(pev->flags, FL_ONGROUND))
+			return;
+
+		player->TabulateAmmo();
+		if (player->ammo_metal < 100)
+			return;
+		
+		const int metal_ammo = player->GetAmmoIndex("uranium");
+		player->m_rgAmmo[metal_ammo] -= 100;
+
+		UTIL_MakeVectors(Vector(0, pev->angles.y, 0));
+
+		// fetch spawn pos
+		Vector SpawnPos = pev->origin + gpGlobals->v_forward * 48;
+		TraceResult tr;
+		UTIL_TraceLine(SpawnPos, SpawnPos - Vector(0, 0, 64), dont_ignore_monsters, dont_ignore_glass, nullptr, &tr);
+
+		CBaseEntity* pList[1];
+		if (UTIL_EntitiesInBox(pList, 1, SpawnPos-DISPENSER_MINS, SpawnPos+DISPENSER_MAXS, FL_MONSTER | FL_CLIENT | FL_CONVEYOR) == 1 || tr.fAllSolid == true || tr.flFraction == 1.0)
+		{
+			return;
+		}
+
+		EMIT_SOUND(player->edict(), CHAN_ITEM, "buildings/building.wav", 1.0, ATTN_IDLE);
+		CTFDispenser::Dispenser_Create(SpawnPos, Vector(0, pev->angles.y, 0), player);
+	}
+	else if (FStrEq(pcmd, "!DETONATEDISPENSER"))
+	{
+		if (!player->m_hDispenser)
+			return;
+		
+		player->m_hDispenser.Entity<CTFSentry>()->DetonateBuilding();
 	}
 #pragma endregion
 	else
