@@ -301,7 +301,8 @@ void CTFSentryBase::Spawn()
 			pRCcam->m_hBuilder = m_hBuilder;
 		pRCcam->pev->colormap = colormap;
 		pRCcam->m_hBase = this;
-		pRCcam->m_iUpgradeLevel = m_iMapPlacedLevel;
+		if (m_iMapPlacedLevel != 0)
+			pRCcam->m_iUpgradeLevel = m_iMapPlacedLevel;
 		pRCcam->Spawn();
 		m_pSentry = pRCcam;
 	}
