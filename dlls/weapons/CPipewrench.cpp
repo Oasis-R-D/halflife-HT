@@ -21,6 +21,7 @@
 #include "CPipewrench.h"
 #include "player.h"
 #include "gamerules.h"
+#include "tf/buildables.h"
 
 #define PIPEWRENCH_BODYHIT_VOLUME 128
 #define PIPEWRENCH_WALLHIT_VOLUME 512
@@ -46,6 +47,8 @@ void CPipewrench::Spawn()
 	SET_MODEL(edict(), "models/w_pipe_wrench.mdl");
 	m_iClip = WEAPON_NOCLIP;
 	m_iSwingMode = SWING_NONE;
+
+	m_iDefaultAmmo = METAL_DEFAULT_GIVE;
 
 	FallInit(); // get ready to fall down.
 }
@@ -169,19 +172,6 @@ bool CPipewrench::Swing(const bool bFirst)
 			m_flNextSecondaryAttack = GetNextAttackDelay(0.75);
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0;
 
-			// Shepard - In Opposing Force, the "miss" sound is
-			// played twice (maybe it's a mistake from Gearbox or
-			// an intended feature), if you only want a single
-			// sound, comment this "switch" or the one in the
-			// event (EV_Pipewrench)
-			/*
-			switch ( ((m_iSwing++) % 1) )
-			{
-			case 0: EMIT_SOUND( m_pPlayer->edict(), CHAN_ITEM, "weapons/pwrench_miss1.wav", 1, ATTN_NORM); break;
-			case 1: EMIT_SOUND( m_pPlayer->edict(), CHAN_ITEM, "weapons/pwrench_miss2.wav", 1, ATTN_NORM); break;
-			}
-			*/
-
 			// player "shoot" animation
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 		}
@@ -212,20 +202,34 @@ bool CPipewrench::Swing(const bool bFirst)
 
 		if (pEntity)
 		{
-			ClearMultiDamage();
-
-			if ((m_flNextPrimaryAttack + 1 < UTIL_WeaponTimeBase()) || g_pGameRules->IsMultiplayer())
+			if ((pEntity->pev->flags & FL_BUILDING) == 0)
 			{
-				// first swing does full damage
-				pEntity->TraceAttack(m_pPlayer->pev, gSkillData.plrDmgPipewrench, gpGlobals->v_forward, &tr, DMG_CLUB);
+				ClearMultiDamage();
+
+				if ((m_flNextPrimaryAttack + 1 < UTIL_WeaponTimeBase()) || g_pGameRules->IsMultiplayer())
+				{
+					// first swing does full damage
+					pEntity->TraceAttack(m_pPlayer->pev, gSkillData.plrDmgPipewrench, gpGlobals->v_forward, &tr, DMG_CLUB);
+				}
+				else
+				{
+					// subsequent swings do half
+					pEntity->TraceAttack(m_pPlayer->pev, gSkillData.plrDmgPipewrench / 2, gpGlobals->v_forward, &tr, DMG_CLUB);
+				}
+
+				ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 			}
 			else
 			{
-				// subsequent swings do half
-				pEntity->TraceAttack(m_pPlayer->pev, gSkillData.plrDmgPipewrench / 2, gpGlobals->v_forward, &tr, DMG_CLUB);
+				if (bFirst)
+				{
+					// do engineer stuff
+					// TO-DO: make sure to check building's team!!!
+					CBuildable* building = dynamic_cast<CBuildable*>(pEntity);
+					if (building)
+						building->OnWrenchHit(m_pPlayer);
+				}
 			}
-
-			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 		}
 
 #endif
@@ -445,12 +449,8 @@ void CPipewrench::BigSwing()
 
 		m_pPlayer->m_iWeaponVolume = flVol * PIPEWRENCH_WALLHIT_VOLUME;
 
-		// Shepard - The original Opposing Force's pipe wrench
-		// doesn't make a bullet hole decal when making a big
-		// swing. If you want that decal, just uncomment the
-		// 2 lines below.
-		/*SetThink( &CPipewrench::Smack );
-		SetNextThink( UTIL_WeaponTimeBase() + 0.2 );*/
+		SetThink( &CPipewrench::Smack );
+		pev->nextthink = UTIL_WeaponTimeBase() + 0.2;
 #endif
 		m_flNextPrimaryAttack = GetNextAttackDelay(1.0);
 		m_flNextSecondaryAttack = GetNextAttackDelay(1.0);
@@ -521,8 +521,8 @@ int CPipewrench::iItemSlot()
 
 bool CPipewrench::GetItemInfo(ItemInfo* p)
 {
-	p->pszAmmo1 = nullptr;
-	p->iMaxAmmo1 = WEAPON_NOCLIP;
+	p->pszAmmo1 = "uranium";
+	p->iMaxAmmo1 = METAL_MAX_CARRY;
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo2 = nullptr;
 	p->iMaxAmmo2 = WEAPON_NOCLIP;
@@ -531,6 +531,6 @@ bool CPipewrench::GetItemInfo(ItemInfo* p)
 	p->iPosition = 1;
 	p->iId = m_iId = WEAPON_PIPEWRENCH;
 	p->iWeight = PIPEWRENCH_WEIGHT;
-
+	p->iFlags = ITEM_FLAG_SELECTONEMPTY;
 	return true;
 }

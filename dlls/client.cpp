@@ -668,11 +668,19 @@ void ClientCommand(edict_t* pEntity)
 			DumpCTFFlagInfo(reinterpret_cast<CBasePlayer*>(GET_PRIVATE(pEntity)));
 		}
 	}
+#pragma region TF_SENTRY
 	else if (FStrEq(pcmd, "!BUILDSENTRY"))
 	{
 		// only 1 sentry, can't build multiple things at once, dont build if in a RC
 		if (player->m_hSentryGun || player->m_hBuilding || player->m_bNoMove_RC)
 			return;
+
+		player->TabulateAmmo();
+		if (player->ammo_metal < 125)
+			return;
+		
+		const int metal_ammo = player->GetAmmoIndex("uranium");
+		player->m_rgAmmo[metal_ammo] -= 125;
 
 		UTIL_MakeVectors(Vector(0, pev->angles.y, 0));
 
@@ -698,6 +706,14 @@ void ClientCommand(edict_t* pEntity)
 		EMIT_SOUND(player->edict(), CHAN_ITEM, "buildings/building.wav", 1.0, ATTN_IDLE);
 		CTFSentryBase::Sentry_Create(SpawnPos, Vector(0, pev->angles.y, 0), player, colormap);
 	}
+	else if (FStrEq(pcmd, "!DETONATESENTRY"))
+	{
+		if (!player->m_hSentryGun)
+			return;
+		
+		player->m_hSentryGun.Entity<CTFSentry>()->DetonateBuilding();
+	}
+#pragma endregion
 	else
 	{
 		// tell the user they entered an unknown command

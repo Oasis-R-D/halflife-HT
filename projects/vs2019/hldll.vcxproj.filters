@@ -603,6 +603,15 @@
     <ClCompile Include="..\..\dlls\tf\sentry.cpp">
       <Filter>Source Files\dlls\tf</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dlls\tf\dispenser.cpp">
+      <Filter>Source Files\dlls\tf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\tf\buildables.cpp">
+      <Filter>Source Files\dlls\tf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\tf\func_no_build.cpp">
+      <Filter>Source Files\dlls\tf</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dlls\doors.h">
@@ -977,10 +986,13 @@
     <ClInclude Include="..\..\dlls\RC.h">
       <Filter>Header Files\dlls</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dlls\sentry.h">
-      <Filter>Header Files\dlls</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dlls\tf\sentry.h">
+      <Filter>Header Files\dlls\tf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\tf\dispenser.h">
+      <Filter>Header Files\dlls\tf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dlls\tf\buildables.h">
       <Filter>Header Files\dlls\tf</Filter>
     </ClInclude>
   </ItemGroup>

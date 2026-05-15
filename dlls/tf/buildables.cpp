@@ -83,3 +83,43 @@ bool CBuildable::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, flo
 
 	return false;
 }
+
+bool CBuildable::OnWrenchHit(CBasePlayer* pPlayer)
+{
+	// else repair the building
+	return Command_Repair( pPlayer );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Separated so it can be triggered by wrench hit or by vgui screen
+//-----------------------------------------------------------------------------
+bool CBuildable::Command_Repair(CBasePlayer* pActivator)
+{
+	int iAmountToHeal = V_min(100, pev->max_health - pev->health);
+
+	// repair the building
+	int iRepairCost = ceil( (float)(iAmountToHeal) * 0.2f );
+
+	// What does this do???
+	//TRACE_OBJECT( UTIL_VarArgs( "%0.2f CObjectDispenser::Command_Repair ( %d / %d ) - cost = %d\n", gpGlobals->time, GetHealth(), GetMaxHealth(), iRepairCost ) );
+
+	if ( iRepairCost > 0 )
+	{
+		static int metal_ammo = pActivator->GetAmmoIndex("uranium");
+		pActivator->TabulateAmmo();
+
+		if ( iRepairCost > pActivator->ammo_metal )
+		{
+			iRepairCost = pActivator->ammo_metal;
+		}
+
+		pActivator->m_rgAmmo[metal_ammo] -= iRepairCost;
+
+		float flNewHealth = V_min( pev->max_health, pev->health + ( iRepairCost * 5 ) );
+		pev->health = flNewHealth;
+
+		return ( iRepairCost > 0 );
+	}
+
+	return false;
+}

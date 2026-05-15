@@ -160,7 +160,7 @@ void CSentryRocket::FollowThink()
 #pragma endregion
 
 // Ground placed version
-#define SENTRYGUN_UPGRADE_METAL 125 // around 100 in TFC
+#define SENTRYGUN_UPGRADE_METAL 125 // around 130 in TFC
 
 #define SENTRY_MODEL_PLACEMENT	"models/base.mdl"
 #define SENTRY_MODEL_LEVEL_1	"models/sentry1.mdl"
@@ -185,10 +185,9 @@ void CSentryRocket::FollowThink()
 #define SENTRYGUN_ADD_UPGRADE	25
 #define SENTRY_THINK_DELAY		0.05
 
-#define SENTRYGUN_RECENTLY_ATTACKED_TIME 2.0
-
-#define BONE_PITCH	1
-#define BONE_YAW	0
+#define BONE_ROCKETPITCH	2
+#define BONE_PITCH			1
+#define BONE_YAW			0
 
 #define SENTRYGUN_ROTBOUND 50
 
@@ -410,16 +409,16 @@ void CTFSentry::SentryThink()
 	switch(m_iState)
 	{
 	case SENTRY_STATE_INACTIVE:
-		ALERT(at_console, "INACTIVE\n");
+		//ALERT(at_console, "INACTIVE\n");
 		break;
 
 	case SENTRY_STATE_SEARCHING:
-		ALERT(at_console, "SEARCH\n");
+		//ALERT(at_console, "SEARCH\n");
 		SentryRotate();
 		break;
 
 	case SENTRY_STATE_ATTACKING:
-		ALERT(at_console, "ATTACK\n");
+		//ALERT(at_console, "ATTACK\n");
 		Attack();
 		break;
 
@@ -442,6 +441,8 @@ bool CTFSentry::StartBuilding(CBaseEntity* pBuilder)
 	//SetPoseParameter(m_iPitchPoseParameter, 0.0);
 	//SetPoseParameter(m_iYawPoseParameter, 0.0);
 
+	if (m_iUpgradeLevel > 2)
+		SetBoneController(BONE_ROCKETPITCH,	0);
 	SetBoneController(BONE_PITCH,	0);
 	SetBoneController(BONE_YAW,		0);
 
@@ -535,17 +536,16 @@ bool CTFSentry::OnWrenchHit(CBasePlayer* pPlayer)
 	bool bDidWork = false;
 	bool upgraded = false;
 
-	static int metal_ammo = pPlayer->GetAmmoIndex("uranium");
+	const int metal_ammo = pPlayer->GetAmmoIndex("uranium");
 
 	// If the player repairs it at all, we're done
 	if (pev->health < pev->max_health)
 	{
-		/*
 		if (Command_Repair(pPlayer))
 		{
+			ALERT(at_console, "repaired!!\n");
 			bDidWork = true;
 		}
-		*/
 	}
 
 	// Don't put in upgrade metal until the sentry is fully healed
@@ -565,11 +565,13 @@ bool CTFSentry::OnWrenchHit(CBasePlayer* pPlayer)
 
 		if (iAmountToAdd > 0)
 		{
+			ALERT(at_console, "added upgrade mat!!\n");
 			bDidWork = true;
 		}
 
 		if (m_iUpgradeMetal >= m_iUpgradeMetalRequired)
 		{
+			ALERT(at_console, "upgraded!!\n");
 			Upgrade();
 			m_iUpgradeMetal = 0;
 			upgraded = true;
@@ -602,6 +604,7 @@ bool CTFSentry::OnWrenchHit(CBasePlayer* pPlayer)
 
 			if (iAmountToAdd > 0)
 			{
+				ALERT(at_console, "added ammo!!\n");
 				bDidWork = true;
 			}
 		}
@@ -623,6 +626,7 @@ bool CTFSentry::OnWrenchHit(CBasePlayer* pPlayer)
 
 			if (iAmountToAdd > 0)
 			{
+				ALERT(at_console, "added rockets!!\n");
 				bDidWork = true;
 			}
 		}
@@ -881,20 +885,13 @@ void CTFSentry::Attack()
 	else if (angToTarget.x < -50)
 		angToTarget.x = -50;
 
-	// pin to turret limitations to [-50...50]
-	// delete these 2 ifs and set goal ang y to ang to target y to make it attack in full 360
-	// also set angtotarget below to goal angles
-	if (angToTarget.y > SENTRYGUN_ROTBOUND)
-		m_vecGoalAngles.y = SENTRYGUN_ROTBOUND;
-	else if (angToTarget.y < -SENTRYGUN_ROTBOUND)
-		m_vecGoalAngles.y = -SENTRYGUN_ROTBOUND;
-
+	m_vecGoalAngles.y = angToTarget.y;
 	m_vecGoalAngles.x = angToTarget.x;
 
 	MoveTurret();
 
 	// Fire on the target if it's within 10 units of being aimed right at it
-	if (m_flNextAttack <= gpGlobals->time && (angToTarget - m_vecCurAngles).Length() <= 10)
+	if (m_flNextAttack <= gpGlobals->time && (m_vecGoalAngles - m_vecCurAngles).Length() <= 10)
 	{
 		Fire();
 
@@ -961,16 +958,19 @@ bool CTFSentry::Fire()
 
 	if (m_iAmmo > 0)
 	{
-		SetActivity(ACT_RANGE_ATTACK1);
+		if (m_iUpgradeLevel == 1 || m_Activity != ACT_RANGE_ATTACK1)
+		{
+			SetActivity(ACT_RANGE_ATTACK1);
+		}
 
 		Vector vecSrc;
 		Vector vecAng;
 
 		int iAttachment;
 
-		if (m_iUpgradeLevel > 1 && bool(m_iAmmo & 1))
+		if (m_iUpgradeLevel > 2 && bool(m_iAmmo & 1))
 		{
-			// level 2 and 3 turrets alternate muzzles each time they fizzy fizzy fire.
+			// level 3 turrets alternate muzzles each time they fizzy fizzy fire.
 			iAttachment = m_iAttachments[SENTRYGUN_ATTACHMENT_MUZZLE_ALT];
 		}
 		else
@@ -1105,6 +1105,8 @@ bool CTFSentry::MoveTurret()
 
 		//SetPoseParameter(m_iPitchPoseParameter, -m_vecCurAngles.x);
 		SetBoneController(BONE_PITCH, -m_vecCurAngles.x);
+		if (m_iUpgradeLevel > 2)
+			SetBoneController(BONE_ROCKETPITCH, -m_vecCurAngles.x);
 		m_fPitch = -m_vecCurAngles.x;
 
 		bMoved = true;
@@ -1300,6 +1302,8 @@ void CTFSentry::SetModel(const char* pModel)
 	//SetPoseParameter(m_iPitchPoseParameter, flPoseParam0);
 	//SetPoseParameter(m_iYawPoseParameter, flPoseParam1);
 
+	if (m_iUpgradeLevel > 2)
+			SetBoneController(BONE_ROCKETPITCH, m_fPitch);
 	SetBoneController(BONE_PITCH,	m_fPitch);
 	SetBoneController(BONE_YAW,		m_fYaw);
 

@@ -115,6 +115,7 @@ public:
 #define M249_MAX_CARRY 200
 #define SPORELAUNCHER_MAX_CARRY 20
 #define SNIPERRIFLE_MAX_CARRY 20
+#define METAL_MAX_CARRY 250
 
 // the maximum amount of ammo each weapon's clip can hold
 #define WEAPON_NOCLIP -1
@@ -164,6 +165,7 @@ public:
 #define SPORELAUNCHER_DEFAULT_GIVE 5
 #define SHOCKRIFLE_DEFAULT_GIVE 10
 #define SNIPERRIFLE_DEFAULT_GIVE 10
+#define METAL_DEFAULT_GIVE 100
 
 // The amount of ammo given to a player by an ammo item.
 #define AMMO_URANIUMBOX_GIVE 20

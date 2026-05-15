@@ -24,7 +24,8 @@ public:
     bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
     virtual void DetonateBuilding() {};
 
-	virtual bool OnWrenchHit(CBasePlayer* pPlayer) {return false;};
+	bool Command_Repair(CBasePlayer* pActivator);
+	virtual bool OnWrenchHit(CBasePlayer* pPlayer);
 
 	void SetActivity(Activity act);
 	inline Activity GetActivity() { return m_Activity; }

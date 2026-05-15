@@ -255,6 +255,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClCompile Include="..\..\dlls\tempmonster.cpp" />
     <ClCompile Include="..\..\dlls\tentacle.cpp" />
     <ClCompile Include="..\..\dlls\tf\buildables.cpp" />
+    <ClCompile Include="..\..\dlls\tf\dispenser.cpp" />
     <ClCompile Include="..\..\dlls\tf\func_no_build.cpp" />
     <ClCompile Include="..\..\dlls\tf\sentry.cpp" />
     <ClCompile Include="..\..\dlls\triggers.cpp" />
@@ -382,6 +383,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(SolutionDir)../../network" "" "delt
     <ClInclude Include="..\..\dlls\talkmonster.h" />
     <ClInclude Include="..\..\dlls\teamplay_gamerules.h" />
     <ClInclude Include="..\..\dlls\tf\buildables.h" />
+    <ClInclude Include="..\..\dlls\tf\dispenser.h" />
     <ClInclude Include="..\..\dlls\tf\sentry.h" />
     <ClInclude Include="..\..\dlls\trains.h" />
     <ClInclude Include="..\..\dlls\UserMessages.h" />

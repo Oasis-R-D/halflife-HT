@@ -137,6 +137,9 @@ TYPEDESCRIPTION CBasePlayer::m_playerSaveData[] =
 
 		// TEAM FORTRESS
 		DEFINE_FIELD(CBasePlayer, m_hSentryGun, FIELD_EHANDLE),
+		DEFINE_FIELD(CBasePlayer, m_hDispenser, FIELD_EHANDLE),
+		//DEFINE_FIELD(CBasePlayer, m_hTeleportIn, FIELD_EHANDLE),
+		//DEFINE_FIELD(CBasePlayer, m_hTeleportOut, FIELD_EHANDLE),
 		DEFINE_FIELD(CBasePlayer, m_hBuilding, FIELD_EHANDLE),
 
 		// HT

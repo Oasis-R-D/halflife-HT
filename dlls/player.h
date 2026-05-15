@@ -226,6 +226,9 @@ public:
 
 	// TEAM FORTRESS
 	EHANDLE m_hSentryGun;
+	EHANDLE m_hDispenser;
+	//EHANDLE m_hTeleportIn;
+	//EHANDLE m_hTeleportOut;
 	EHANDLE m_hBuilding; // is building (sentry, dispenser, etc)
 
 	// HT
