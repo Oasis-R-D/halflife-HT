@@ -6,20 +6,23 @@
 #define SENTRYGUN_MINS			Vector(-20, -20, 0)
 #define SENTRYGUN_MAXS			Vector(20,  20, 66)
 
-class CTFSentryBase : public CBaseEntity
+class CTFSentryBase : public CBuildable
 {
 public:
 	void Spawn() override;
-	void Precache();
+	void PrecacheBuildable() override;
 
 	static CTFSentryBase* Sentry_Create(Vector VecSpawnPos, Vector vecDir, CBaseEntity* pOwner = NULL, int colormap = 0);
 
+	bool OnWrenchHit(CBasePlayer* pPlayer) override { return true; };
 	void EXPORT FinishConstruction();
+
+	void DetonateBuilding() override;
 
 	bool m_bMapPlaced = true;
 
 	EHANDLE m_pSentry;
-	
+
 	int colormap;
 
 	bool Save(CSave& save) override;

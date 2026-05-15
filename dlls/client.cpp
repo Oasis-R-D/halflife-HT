@@ -726,7 +726,7 @@ void ClientCommand(edict_t* pEntity)
 		else
 			colormap = player->pev->colormap;
 
-		EMIT_SOUND(player->edict(), CHAN_ITEM, "buildings/building.wav", 1.0, ATTN_IDLE);
+		EMIT_SOUND(player->edict(), CHAN_VOICE, "buildings/building.wav", 1.0, ATTN_IDLE);
 		CTFSentryBase::Sentry_Create(SpawnPos, Vector(0, pev->angles.y, 0), player, colormap);
 	}
 	else if (FStrEq(pcmd, "!DETONATESENTRY"))

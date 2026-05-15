@@ -237,12 +237,11 @@ IMPLEMENT_SAVERESTORE(CTFSentry, CBuildable);
 
 TYPEDESCRIPTION CTFSentryBase::m_SaveData[] =
 	{
-		DEFINE_FIELD(CTFSentryBase, m_pSentry, FIELD_EHANDLE),
 		DEFINE_FIELD(CTFSentryBase, colormap, FIELD_INTEGER),
 		DEFINE_FIELD(CTFSentryBase, m_bMapPlaced, FIELD_BOOLEAN),
 };
 
-IMPLEMENT_SAVERESTORE(CTFSentryBase, CBaseEntity);
+IMPLEMENT_SAVERESTORE(CTFSentryBase, CBuildable);
 
 
 LINK_ENTITY_TO_CLASS(tf_sentry_top, CTFSentry);
@@ -255,7 +254,7 @@ CTFSentryBase* CTFSentryBase::Sentry_Create(Vector VecSpawnPos, Vector vecDir, C
 	pSentry->pev->classname = MAKE_STRING("tf_sentry");
 	pSentry->pev->origin = VecSpawnPos;
 	pSentry->pev->angles = vecDir;
-	pSentry->pev->owner = pOwner->edict();
+	pSentry->m_hBuilder = pOwner;
 	pSentry->pev->spawnflags |= SF_NORESPAWN | SF_MONSTER_FALL_TO_GROUND;
 	pSentry->colormap = colormap;
 	pSentry->m_bMapPlaced = false;
@@ -271,14 +270,26 @@ void CTFSentryBase::Spawn()
 	SET_MODEL(ENT(pev), "models/base.mdl");
 	pev->classname = MAKE_STRING("tf_sentry");
 
+	pev->max_health = SENTRYGUN_MAX_HEALTH;
+	pev->health = SENTRYGUN_MAX_HEALTH/3;
+
+	// NPCs attack it
+	SetBits(pev->flags, FL_MONSTER | FL_BUILDING);
+	pev->takedamage = DAMAGE_YES;
+	pev->solid = SOLID_BBOX;
+
+	m_bloodColor = DONT_BLEED;
+
+	UTIL_SetSize(pev, SENTRYGUN_MINS, SENTRYGUN_MAXS);
+
 	if (m_bMapPlaced)
 	{
 		CTFSentry* pRCcam = GetClassPtr((CTFSentry*)NULL);
 		pRCcam->pev->classname = MAKE_STRING("tf_sentry_top");
 		pRCcam->pev->origin = pev->origin + Vector(0, 0, 21);
 		pRCcam->pev->angles = pev->angles;
-		if (pev->owner)
-			pRCcam->m_hBuilder = CBaseEntity::Instance(pev->owner);
+		if (m_hBuilder)
+			pRCcam->m_hBuilder = m_hBuilder;
 		pRCcam->pev->colormap = colormap;
 		pRCcam->m_hBase = this;
 		pRCcam->Spawn();
@@ -287,7 +298,7 @@ void CTFSentryBase::Spawn()
 	else
 	{
 		pev->movetype = MOVETYPE_TOSS;
-		((CBasePlayer*)CBaseEntity::Instance(pev->owner))->m_hBuilding = this;
+		m_hBuilder.Entity<CBasePlayer>()->m_hBuilding = this;
 		SetThink(&CTFSentryBase::FinishConstruction);
 		pev->nextthink = gpGlobals->time + 5;
 	}
@@ -297,25 +308,85 @@ void CTFSentryBase::Spawn()
 
 void CTFSentryBase::FinishConstruction()
 {
-	pev->movetype = MOVETYPE_NONE;
-	UTIL_SetOrigin(pev, pev->origin);
+	if (pev->health > 0)
+	{
+		pev->movetype = MOVETYPE_NONE;
+		pev->takedamage = DAMAGE_NO;
+		pev->solid = SOLID_NOT;
+		pev->health = 999;
+		UTIL_SetOrigin(pev, pev->origin);
 
-	CTFSentry* pRCcam = GetClassPtr((CTFSentry*)NULL);
-	pRCcam->pev->classname = MAKE_STRING("tf_sentry_top");
-	pRCcam->pev->origin = pev->origin + Vector(0, 0, 21);
-	pRCcam->pev->angles = pev->angles;
-	if (pev->owner)
-		pRCcam->m_hBuilder = CBaseEntity::Instance(pev->owner);
-	pRCcam->pev->colormap = colormap;
-	pRCcam->m_hBase = this;
-	pRCcam->Spawn();
-	
-	((CBasePlayer*)CBaseEntity::Instance(pev->owner))->m_hBuilding = nullptr;
+		CTFSentry* pRCcam = GetClassPtr((CTFSentry*)NULL);
+		pRCcam->pev->classname = MAKE_STRING("tf_sentry_top");
+		pRCcam->pev->origin = pev->origin + Vector(0, 0, 21);
+		pRCcam->pev->angles = pev->angles;
+		if (pev->owner)
+			pRCcam->m_hBuilder = CBaseEntity::Instance(pev->owner);
+		pRCcam->pev->colormap = colormap;
+		pRCcam->m_hBase = this;
+		pRCcam->Spawn();
 
-	SetThink(NULL);
+		m_hBuilder.Entity<CBasePlayer>()->m_hBuilding = nullptr;
+
+		SetThink(NULL);
+	}
 }
 
-void CTFSentryBase::Precache()
+//-----------------------------------------------------------------------------
+// Purpose: Called when this object is destroyed
+//-----------------------------------------------------------------------------
+void CTFSentryBase::DetonateBuilding()
+{
+	if (m_hBuilder)
+	{
+		ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_destroyed");
+		m_hBuilder.Entity<CBasePlayer>()->m_hBuilding = nullptr;
+	}
+
+	Vector pos = pev->origin + Vector(0, 0, 48);
+
+	// breakmodel
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pos);
+		WRITE_BYTE(TE_BREAKMODEL);
+		// position
+		WRITE_COORD(pos.x);
+		WRITE_COORD(pos.y);
+		WRITE_COORD(pos.z);
+		// size
+		WRITE_COORD(32);
+		WRITE_COORD(32);
+		WRITE_COORD(32);
+		// velocity
+		WRITE_COORD(0);
+		WRITE_COORD(0);
+		WRITE_COORD(0);
+		WRITE_BYTE(30); // randomization
+		// Model
+		WRITE_SHORT(m_idShard); // model id#
+		// # of shards
+		WRITE_BYTE(5);
+		// duration
+		WRITE_BYTE(30); // 3.0 seconds
+		WRITE_BYTE(BREAK_SMOKE); // flags
+	MESSAGE_END();
+
+	switch (RANDOM_LONG(0, 2))
+	{
+	case 0:
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris1.wav", 0.55, ATTN_NORM);
+		break;
+	case 1:
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris2.wav", 0.55, ATTN_NORM);
+		break;
+	case 2:
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris3.wav", 0.55, ATTN_NORM);
+		break;
+	}
+
+	UTIL_Remove(this);
+}
+
+void CTFSentryBase::PrecacheBuildable()
 {
 	UTIL_PrecacheOther("tf_sentry_top");
 	UTIL_PrecacheOther("sentry_rocket");
@@ -341,8 +412,6 @@ void CTFSentry::SpawnBuildable()
 	m_iUpgradeLevel = 1;
 	m_iUpgradeMetal = 0;
 	m_iUpgradeMetalRequired = SENTRYGUN_UPGRADE_METAL;
-
-	pev->health = SENTRYGUN_MAX_HEALTH; // TO-DO: skill cvar
 
 	// Rotate Details
 	m_iRightBound = 45;
