@@ -200,7 +200,7 @@ TYPEDESCRIPTION CTFSentry::m_SaveData[] =
 		DEFINE_FIELD(CTFSentry, m_iState, FIELD_INTEGER),
 		DEFINE_FIELD(CTFSentry, m_iUpgradeLevel, FIELD_INTEGER),
 
-		DEFINE_FIELD(CTFSentry, m_iAttachments, FIELD_INTEGER),
+		DEFINE_ARRAY(CTFSentry, m_iAttachments, FIELD_INTEGER, 4),
 
 		DEFINE_FIELD(CTFSentry, m_iAmmo, FIELD_INTEGER),
 		DEFINE_FIELD(CTFSentry, m_iMaxAmmo, FIELD_INTEGER),
@@ -232,20 +232,18 @@ TYPEDESCRIPTION CTFSentry::m_SaveData[] =
 		DEFINE_FIELD(CTFSentry, m_hBase, FIELD_EHANDLE),
 };
 
-IMPLEMENT_SAVERESTORE(CTFSentry, CBuildable);
-
-
 TYPEDESCRIPTION CTFSentryBase::m_SaveData[] =
 	{
+		DEFINE_FIELD(CTFSentryBase, m_iMapPlacedLevel, FIELD_INTEGER),
 		DEFINE_FIELD(CTFSentryBase, colormap, FIELD_INTEGER),
 		DEFINE_FIELD(CTFSentryBase, m_bMapPlaced, FIELD_BOOLEAN),
 };
 
+IMPLEMENT_SAVERESTORE(CTFSentry, CBuildable);
 IMPLEMENT_SAVERESTORE(CTFSentryBase, CBuildable);
 
 
 LINK_ENTITY_TO_CLASS(tf_sentry_top, CTFSentry);
-
 LINK_ENTITY_TO_CLASS(tf_sentry, CTFSentryBase);
 
 CTFSentryBase* CTFSentryBase::Sentry_Create(Vector VecSpawnPos, Vector vecDir, CBaseEntity* pOwner, int colormap)
@@ -261,6 +259,17 @@ CTFSentryBase* CTFSentryBase::Sentry_Create(Vector VecSpawnPos, Vector vecDir, C
 	pSentry->Spawn();
 
 	return pSentry;
+}
+
+bool CTFSentryBase::KeyValue(KeyValueData* pkvd)
+{
+	if (FStrEq(pkvd->szKeyName, "level"))
+	{
+		m_iMapPlacedLevel = atoi(pkvd->szValue);
+		return true;
+	}
+
+	return CBuildable::KeyValue(pkvd);
 }
 
 void CTFSentryBase::Spawn()
@@ -292,6 +301,7 @@ void CTFSentryBase::Spawn()
 			pRCcam->m_hBuilder = m_hBuilder;
 		pRCcam->pev->colormap = colormap;
 		pRCcam->m_hBase = this;
+		pRCcam->m_iUpgradeLevel = m_iMapPlacedLevel;
 		pRCcam->Spawn();
 		m_pSentry = pRCcam;
 	}
@@ -456,6 +466,12 @@ void CTFSentry::SpawnBuildable()
 	m_iAttachments[SENTRYGUN_ATTACHMENT_MUZZLE_ALT] = 1;
 	m_iAttachments[SENTRYGUN_ATTACHMENT_ROCKET_L] = 2;
 	m_iAttachments[SENTRYGUN_ATTACHMENT_ROCKET_R] = 3;
+
+	if (m_iUpgradeLevel > 1)
+		Upgrade();
+
+	if (m_iUpgradeLevel > 2)
+		Upgrade();
 
 	SetThink(&CTFSentry::SentryThink);
 	pev->nextthink = gpGlobals->time;

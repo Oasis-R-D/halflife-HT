@@ -12,6 +12,8 @@ public:
 	void Spawn() override;
 	void PrecacheBuildable() override;
 
+	bool KeyValue(KeyValueData* pkvd) override;
+
 	static CTFSentryBase* Sentry_Create(Vector VecSpawnPos, Vector vecDir, CBaseEntity* pOwner = NULL, int colormap = 0);
 
 	bool OnWrenchHit(CBasePlayer* pPlayer) override { return true; };
@@ -20,6 +22,7 @@ public:
 	void DetonateBuilding() override;
 
 	bool m_bMapPlaced = true;
+	int m_iMapPlacedLevel;
 
 	EHANDLE m_pSentry;
 
@@ -107,4 +110,6 @@ private:
 
 	double m_fPitch;
 	double m_fYaw;
+
+	friend class CTFSentryBase; 
 };

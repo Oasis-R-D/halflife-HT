@@ -3376,12 +3376,13 @@ initammo(string) : "Initial Ammo" : "6"
 //
 //WEAPONS
 //
+@PointClass base(Weapon, Targetx, RenderFields) studio("models/w_9mmar.mdl") = weapon_ag36 : "556mm Assault Rifle" []
 @PointClass base(Weapon, Targetx, RenderFields) studio("models/w_displacer.mdl") = weapon_vortigun : "Vortigun" []
 @PointClass base(Weapon, Targetx, RenderFields) studio("models/w_desert_eagle.mdl") = weapon_eagle : "Desert Eagle" []
 @PointClass base(Weapon, Targetx, RenderFields) studio("models/w_bgrap.mdl") = weapon_grapple : "Barnacle Grapple" []
 @PointClass base(Weapon, Targetx, RenderFields) studio("models/w_knife.mdl") = weapon_knife : "Knife" []
 @PointClass base(Weapon, Targetx, RenderFields) studio("models/w_saw.mdl") = weapon_m249 : "M249 SAW" []
-@PointClass base(Weapon, Targetx, RenderFields) studio("models/w_penguinnest.mdl") = weapon_penguin : "Killer Penguin" []
+@PointClass base(Weapon, Targetx, RenderFields) studio("models/w_sqknest.mdl") = weapon_rc : "RC car" []
 @PointClass base(Weapon, Targetx, RenderFields) studio("models/w_pipe_wrench.mdl") = weapon_pipewrench : "Pipe Wrench" []
 @PointClass base(Weapon, Targetx, RenderFields) studio("models/w_shock.mdl") = weapon_shockrifle : "Shock Roach" []
 @PointClass base(Weapon, Targetx, RenderFields) studio("models/w_m40a1.mdl") = weapon_sniperrifle : "Sniper Rifle" []
