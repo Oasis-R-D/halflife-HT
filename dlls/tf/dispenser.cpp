@@ -4,10 +4,12 @@
 // Ground placed version
 #define DISPENSER_MODEL				"models/dispenser.mdl"
 
-#define DISPENSER_MAX_METAL_AMMO	400
+#define DISPENSER_MAX_METAL_AMMO	200
 
 // How much of each ammo gets added per refill
-#define DISPENSER_REFILL_METAL_AMMO			40
+#define DISPENSER_REFILL_METAL_AMMO	40
+
+#define DISPENSER_REFILL_TIME		12
 
 // How much ammo is given our per use
 #define DISPENSER_DROP_PRIMARY		40
@@ -79,7 +81,7 @@ void CTFDispenser::SpawnBuildable()
 
 void CTFDispenser::FinishConstruction()
 {
-	m_flNextRefill = gpGlobals->time + 6; // 12 in TFC with double the given ammo!
+	m_flNextRefill = gpGlobals->time + DISPENSER_REFILL_TIME; // 12 in TFC with double the given ammo!
 	m_flNextDispense = gpGlobals->time + 1.0;
 
 	pev->health = pev->max_health = 150;
@@ -136,11 +138,10 @@ void CTFDispenser::DispenserThink()
 {
 	if (m_flNextRefill <= gpGlobals->time)
 	{
-		m_flNextRefill = gpGlobals->time + 12;
+		m_flNextRefill = gpGlobals->time + DISPENSER_REFILL_TIME;
 
 		if ( m_iAmmoMetal < DISPENSER_MAX_METAL_AMMO )
 		{
-			ALERT(at_console, "REFILLED\n");
 			m_iAmmoMetal = V_min( m_iAmmoMetal + DISPENSER_MAX_METAL_AMMO * 0.2, DISPENSER_MAX_METAL_AMMO );
 		}
 	}
@@ -164,7 +165,6 @@ void CTFDispenser::DispenserThink()
 			if ( !pPlayer || !pPlayer->IsAlive() )
 				continue;
 			
-			ALERT(at_console, "DISPENSED\n");
 			DispenseAmmo( pPlayer );
 
 			iNumNearbyPlayers++;

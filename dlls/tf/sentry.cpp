@@ -297,8 +297,6 @@ void CTFSentryBase::Spawn()
 		pRCcam->pev->classname = MAKE_STRING("tf_sentry_top");
 		pRCcam->pev->origin = pev->origin + Vector(0, 0, 21);
 		pRCcam->pev->angles = pev->angles;
-		if (m_hBuilder)
-			pRCcam->m_hBuilder = m_hBuilder;
 		pRCcam->pev->colormap = colormap;
 		pRCcam->m_hBase = this;
 		if (m_iMapPlacedLevel != 0)
@@ -331,8 +329,8 @@ void CTFSentryBase::FinishConstruction()
 		pRCcam->pev->classname = MAKE_STRING("tf_sentry_top");
 		pRCcam->pev->origin = pev->origin + Vector(0, 0, 21);
 		pRCcam->pev->angles = pev->angles;
-		if (pev->owner)
-			pRCcam->m_hBuilder = CBaseEntity::Instance(pev->owner);
+		if (m_hBuilder)
+			pRCcam->m_hBuilder = m_hBuilder;
 		pRCcam->pev->colormap = colormap;
 		pRCcam->m_hBase = this;
 		pRCcam->Spawn();
@@ -434,7 +432,7 @@ void CTFSentry::SpawnBuildable()
 	// Give the Gun some ammo
 	m_iMaxAmmo = SENTRYGUN_MAX_SHELLS_1;
 	m_iMaxAmmoRockets = SENTRYGUN_MAX_ROCKETS;
-	m_iAmmo = m_iMaxAmmo;
+	m_iAmmo = m_hBuilder ? m_iMaxAmmo * 0.25 : m_iMaxAmmo;
 	m_iAmmoRockets = m_iMaxAmmoRockets;
 
 	// Start searching for enemies
@@ -500,6 +498,27 @@ void CTFSentry::SentryThink()
 	default:
 		ASSERT(0);
 		break;
+	}
+
+	if (m_hBuilder)
+	{
+		/*
+		* add back once I figure out how to make it not spam console
+		char buffer1[4];
+		char buffer2[4];
+		char buffer3[4];
+		char buffer4[4];
+
+		itoa(m_iUpgradeLevel, buffer1, 10);
+		itoa((pev->health/pev->max_health)*100, buffer2, 10);
+		itoa((m_iAmmo/m_iMaxAmmo)*100, buffer3, 10);
+		itoa(m_iAmmoRockets, buffer4, 10);
+		
+		if (m_iUpgradeLevel < 3)
+			ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_detail", buffer1, buffer2, buffer3);
+		else
+			ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Sentry_detailrox", buffer1, buffer2, buffer3, buffer4);
+		*/
 	}
 
 	pev->nextthink = gpGlobals->time + SENTRY_THINK_DELAY;
