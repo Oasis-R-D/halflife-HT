@@ -392,4 +392,4 @@ public:
 	}
 };
 
-LINK_ENTITY_TO_CLASS(ammo_556, CAmmo556);
+LINK_ENTITY_TO_CLASS(ammo_556box, CAmmo556);

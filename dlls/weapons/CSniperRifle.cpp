@@ -237,7 +237,7 @@ void CSniperRifle::Shoot(double time)
 
 	Vector vecShot = m_pPlayer->FireBulletsPlayer(1,
 		vecSrc, vecAiming, g_vecZero,
-		8192, BULLET_PLAYER_223, 0, damage,
+		8192, BULLET_PLAYER_AG36, 0, damage,
 		m_pPlayer->pev, m_pPlayer->random_seed);
 
 	PLAYBACK_EVENT_FULL(UTIL_DefaultPlaybackFlags(),
@@ -265,7 +265,7 @@ void CSniperRifle::SecondaryAttack()
 
 void CSniperRifle::Reload()
 {
-	if (m_pPlayer->ammo_223 > 0)
+	if (m_pPlayer->ammo_556 > 0)
 	{
 		if (m_pPlayer->m_iFOV != 0)
 		{
@@ -314,8 +314,8 @@ int CSniperRifle::iItemSlot()
 
 bool CSniperRifle::GetItemInfo(ItemInfo* p)
 {
-	p->pszAmmo1 = "223";
-	p->iMaxAmmo1 = SNIPERRIFLE_MAX_CARRY;
+	p->pszAmmo1 = "556";
+	p->iMaxAmmo1 = M249_MAX_CARRY;
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo2 = 0;
 	p->iMaxAmmo2 = WEAPON_NOCLIP;
@@ -330,7 +330,7 @@ bool CSniperRifle::GetItemInfo(ItemInfo* p)
 
 void CSniperRifle::IncrementAmmo(CBasePlayer* pPlayer)
 {
-	if (pPlayer->GiveAmmo(1, "223", SNIPERRIFLE_MAX_CARRY) >= 0)
+	if (pPlayer->GiveAmmo(1, "556", M249_MAX_CARRY) >= 0)
 	{
 		EMIT_SOUND(pPlayer->edict(), CHAN_STATIC, "ctf/pow_backpack.wav", 0.5, ATTN_NORM);
 	}
@@ -403,7 +403,7 @@ public:
 
 	bool AddAmmo(CBaseEntity* pOther) override
 	{
-		if (pOther->GiveAmmo(AMMO_SNIPERRIFLE_GIVE, "223", SNIPERRIFLE_MAX_CARRY) != -1)
+		if (pOther->GiveAmmo(AMMO_SNIPERRIFLE_GIVE, "556", M249_MAX_CARRY) != -1)
 		{
 			EMIT_SOUND(edict(), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
 
@@ -414,4 +414,4 @@ public:
 	}
 };
 
-LINK_ENTITY_TO_CLASS(ammo_223, CSniperRifleAmmo);
+LINK_ENTITY_TO_CLASS(ammo_556, CSniperRifleAmmo);

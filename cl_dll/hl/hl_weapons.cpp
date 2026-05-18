@@ -763,7 +763,7 @@ void HUD_WeaponsPostThink(local_state_s* from, local_state_s* to, usercmd_t* cmd
 	player.ammo_hornets = (int)from->client.vuser2[0];
 	player.ammo_rockets = (int)from->client.ammo_rockets;
 	player.ammo_spores = (int)from->client.vuser2.y;
-	player.ammo_223 = (int)from->client.vuser2.z;
+	player.ammo_556 = (int)from->client.vuser2.z;
 
 
 	// Point to current weapon object
@@ -841,7 +841,7 @@ void HUD_WeaponsPostThink(local_state_s* from, local_state_s* to, usercmd_t* cmd
 	to->client.vuser2[0] = player.ammo_hornets;
 	to->client.ammo_rockets = player.ammo_rockets;
 	to->client.vuser2.y = player.ammo_spores;
-	to->client.vuser2.z = player.ammo_223;
+	to->client.vuser2.z = player.ammo_556;
 
 	if (player.m_pActiveItem->m_iId == WEAPON_RPG)
 	{
