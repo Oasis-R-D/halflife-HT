@@ -1630,6 +1630,38 @@ Vector CBaseEntity::FireBulletsPlayer(unsigned int cShots, Vector vecSrc, Vector
 
 				case BULLET_PLAYER_357:
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg357, vecDir, &tr, DMG_BULLET);
+					if (tr.pHit && tr.pHit->v.takedamage != DAMAGE_NO)
+					{
+						auto pHitEntity = Instance(tr.pHit);
+
+						if (pHitEntity->BloodColor() != DONT_BLEED)
+						{
+							MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, EyePosition());
+							WRITE_BYTE(TE_BLOODSTREAM);
+
+							WRITE_COORD(tr.vecEndPos.x);
+							WRITE_COORD(tr.vecEndPos.y);
+							WRITE_COORD(tr.vecEndPos.z);
+
+							const auto direction = vecSrc - tr.vecEndPos;
+
+							WRITE_COORD(direction.x);
+							WRITE_COORD(direction.y);
+							WRITE_COORD(direction.z);
+
+							if (pHitEntity->BloodColor() == BLOOD_COLOR_RED)
+							{
+								WRITE_BYTE(70);
+							}
+							else
+							{
+								WRITE_BYTE(pHitEntity->BloodColor());
+							}
+
+							WRITE_BYTE(150);
+							MESSAGE_END();
+						}
+					}
 					break;
 
 				case BULLET_PLAYER_M249:
