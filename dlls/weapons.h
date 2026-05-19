@@ -102,7 +102,7 @@ public:
 // weapon clip/carry ammo capacities
 #define URANIUM_MAX_CARRY 100
 #define _9MM_MAX_CARRY 250
-#define _357_MAX_CARRY 36
+#define _357_MAX_CARRY 25
 #define BUCKSHOT_MAX_CARRY 125
 #define BOLT_MAX_CARRY 50
 #define ROCKET_MAX_CARRY 5
@@ -122,7 +122,7 @@ public:
 
 //#define CROWBAR_MAX_CLIP		WEAPON_NOCLIP
 #define GLOCK_MAX_CLIP 17
-#define PYTHON_MAX_CLIP 6
+#define PYTHON_MAX_CLIP 5
 #define MP5_MAX_CLIP 40
 #define AG36_MAX_CLIP 30
 #define MP5_DEFAULT_AMMO 25
@@ -618,7 +618,11 @@ enum python_e
 	PYTHON_HOLSTER,
 	PYTHON_DRAW,
 	PYTHON_IDLE2,
-	PYTHON_IDLE3
+	PYTHON_IDLE3,
+	PYTHON_SIGHTIN,
+	PYTHON_SIGHTIDLE,
+	PYTHON_SIGHTSHOOT,
+	PYTHON_SIGHTOUT
 };
 
 class CPython : public CBasePlayerWeapon

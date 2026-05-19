@@ -1258,6 +1258,9 @@ void ClientPrecache()
 	PRECACHE_SOUND("player/geiger2.wav");
 	PRECACHE_SOUND("player/geiger1.wav");
 
+	PRECACHE_SOUND("player/flatline.wav");
+	PRECACHE_SOUND("player/h2odeath.wav");
+
 	PRECACHE_SOUND("ctf/pow_big_jump.wav");
 
 	if (giPrecacheGrunt)

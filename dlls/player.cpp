@@ -274,30 +274,14 @@ int TrainSpeed(int iSpeed, int iMax)
 void CBasePlayer::DeathSound()
 {
 	// water death sounds
-	/*
+
 	if (pev->waterlevel == 3)
 	{
 		EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/h2odeath.wav", 1, ATTN_NONE);
 		return;
 	}
-	*/
 
-	// temporarily using pain sounds for death sounds
-	switch (RANDOM_LONG(1, 5))
-	{
-	case 1:
-		EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/pl_pain5.wav", 1, ATTN_NORM);
-		break;
-	case 2:
-		EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/pl_pain6.wav", 1, ATTN_NORM);
-		break;
-	case 3:
-		EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/pl_pain7.wav", 1, ATTN_NORM);
-		break;
-	}
-
-	// play one of the suit death alarms
-	EMIT_GROUPNAME_SUIT(ENT(pev), "HEV_DEAD");
+	EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/flatline.wav", 10, ATTN_NORM);
 }
 
 // override takehealth
@@ -494,6 +478,18 @@ bool CBasePlayer::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, fl
 	// DMG_FREEZE
 	// DMG_BLAST
 	// DMG_SHOCK
+	int cl_damageind = CVAR_GET_FLOAT("cl_damageindicators");
+
+	if (IsAlive())
+	{
+		if (cl_damageind == 1)
+		{
+			if ((bitsDamage & DMG_DROWN) != 0)
+				UTIL_ScreenFade(this, Vector(0, 0, 255), 0.25, 0, 220, FFADE_IN);
+			else
+				UTIL_ScreenFade(this, Vector(128, 0, 0), 0.5, 0, 255, FFADE_IN);
+		}
+	}
 
 	m_bitsDamageType |= bitsDamage; // Save this so we can report it to the client
 	m_bitsHUDDamage = -1;			// make sure the damage bits get resent
@@ -901,7 +897,16 @@ void CBasePlayer::Killed(entvars_t* pevAttacker, int iGib)
 
 
 	// UNDONE: Put this in, but add FFADE_PERMANENT and make fade time 8.8 instead of 4.12
-	// UTIL_ScreenFade( edict(), Vector(128,0,0), 6, 15, 255, FFADE_OUT | FFADE_MODULATE );
+	//UTIL_ScreenFade( edict(), Vector(128,0,0), 6, 15, 255, FFADE_OUT | FFADE_MODULATE );
+
+	if (m_bitsDamageType & DMG_FALL)
+	{
+		UTIL_ScreenFade(this, Vector(0, 0, 0), 0, 5, 255, FFADE_OUT | FFADE_STAYOUT);
+	}
+	else
+	{
+		UTIL_ScreenFade(this, Vector(128, 0, 0), 4.5, 15, 255, FFADE_OUT | FFADE_MODULATE | FFADE_STAYOUT);
+	}
 
 	if ((pev->health < -40 && iGib != GIB_NEVER) || iGib == GIB_ALWAYS)
 	{
@@ -3693,6 +3698,7 @@ void CBasePlayer::FlashlightTurnOn()
 
 	if (HasSuit())
 	{
+		UTIL_ScreenFade(this, Vector(0, 0, 0), 0.2, 0.2, 255, FFADE_MODULATE);
 		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, SOUND_FLASHLIGHT_ON, 1.0, ATTN_NORM, 0, PITCH_NORM);
 		SetBits(pev->effects, EF_BRIGHTLIGHT);
 		MESSAGE_BEGIN(MSG_ONE, gmsgFlashlight, NULL, pev);
@@ -3707,6 +3713,7 @@ void CBasePlayer::FlashlightTurnOn()
 
 void CBasePlayer::FlashlightTurnOff()
 {
+	UTIL_ScreenFade(this, Vector(15, 145, 20), 0.2, 0.2, 255, FFADE_IN);
 	EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, SOUND_FLASHLIGHT_OFF, 1.0, ATTN_NORM, 0, PITCH_NORM);
 	ClearBits(pev->effects, EF_BRIGHTLIGHT);
 	MESSAGE_BEGIN(MSG_ONE, gmsgFlashlight, NULL, pev);

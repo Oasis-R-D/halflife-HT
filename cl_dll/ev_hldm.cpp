@@ -858,9 +858,6 @@ void EV_FirePython(event_args_t* args)
 
 		// Add muzzle flash to current weapon model
 		EV_MuzzleFlash();
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(PYTHON_FIRE1, body);
-
-		V_PunchAxis(0, -10.0);
 
 		SetLocalBody(WEAPON_PYTHON, body);
 	}

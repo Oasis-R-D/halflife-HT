@@ -82,20 +82,6 @@ void CPython::Precache()
 
 bool CPython::Deploy()
 {
-#ifdef CLIENT_DLL
-	if (bIsMultiplayer())
-#else
-	if (g_pGameRules->IsMultiplayer())
-#endif
-	{
-		// enable laser sight geometry.
-		pev->body = 1;
-	}
-	else
-	{
-		pev->body = 0;
-	}
-
 	return DefaultDeploy("models/v_357.mdl", "models/p_357.mdl", PYTHON_DRAW, "python", pev->body);
 }
 
@@ -118,10 +104,12 @@ void CPython::SecondaryAttack()
 {
 	if (m_pPlayer->m_iFOV != 0)
 	{
+		SendWeaponAnim(PYTHON_SIGHTOUT);
 		m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
 	}
 	else if (m_pPlayer->m_iFOV != 40)
 	{
+		SendWeaponAnim(PYTHON_SIGHTIN);
 		m_pPlayer->m_iFOV = 40;
 	}
 
@@ -176,19 +164,14 @@ void CPython::PrimaryAttack()
 #endif
 
 	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFirePython, 0.0, g_vecZero, g_vecZero, vecSpread.x, vecSpread.y, 0, 0, 0, 0);
+	SendWeaponAnim(((m_pPlayer->m_iFOV != 0) ? PYTHON_SIGHTSHOOT : PYTHON_FIRE1), pev->body);
+	m_pPlayer->pev->punchangle.x -= ((m_pPlayer->m_iFOV != 0) ? 8.5 : 20);
 
 	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);
 
-	if (m_pPlayer->m_iFOV != 0)
-	{
-		m_flNextPrimaryAttack = 0.75;
-	}
-	else if (m_pPlayer->m_iFOV != 40)
-	{
-		m_flNextPrimaryAttack = 0.25;
-	}
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + ((m_pPlayer->m_iFOV != 0) ? 0.75 : 0.25);
 	m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
 }
 
@@ -198,19 +181,13 @@ void CPython::Reload()
 	if (m_pPlayer->ammo_357 <= 0)
 		return;
 
-	if (m_pPlayer->m_iFOV != 0)
+	if (m_pPlayer->m_iFOV != 0 && m_iClip != 5)
 	{
+		SendWeaponAnim(PYTHON_SIGHTOUT);
 		m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
 	}
 
-	bool bUseScope = false;
-#ifdef CLIENT_DLL
-	bUseScope = bIsMultiplayer();
-#else
-	bUseScope = g_pGameRules->IsMultiplayer();
-#endif
-
-	DefaultReload(6, PYTHON_RELOAD, 2.0, bUseScope ? 1 : 0);
+	DefaultReload(5, PYTHON_RELOAD, 2.0, 0);
 }
 
 
@@ -222,6 +199,13 @@ void CPython::WeaponIdle()
 
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
+
+	if (m_pPlayer->m_iFOV != 0)
+	{
+		SendWeaponAnim(PYTHON_SIGHTIDLE, pev->body);
+		m_flTimeWeaponIdle = 1;
+		return;
+	}
 
 	int iAnim;
 	float flRand = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 0, 1);
@@ -246,14 +230,7 @@ void CPython::WeaponIdle()
 		m_flTimeWeaponIdle = (170.0 / 30.0);
 	}
 
-	bool bUseScope = false;
-#ifdef CLIENT_DLL
-	bUseScope = bIsMultiplayer();
-#else
-	bUseScope = g_pGameRules->IsMultiplayer();
-#endif
-
-	SendWeaponAnim(iAnim, bUseScope ? 1 : 0);
+	SendWeaponAnim(iAnim, 0);
 }
 
 

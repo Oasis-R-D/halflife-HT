@@ -231,7 +231,9 @@ void CSniperRifle::Shoot(double time)
 	//TODO: 8192 constant should be defined somewhere - Solokiller
 	double charge = time;
 	if (charge > 5) // don't let it get too high
+	{
 		charge = 5;
+	}
 
 	float damage = pow(1.6 * charge, 3) + gSkillData.plrDmg762;
 
