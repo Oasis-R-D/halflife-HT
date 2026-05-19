@@ -281,7 +281,21 @@ void CBasePlayer::DeathSound()
 		return;
 	}
 
-	EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/flatline.wav", 10, ATTN_NORM);
+	// temporarily using pain sounds for death sounds
+	switch (RANDOM_LONG(1, 5))
+	{
+	case 1:
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/pl_pain5.wav", 1, ATTN_NORM);
+		break;
+	case 2:
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/pl_pain6.wav", 1, ATTN_NORM);
+		break;
+	case 3:
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/pl_pain7.wav", 1, ATTN_NORM);
+		break;
+	}
+
+	EMIT_GROUPNAME_SUIT(ENT(pev), "HEV_DEAD");
 }
 
 // override takehealth

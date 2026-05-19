@@ -163,10 +163,8 @@ void CPython::PrimaryAttack()
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFirePython, 0.0, g_vecZero, g_vecZero, vecSpread.x, vecSpread.y, 0, 0, 0, 0);
-	SendWeaponAnim(((m_pPlayer->m_iFOV != 0) ? PYTHON_SIGHTSHOOT : PYTHON_FIRE1), pev->body);
-	m_pPlayer->pev->punchangle.x -= ((m_pPlayer->m_iFOV != 0) ? 8.5 : 20);
-
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFirePython, 0.0, g_vecZero, g_vecZero, vecSpread.x, vecSpread.y, m_pPlayer->m_iFOV != 0, 0, 0, 0);
+	
 	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);

@@ -229,11 +229,7 @@ void CSniperRifle::Shoot(double time)
 	Vector vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_2DEGREES);
 
 	//TODO: 8192 constant should be defined somewhere - Solokiller
-	double charge = time;
-	if (charge > 5) // don't let it get too high
-	{
-		charge = 5;
-	}
+	double charge = time > 5 ? 5 : time; // don't let it get too high
 
 	float damage = pow(1.6 * charge, 3) + gSkillData.plrDmg762;
 

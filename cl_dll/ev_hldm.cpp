@@ -842,6 +842,8 @@ void EV_FirePython(event_args_t* args)
 	Vector vecSrc, vecAiming;
 	Vector up, right, forward;
 
+	bool ADS = args->bparam1;
+
 	idx = args->entindex;
 	VectorCopy(args->origin, origin);
 	VectorCopy(args->angles, angles);
@@ -859,7 +861,9 @@ void EV_FirePython(event_args_t* args)
 		// Add muzzle flash to current weapon model
 		EV_MuzzleFlash();
 
-		SetLocalBody(WEAPON_PYTHON, body);
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(ADS ? PYTHON_SIGHTSHOOT : PYTHON_FIRE1);
+
+		V_PunchAxis(0, ADS ? 8.5 : 20);
 	}
 
 	switch (gEngfuncs.pfnRandomLong(0, 1))
