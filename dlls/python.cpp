@@ -116,15 +116,6 @@ void CPython::Holster()
 
 void CPython::SecondaryAttack()
 {
-#ifdef CLIENT_DLL
-	if (!bIsMultiplayer())
-#else
-	if (!g_pGameRules->IsMultiplayer())
-#endif
-	{
-		return;
-	}
-
 	if (m_pPlayer->m_iFOV != 0)
 	{
 		m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
@@ -143,7 +134,7 @@ void CPython::PrimaryAttack()
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = 0.15;
+		m_flNextPrimaryAttack = 0.25;
 		return;
 	}
 
@@ -152,7 +143,7 @@ void CPython::PrimaryAttack()
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = 0.15;
+			m_flNextPrimaryAttack = 0.25;
 		}
 
 		return;
@@ -174,8 +165,8 @@ void CPython::PrimaryAttack()
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
 
-	Vector vecDir;
-	vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, VECTOR_CONE_1DEGREES, 8192, BULLET_PLAYER_357, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
+	const float flSpread = (m_pPlayer->m_iFOV != 0) ? 0.001 : 0.1;
+	const Vector vecSpread = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, Vector(flSpread, flSpread, flSpread), 8192, BULLET_PLAYER_357, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 
 	int flags;
 #if defined(CLIENT_WEAPONS)
@@ -184,13 +175,20 @@ void CPython::PrimaryAttack()
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFirePython, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFirePython, 0.0, g_vecZero, g_vecZero, vecSpread.x, vecSpread.y, 0, 0, 0, 0);
 
 	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);
 
-	m_flNextPrimaryAttack = 0.75;
+	if (m_pPlayer->m_iFOV != 0)
+	{
+		m_flNextPrimaryAttack = 0.75;
+	}
+	else if (m_pPlayer->m_iFOV != 40)
+	{
+		m_flNextPrimaryAttack = 0.25;
+	}
 	m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
 }
 
