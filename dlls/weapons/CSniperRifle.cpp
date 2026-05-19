@@ -237,7 +237,7 @@ void CSniperRifle::Shoot(double time)
 
 	Vector vecShot = m_pPlayer->FireBulletsPlayer(1,
 		vecSrc, vecAiming, g_vecZero,
-		8192, BULLET_PLAYER_AG36, 0, damage,
+		8192, BULLET_PLAYER_SNIPER, 0, damage,
 		m_pPlayer->pev, m_pPlayer->random_seed);
 
 	PLAYBACK_EVENT_FULL(UTIL_DefaultPlaybackFlags(),
@@ -414,4 +414,4 @@ public:
 	}
 };
 
-LINK_ENTITY_TO_CLASS(ammo_556, CSniperRifleAmmo);
+LINK_ENTITY_TO_CLASS(ammo_sniper, CSniperRifleAmmo);
