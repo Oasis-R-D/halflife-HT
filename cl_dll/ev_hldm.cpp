@@ -863,7 +863,7 @@ void EV_FirePython(event_args_t* args)
 
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(ADS ? PYTHON_SIGHTSHOOT : PYTHON_FIRE1, 0);
 
-		V_PunchAxis(0, ADS ? 8.5 : 20);
+		V_PunchAxis(0, ADS ? -8.5 : -20);
 	}
 
 	switch (gEngfuncs.pfnRandomLong(0, 1))
