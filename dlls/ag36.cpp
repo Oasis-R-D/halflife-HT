@@ -116,14 +116,14 @@ void CAG36::PrimaryAttack()
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = 0.10;
+		m_flNextPrimaryAttack = 0.15;
 		return;
 	}
 
 	if (m_iClip <= 0)
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = 0.10;
+		m_flNextPrimaryAttack = 0.15;
 		return;
 	}
 
@@ -149,12 +149,12 @@ void CAG36::PrimaryAttack()
 #endif
 	{
 		// optimized multiplayer. Widened to make it easier to hit a moving player
-		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, Vector(0.01745, 0.01745, 0.01745), 8192, BULLET_PLAYER_AG36, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
+		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, Vector(0.02618, 0.02618, 0.02618), 8192, BULLET_PLAYER_AG36, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 	}
 	else
 	{
 		// single player spread
-		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, Vector(0.00873, 0.00873, 0.02618), 8192, BULLET_PLAYER_AG36, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
+		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, Vector(0.01745, 0.01745, 0.01745), 8192, BULLET_PLAYER_AG36, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 	}
 
 	int flags;
@@ -170,15 +170,13 @@ void CAG36::PrimaryAttack()
 		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);
 
-	m_flNextPrimaryAttack = GetNextAttackDelay(0.10);
+	m_flNextPrimaryAttack = GetNextAttackDelay(0.166);
 
 	if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.10;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.166;
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
 }
-
-
 
 void CAG36::SecondaryAttack()
 {
