@@ -41,6 +41,9 @@ TYPEDESCRIPTION CSniperRifle::m_SaveData[] =
 	{
 		DEFINE_FIELD(CSniperRifle, m_flReloadStart, FIELD_TIME),
 		DEFINE_FIELD(CSniperRifle, m_bReloading, FIELD_BOOLEAN),
+		DEFINE_FIELD(CSniperRifle, m_bSpotVisible, FIELD_BOOLEAN),
+		DEFINE_FIELD(CSniperRifle, m_bLaserActive, FIELD_BOOLEAN),
+		DEFINE_FIELD(CSniperRifle, m_flChargeTime, FIELD_FLOAT),
 };
 
 IMPLEMENT_SAVERESTORE(CSniperRifle, CSniperRifle::BaseClass);
