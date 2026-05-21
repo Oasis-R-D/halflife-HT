@@ -2209,7 +2209,7 @@ void CBasePlayer::PreThink()
 	}
 	else if (m_bInSniper)
 	{
-		pev->maxspeed = 48;
+		pev->maxspeed = 48; // might be 64 in TFC
 	}
 	else
 	{

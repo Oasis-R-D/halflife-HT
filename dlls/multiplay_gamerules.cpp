@@ -137,7 +137,7 @@ void CHalfLifeMultiplay::RefreshSkillData()
 	gSkillData.plrDmgM203Grenade = 100;
 
 	// Shotgun buckshot
-	gSkillData.plrDmgBuckshot = 16; // fewer pellets in deathmatch
+	gSkillData.plrDmgBuckshot = 4; // match TFC value
 
 	// Crossbow
 	gSkillData.plrDmgCrossbowClient = 20;

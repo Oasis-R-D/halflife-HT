@@ -623,14 +623,7 @@ void EV_FireShotGunDouble(event_args_t* args) // SPAS-12
 	EV_GetGunPosition(args, vecSrc, origin);
 	VectorCopy(forward, vecAiming);
 
-	if (gEngfuncs.GetMaxClients() > 1)
-	{
-		EV_HLDM_FireBullets(idx, forward, right, up, 4, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.04362*2, 0.04362);
-	}
-	else
-	{
-		EV_HLDM_FireBullets(idx, forward, right, up, 6, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.08716, 0.08716);
-	}
+	EV_HLDM_FireBullets(idx, forward, right, up, 7, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.08716, 0.04362);
 }
 
 void EV_FireShotGunSingle(event_args_t* args) // MOSSBERG
@@ -673,14 +666,7 @@ void EV_FireShotGunSingle(event_args_t* args) // MOSSBERG
 	EV_GetGunPosition(args, vecSrc, origin);
 	VectorCopy(forward, vecAiming);
 
-	if (gEngfuncs.GetMaxClients() > 1)
-	{
-		EV_HLDM_FireBullets(idx, forward, right, up, 4, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.04362, 0.04362/2);
-	}
-	else
-	{
-		EV_HLDM_FireBullets(idx, forward, right, up, 6, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.04362, 0.04362);
-	}
+	EV_HLDM_FireBullets(idx, forward, right, up, 6, vecSrc, vecAiming, 2048, BULLET_PLAYER_BUCKSHOT, 0, &tracerCount[idx - 1], 0.08716, 0.04362);
 }
 //======================
 //	   SHOTGUN END

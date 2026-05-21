@@ -25,8 +25,9 @@
 #include "UserMessages.h"
 
 // special deathmatch shotgun spreads
-#define VECTOR_CONE_DM_SHOTGUN Vector(0.04362, 0.04362/2, 0.00)		// 10 degrees by 5 degrees
-#define VECTOR_CONE_DM_DOUBLESHOTGUN Vector(0.04362*2, 0.04362, 0.00) // 20 degrees by 5 degrees
+#define VECTOR_CONE_DM_SHOTGUN Vector(0.08716, 0.04362, 0.00)		// 10 degrees by 5 degrees
+
+extern bool CanAttack(float attack_time, float curtime, bool isPredicted);
 
 LINK_ENTITY_TO_CLASS(weapon_shotgun, CShotgun);
 
@@ -137,19 +138,7 @@ void CShotgun::PrimaryAttack()
 
 	Vector vecDir;
 
-#ifdef CLIENT_DLL
-	if (bIsMultiplayer())
-#else
-	if (g_pGameRules->IsMultiplayer())
-#endif
-	{
-		vecDir = m_pPlayer->FireBulletsPlayer(6, vecSrc, vecAiming, VECTOR_CONE_DM_SHOTGUN, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
-	}
-	else
-	{
-		// regular old, untouched spread.
-		vecDir = m_pPlayer->FireBulletsPlayer(8, vecSrc, vecAiming, VECTOR_CONE_5DEGREES, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
-	}
+	vecDir = m_pPlayer->FireBulletsPlayer(6, vecSrc, vecAiming, VECTOR_CONE_DM_SHOTGUN, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 
 	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usSingleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
 
@@ -159,7 +148,7 @@ void CShotgun::PrimaryAttack()
 
 	m_flPumpTime = gpGlobals->time + 0.5;
 
-	m_flNextPrimaryAttack = GetNextAttackDelay(1.0);
+	m_flNextPrimaryAttack = GetNextAttackDelay(0.5);
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0;
 	if (m_iClip != 0)
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5.0;
@@ -182,7 +171,8 @@ void CShotgun::SecondaryAttack()
 	{
 		if (m_iClip == 1)
 		{
-			PrimaryAttack();
+			if (CanAttack(m_flNextPrimaryAttack, gpGlobals->time, UseDecrement()))
+				PrimaryAttack();;
 			return;
 		}
 		Reload();
@@ -198,8 +188,8 @@ void CShotgun::SecondaryAttack()
 
 		m_flPumpTime = gpGlobals->time + 0.5;
 
-		m_flNextPrimaryAttack = GetNextAttackDelay(1.0);
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0;
+		m_flNextPrimaryAttack = GetNextAttackDelay(1.275);
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.575;
 	}
 	else // first shot
 	{
@@ -228,19 +218,7 @@ void CShotgun::SecondaryAttack()
 
 	Vector vecDir;
 
-#ifdef CLIENT_DLL
-	if (bIsMultiplayer())
-#else
-	if (g_pGameRules->IsMultiplayer())
-#endif
-	{
-		vecDir = m_pPlayer->FireBulletsPlayer(6, vecSrc, vecAiming, VECTOR_CONE_DM_SHOTGUN, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
-	}
-	else
-	{
-		// regular old, untouched spread.
-		vecDir = m_pPlayer->FireBulletsPlayer(8, vecSrc, vecAiming, VECTOR_CONE_10DEGREES, 1024, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
-	}
+	vecDir = m_pPlayer->FireBulletsPlayer(7, vecSrc, vecAiming, VECTOR_CONE_DM_SHOTGUN, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 
 	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usDoubleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
 
@@ -378,8 +356,6 @@ void CShotgun::WeaponIdle()
 		}
 	}
 }
-
-extern bool CanAttack(float attack_time, float curtime, bool isPredicted);
 
 void CShotgun::ItemPostFrame()
 {
