@@ -392,7 +392,7 @@ void CSniperRifle::UpdateLaser()
 			EMIT_SOUND_DYN(edict(), CHAN_WEAPON, "weapons/desert_eagle_sight.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		}
 
-		m_pLaser->pev->renderamt = 25.4 * m_flChargeTime + 128;
+		m_pLaser->pev->renderamt = 127 + (128 * (m_flChargeTime/MaxCharge()));
 
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
