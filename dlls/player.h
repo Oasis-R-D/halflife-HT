@@ -231,6 +231,8 @@ public:
 	//EHANDLE m_hTeleportOut;
 	EHANDLE m_hBuilding; // is building (sentry, dispenser, etc)
 
+	bool m_bInSniper;
+
 	// HT
 	bool m_bNoMove_RC;
 

@@ -94,9 +94,19 @@ bool CSniperRifle::Deploy()
 
 void CSniperRifle::Holster()
 {
-	m_bSpotVisible = false;
 	m_flChargeTime = -1;
 	m_fInReload = false; // cancel any reload in progress.
+
+#ifndef CLIENT_DLL
+	if (m_pLaser)
+	{
+		m_pLaser->Killed(nullptr, GIB_NEVER);
+		m_pLaser = nullptr;
+		m_bSpotVisible = false;
+	}
+#endif
+
+	m_pPlayer->m_bInSniper = false;
 
 	if (m_pPlayer->m_iFOV != 0)
 	{
@@ -152,10 +162,11 @@ void CSniperRifle::ItemPostFrame()
 	{
 		if ((m_pPlayer->pev->button & IN_ATTACK) != 0 && CanAttackSniper(m_flNextPrimaryAttack, gpGlobals->time, UseDecrement()))
 		{
-			if ((m_iClip > 0 && m_pPlayer->pev->waterlevel != WATERLEVEL_HEAD))
+			if (m_iClip > 0 && m_pPlayer->pev->waterlevel != WATERLEVEL_HEAD && FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 			{
 				SendWeaponAnim(TFCRIFLE_AIM);
 				m_flChargeTime = 0;
+				m_pPlayer->m_bInSniper = true;
 				return;
 			}
 		}
@@ -196,6 +207,7 @@ void CSniperRifle::ItemPostFrame()
 			{
 				if (m_iClip > 0)
 				{
+					m_pPlayer->m_bInSniper = false;
 					Shoot(m_flChargeTime);
 				}
 				

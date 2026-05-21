@@ -141,6 +141,7 @@ TYPEDESCRIPTION CBasePlayer::m_playerSaveData[] =
 		//DEFINE_FIELD(CBasePlayer, m_hTeleportIn, FIELD_EHANDLE),
 		//DEFINE_FIELD(CBasePlayer, m_hTeleportOut, FIELD_EHANDLE),
 		DEFINE_FIELD(CBasePlayer, m_hBuilding, FIELD_EHANDLE),
+		DEFINE_FIELD(CBasePlayer, m_bInSniper, FIELD_BOOLEAN),
 
 		// HT
 		DEFINE_FIELD(CBasePlayer, m_bNoMove_RC, FIELD_BOOLEAN),
@@ -2205,6 +2206,10 @@ void CBasePlayer::PreThink()
 	if (m_hBuilding || m_bNoMove_RC)
 	{
 		pev->maxspeed = 0.0001;
+	}
+	else if (m_bInSniper)
+	{
+		pev->maxspeed = 48;
 	}
 	else
 	{
