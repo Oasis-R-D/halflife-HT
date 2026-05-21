@@ -225,7 +225,20 @@ void CSniperRifle::ItemPostFrame()
 		}
 	}
 	CBasePlayerWeapon::ItemPostFrame();
-	ALERT(at_console, "CHARGE: %f\n", m_flChargeTime);
+}
+
+static float MaxCharge()
+{
+	#ifdef CLIENT_DLL
+	if (bIsMultiplayer())
+#else
+	if (g_pGameRules->IsMultiplayer())
+#endif
+	{
+		return 5;
+	}
+	else
+		return 2.5;
 }
 
 void CSniperRifle::Shoot(double time)
@@ -244,7 +257,7 @@ void CSniperRifle::Shoot(double time)
 	Vector vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_2DEGREES);
 
 	//TODO: 8192 constant should be defined somewhere - Solokiller
-	double charge = time > 5 ? 5 : time; // don't let it get too high
+	double charge = time > MaxCharge() ? MaxCharge() : time; // don't let it get too high
 
 	float damage = pow(1.6 * charge, 3) + gSkillData.plrDmg762;
 
