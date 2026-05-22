@@ -280,8 +280,8 @@ void CShotgun::Reload()
 
 		SendWeaponAnim(SHOTGUN_RELOAD);
 
-		m_flNextReload = UTIL_WeaponTimeBase() + 0.5;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5;
+		m_flNextReload = UTIL_WeaponTimeBase() + 0.375;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.375;
 	}
 	else
 	{
