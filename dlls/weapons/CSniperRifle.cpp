@@ -195,7 +195,6 @@ void CSniperRifle::ItemPostFrame()
 		// Only allow shooting after 0.1 seconds!
 		if (m_flChargeTime > 0.1)
 		{
-			ALERT(at_console, "3\n");
 			m_bLaserActive = true;
 
 #ifndef CLIENT_DLL
