@@ -173,8 +173,6 @@ void CSentryRocket::FollowThink()
 #define BONE_PITCH			1
 #define BONE_YAW			0
 
-#define SENTRYGUN_ROTBOUND 50
-
 #define SENTRY_SOUND_IDLE		"buildings/turridle.wav"
 #define SENTRY_SOUND_SPOT		"buildings/turrspot.wav"
 #define SENTRY_SOUND_SET		"buildings/turrset.wav"

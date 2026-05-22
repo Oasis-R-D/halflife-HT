@@ -6,6 +6,8 @@
 #define SENTRYGUN_MINS			Vector(-20, -20, 0)
 #define SENTRYGUN_MAXS			Vector(20,  20, 66)
 
+#define SENTRYGUN_ROTBOUND 50
+
 class CTFSentryBase : public CBuildable
 {
 public:
@@ -54,6 +56,14 @@ public:
 
 	EHANDLE m_hBase;
 
+	int m_iRightBound;
+	int m_iLeftBound;
+	int	m_iBaseTurnRate;
+	bool m_bTurningRight;
+
+	Vector m_vecCurAngles;
+	Vector m_vecGoalAngles;
+
 private:
 	// Main think
 	void EXPORT SentryThink();
@@ -84,14 +94,6 @@ private:
 	float m_flFieldOfView;	// width of monster's field of view ( dot product )
 
 	int m_iUpgradeLevel;
-
-	int m_iRightBound;
-	int m_iLeftBound;
-	int	m_iBaseTurnRate;
-	bool m_bTurningRight;
-
-	Vector m_vecCurAngles;
-	Vector m_vecGoalAngles;
 
 	float m_flTurnRate;
 

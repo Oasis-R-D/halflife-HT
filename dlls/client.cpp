@@ -747,6 +747,49 @@ void ClientCommand(edict_t* pEntity)
 		
 		player->m_hSentryGun.Entity<CTFSentry>()->DetonateBuilding();
 	}
+	// TO-DO: rotate sentry commands work very piss poorly, prob needs something else om the ang_y definitions
+	else if (FStrEq(pcmd, "!ROTATESENTRY180"))
+	{
+		if (!player->m_hSentryGun)
+			return;
+		CTFSentry* sentry = player->m_hSentryGun.Entity<CTFSentry>();
+
+		// Orient it
+		float ang_y = UTIL_AngleMod((sentry->m_hBase->pev->angles.y)+180);
+
+		sentry->m_iRightBound = UTIL_AngleMod((int)ang_y - SENTRYGUN_ROTBOUND);
+		sentry->m_iLeftBound = UTIL_AngleMod((int)ang_y + SENTRYGUN_ROTBOUND);
+		if (sentry->m_iRightBound > sentry->m_iLeftBound)
+		{
+			sentry->m_iRightBound = sentry->m_iLeftBound;
+			sentry->m_iLeftBound = UTIL_AngleMod((int)ang_y - SENTRYGUN_ROTBOUND);
+		}
+
+		// Start it rotating
+		sentry->m_vecGoalAngles.y = sentry->m_iRightBound;
+		sentry->m_bTurningRight = true;
+	}
+	else if (FStrEq(pcmd, "!ROTATESENTRY"))
+	{
+		if (!player->m_hSentryGun)
+			return;
+		CTFSentry* sentry = player->m_hSentryGun.Entity<CTFSentry>();
+
+		// Orient it
+		float ang_y = UTIL_AngleMod((sentry->m_hBase->pev->angles.y)+45);
+
+		sentry->m_iRightBound = UTIL_AngleMod((int)ang_y - SENTRYGUN_ROTBOUND);
+		sentry->m_iLeftBound = UTIL_AngleMod((int)ang_y + SENTRYGUN_ROTBOUND);
+		if (sentry->m_iRightBound > sentry->m_iLeftBound)
+		{
+			sentry->m_iRightBound = sentry->m_iLeftBound;
+			sentry->m_iLeftBound = UTIL_AngleMod((int)ang_y - SENTRYGUN_ROTBOUND);
+		}
+
+		// Start it rotating
+		sentry->m_vecGoalAngles.y = sentry->m_iRightBound;
+		sentry->m_bTurningRight = true;
+	}
 #pragma endregion
 #pragma region TF_DISPENSER
 	else if (FStrEq(pcmd, "!BUILDDISPENSER"))
