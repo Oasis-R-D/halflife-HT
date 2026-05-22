@@ -1409,7 +1409,7 @@ int V_FindViewModelByWeaponModel(int weaponindex)
 		{"models/p_9mmhandgun.mdl", "models/v_9mmhandgun.mdl"},
 		{"models/p_grenade.mdl", "models/v_grenade.mdl"},
 		{"models/p_hgun.mdl", "models/v_hgun.mdl"},
-		{"models/p_9mmAR.mdl", "models/v_9mmAR.mdl"},
+		{"models/p_9mmAR.mdl", "models/v_9mmARk.mdl"},
 		{"models/p_357.mdl", "models/v_357.mdl"},
 		{"models/p_rpg.mdl", "models/v_rpg.mdl"},
 		{"models/p_shotgun.mdl", "models/v_shotgun.mdl"},
@@ -1417,6 +1417,7 @@ int V_FindViewModelByWeaponModel(int weaponindex)
 		{"models/p_tripmine.mdl", "models/v_tripmine.mdl"},
 		{"models/p_satchel_radio.mdl", "models/v_satchel_radio.mdl"},
 		{"models/p_satchel.mdl", "models/v_satchel.mdl"},
+		{"models/p_sniper.mdl", "models/v_sniper.mdl"},
 		{NULL, NULL}};
 
 	struct model_s* weaponModel = IEngineStudio.GetModelByIndex(weaponindex);

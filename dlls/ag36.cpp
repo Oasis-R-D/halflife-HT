@@ -48,7 +48,7 @@ void CAG36::Precache()
 {
 	PRECACHE_MODEL("models/v_556mmAR.mdl");
 	PRECACHE_MODEL("models/w_9mmAR.mdl");
-	PRECACHE_MODEL("models/p_9mmAR.mdl");
+	PRECACHE_MODEL("models/p_sniper.mdl");
 
 	m_iShell = PRECACHE_MODEL("models/saw_shell.mdl"); // brass shellTE_MODEL
 
@@ -106,7 +106,7 @@ void CAG36::IncrementAmmo(CBasePlayer* pPlayer)
 
 bool CAG36::Deploy()
 {
-	return DefaultDeploy("models/v_556mmAR.mdl", "models/p_9mmAR.mdl", AG36_DEPLOY, "ag36");
+	return DefaultDeploy("models/v_556mmAR.mdl", "models/p_sniper.mdl", AG36_DEPLOY, "mp5");
 }
 
 
@@ -131,7 +131,6 @@ void CAG36::PrimaryAttack()
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
 	m_iClip--;
-
 
 	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
 

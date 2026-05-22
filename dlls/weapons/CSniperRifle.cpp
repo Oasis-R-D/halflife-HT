@@ -61,7 +61,7 @@ void CSniperRifle::Precache()
 
 	PRECACHE_MODEL("models/w_m40a1.mdl");
 	PRECACHE_MODEL("models/v_sniper.mdl");
-	PRECACHE_MODEL("models/p_m40a1.mdl");
+	PRECACHE_MODEL("models/p_sniper.mdl");
 
 	PRECACHE_SOUND("weapons/sniper_fire.wav");
 	PRECACHE_SOUND("weapons/sniper_zoom.wav");
@@ -89,7 +89,7 @@ bool CSniperRifle::Deploy()
 {
 	m_bSpotVisible = true;
 	m_flChargeTime = -1;
-	return BaseClass::DefaultDeploy("models/v_sniper.mdl", "models/p_m40a1.mdl", TFCRIFLE_DRAW, "bow");
+	return BaseClass::DefaultDeploy("models/v_sniper.mdl", "models/p_sniper.mdl", TFCRIFLE_DRAW, "shotgun");
 }
 
 void CSniperRifle::Holster()
@@ -243,7 +243,10 @@ static float MaxCharge()
 
 void CSniperRifle::Shoot(double time)
 {
-	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
+	m_pPlayer->m_iWeaponFlash = time > 1 ? BRIGHT_GUN_FLASH : NORMAL_GUN_FLASH;
+	m_pPlayer->m_iWeaponVolume = time > 1 ? LOUD_GUN_VOLUME : NORMAL_GUN_VOLUME;
+
+	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
 
 	--m_iClip;
 

@@ -96,7 +96,7 @@ void CShotgun::IncrementAmmo(CBasePlayer* pPlayer)
 
 bool CShotgun::Deploy()
 {
-	return DefaultDeploy("models/v_shotgun.mdl", "models/p_shotgun.mdl", SHOTGUN_DRAW, "shotgundouble");
+	return DefaultDeploy("models/v_shotgun.mdl", "models/p_shotgun.mdl", SHOTGUN_DRAW, "shotgun");
 }
 
 void CShotgun::PrimaryAttack()
@@ -130,6 +130,9 @@ void CShotgun::PrimaryAttack()
 #else
 	flags = 0;
 #endif
+
+	// player "shoot" animation
+	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
 	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
 
@@ -210,6 +213,9 @@ void CShotgun::SecondaryAttack()
 #else
 	flags = 0;
 #endif
+
+	// player "shoot" animation
+	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
 	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
 
