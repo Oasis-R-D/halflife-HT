@@ -729,6 +729,17 @@ void ClientCommand(edict_t* pEntity)
 		EMIT_SOUND(player->edict(), CHAN_VOICE, "buildings/building.wav", 1.0, ATTN_IDLE);
 		CTFSentryBase::Sentry_Create(SpawnPos, Vector(0, pev->angles.y, 0), player, colormap);
 	}
+	else if (FStrEq(pcmd, "!DISMANTLESENTRY"))
+	{
+		if (!player->m_hSentryGun)
+			return;
+		
+		if ((player->m_hSentryGun->pev->origin - pev->origin).LengthSquared() > 16384)
+			return;
+
+		player->GiveAmmo(65, "uranium", METAL_MAX_CARRY);
+		player->m_hSentryGun.Entity<CTFSentry>()->DismantleBuilding();
+	}
 	else if (FStrEq(pcmd, "!DETONATESENTRY"))
 	{
 		if (!player->m_hSentryGun)
@@ -788,6 +799,19 @@ void ClientCommand(edict_t* pEntity)
 
 		EMIT_SOUND(player->edict(), CHAN_VOICE, "buildings/building.wav", 1.0, ATTN_IDLE);
 		CTFDispenser::Dispenser_Create(SpawnPos, Vector(0, pev->angles.y, 0), player);
+	}
+	else if (FStrEq(pcmd, "!DISMANTLEDISPENSER"))
+	{
+		if (!player->m_hDispenser)
+			return;
+		
+		if ((player->m_hDispenser->pev->origin - pev->origin).LengthSquared() > 16384)
+			return;
+
+		player->GiveAmmo(50, "uranium", METAL_MAX_CARRY); // TO-DO: convert ammo back into metal!!!
+		player->GiveAmmo(player->m_hDispenser.Entity<CTFDispenser>()->m_iAmmoMetal, "uranium", METAL_MAX_CARRY);
+
+		player->m_hDispenser.Entity<CTFSentry>()->DismantleBuilding();
 	}
 	else if (FStrEq(pcmd, "!DETONATEDISPENSER"))
 	{

@@ -14,7 +14,7 @@ public:
 	void PrecacheBuildable() override;
 
 	void DetonateBuilding() override;
-
+	void DismantleBuilding() override;
 	//bool OnWrenchHit(CBasePlayer* pPlayer) override;
 
 	static CTFDispenser* Dispenser_Create(Vector VecSpawnPos, Vector vecDir, CBaseEntity* pOwner = NULL);

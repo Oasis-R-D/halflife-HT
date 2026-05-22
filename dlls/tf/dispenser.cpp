@@ -180,6 +180,60 @@ void CTFDispenser::DispenserThink()
 //-----------------------------------------------------------------------------
 // Purpose: Called when this object is destroyed
 //-----------------------------------------------------------------------------
+void CTFDispenser::DismantleBuilding()
+{
+	if (m_hBuilder)
+	{
+		ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Dispenser_dismantle");
+		m_hBuilder.Entity<CBasePlayer>()->m_hDispenser = nullptr;
+	}
+
+	Vector pos = Center();
+
+	// breakmodel
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pos);
+		WRITE_BYTE(TE_BREAKMODEL);
+		// position
+		WRITE_COORD(pos.x);
+		WRITE_COORD(pos.y);
+		WRITE_COORD(pos.z-8);
+		// size
+		WRITE_COORD(32);
+		WRITE_COORD(32);
+		WRITE_COORD(32);
+		// velocity
+		WRITE_COORD(0);
+		WRITE_COORD(0);
+		WRITE_COORD(0);
+		WRITE_BYTE(10); // randomization
+		// Model
+		WRITE_SHORT(m_idShard); // model id#
+		// # of shards
+		WRITE_BYTE(4);
+		// duration
+		WRITE_BYTE(30); // 3.0 seconds
+		WRITE_BYTE(BREAK_SMOKE); // flags
+	MESSAGE_END();
+
+	switch (RANDOM_LONG(0, 2))
+	{
+	case 0:
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris1.wav", 0.55, ATTN_NORM);
+		break;
+	case 1:
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris2.wav", 0.55, ATTN_NORM);
+		break;
+	case 2:
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/debris3.wav", 0.55, ATTN_NORM);
+		break;
+	}
+
+	UTIL_Remove(this);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Called when this object is destroyed
+//-----------------------------------------------------------------------------
 void CTFDispenser::DetonateBuilding()
 {
 	ClientPrint(m_hBuilder.Entity<CBasePlayer>()->pev, HUD_PRINTNOTIFY, "#Dispenser_destroyed");

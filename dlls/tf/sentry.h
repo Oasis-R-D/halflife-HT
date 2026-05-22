@@ -43,6 +43,7 @@ public:
 	void PrecacheBuildable() override;
 
 	void DetonateBuilding() override;
+	void DismantleBuilding() override;
 
 	void SetModel(const char *pModel);
 	bool OnWrenchHit(CBasePlayer* pPlayer) override;
