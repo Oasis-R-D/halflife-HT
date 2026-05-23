@@ -279,6 +279,11 @@ void CRpg::Reload()
 	if (m_pPlayer->ammo_rockets <= 0)
 		return;
 
+	if (m_pPlayer->m_iFOV != 0 && m_iClip != 1)
+	{
+		m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
+	}
+
 	// because the RPG waits to autoreload when no missiles are active while  the LTD is on, the
 	// weapons code is constantly calling into this function, but is often denied because
 	// a) missiles are in flight, but the LTD is on
@@ -289,22 +294,22 @@ void CRpg::Reload()
 	// Set the next attack time into the future so that WeaponIdle will get called more often
 	// than reload, allowing the RPG LTD to be updated
 
-	m_flNextPrimaryAttack = GetNextAttackDelay(0.5);
+	//m_flNextPrimaryAttack = GetNextAttackDelay(0.5);
 
-	if (0 != m_cActiveRockets && m_fSpotActive)
-	{
-		// no reloading when there are active missiles tracking the designator.
-		// ward off future autoreload attempts by setting next attack time into the future for a bit.
-		return;
-	}
+	//if (0 != m_cActiveRockets && m_fSpotActive)
+	//{
+	//	// no reloading when there are active missiles tracking the designator.
+	//	// ward off future autoreload attempts by setting next attack time into the future for a bit.
+	//	return;
+	//}
 
-#ifndef CLIENT_DLL
-	if (m_pSpot && m_fSpotActive)
-	{
-		m_pSpot->Suspend(2.1);
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.1;
-	}
-#endif
+//#ifndef CLIENT_DLL
+//	if (m_pSpot && m_fSpotActive)
+//	{
+//		m_pSpot->Suspend(2.1);
+//		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.1;
+//	}
+//#endif
 
 	if (m_iClip == 0)
 	{
@@ -414,16 +419,20 @@ void CRpg::Holster()
 
 	SendWeaponAnim(RPG_HOLSTER1);
 
-#ifndef CLIENT_DLL
-	if (m_pSpot)
+
+	if (m_pPlayer->m_iFOV != 0)
 	{
-		m_pSpot->Killed(NULL, GIB_NEVER);
-		m_pSpot = NULL;
+		SecondaryAttack();
 	}
-#endif
+
+	//#ifndef CLIENT_DLL
+//	if (m_pSpot)
+//	{
+//		m_pSpot->Killed(NULL, GIB_NEVER);
+//		m_pSpot = NULL;
+//	}
+//#endif
 }
-
-
 
 void CRpg::PrimaryAttack()
 {
@@ -466,23 +475,34 @@ void CRpg::PrimaryAttack()
 	{
 		PlayEmptySound();
 	}
-	UpdateSpot();
+	// UpdateSpot();
 }
 
 
 void CRpg::SecondaryAttack()
 {
-	m_fSpotActive = !m_fSpotActive;
-
-#ifndef CLIENT_DLL
-	if (!m_fSpotActive && m_pSpot)
+	if (m_pPlayer->m_iFOV != 0)
 	{
-		m_pSpot->Killed(NULL, GIB_NORMAL);
-		m_pSpot = NULL;
+		m_pPlayer->m_iFOV = 0; // 0 means reset to default fov
 	}
-#endif
+	else if (m_pPlayer->m_iFOV != 40)
+	{
+		m_pPlayer->m_iFOV = 40;
+	}
 
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2;
+	m_flNextSecondaryAttack = 0.5;
+
+//	m_fSpotActive = !m_fSpotActive;
+//
+//#ifndef CLIENT_DLL
+//	if (!m_fSpotActive && m_pSpot)
+//	{
+//		m_pSpot->Killed(NULL, GIB_NORMAL);
+//		m_pSpot = NULL;
+//	}
+//#endif
+//
+//	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2;
 }
 
 
@@ -494,7 +514,7 @@ void CRpg::WeaponIdle()
 		ResetEmptySound();
 	}
 
-	UpdateSpot();
+	// UpdateSpot();
 
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
@@ -503,7 +523,7 @@ void CRpg::WeaponIdle()
 	{
 		int iAnim;
 		float flRand = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 0, 1);
-		if (flRand <= 0.75 || m_fSpotActive)
+		if (flRand <= 0.75)
 		{
 			if (m_iClip == 0)
 				iAnim = RPG_IDLE_UL;
@@ -530,36 +550,34 @@ void CRpg::WeaponIdle()
 	}
 }
 
-
-
-void CRpg::UpdateSpot()
-{
-
-#ifndef CLIENT_DLL
-	// Don't turn on the laser if we're in the middle of a reload.
-	if (m_fInReload)
-	{
-		return;
-	}
-
-	if (m_fSpotActive)
-	{
-		if (!m_pSpot)
-		{
-			m_pSpot = CLaserSpot::CreateSpot();
-		}
-
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-		Vector vecSrc = m_pPlayer->GetGunPosition();
-		Vector vecAiming = gpGlobals->v_forward;
-
-		TraceResult tr;
-		UTIL_TraceLine(vecSrc, vecSrc + vecAiming * 8192, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-
-		UTIL_SetOrigin(m_pSpot->pev, tr.vecEndPos);
-	}
-#endif
-}
+//void CRpg::UpdateSpot()
+//{
+//
+//#ifndef CLIENT_DLL
+//	// Don't turn on the laser if we're in the middle of a reload.
+//	if (m_fInReload)
+//	{
+//		return;
+//	}
+//
+//	if (m_fSpotActive)
+//	{
+//		if (!m_pSpot)
+//		{
+//			m_pSpot = CLaserSpot::CreateSpot();
+//		}
+//
+//		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+//		Vector vecSrc = m_pPlayer->GetGunPosition();
+//		Vector vecAiming = gpGlobals->v_forward;
+//
+//		TraceResult tr;
+//		UTIL_TraceLine(vecSrc, vecSrc + vecAiming * 8192, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+//
+//		UTIL_SetOrigin(m_pSpot->pev, tr.vecEndPos);
+//	}
+//#endif
+//}
 
 class CRpgAmmo : public CBasePlayerAmmo
 {
