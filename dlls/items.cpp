@@ -29,6 +29,7 @@
 #include "items.h"
 #include "gamerules.h"
 #include "UserMessages.h"
+#include "shake.h"
 
 class CWorldItem : public CBaseEntity
 {
@@ -231,6 +232,7 @@ class CItemBattery : public CItem
 			pPlayer->pev->armorvalue += gSkillData.batteryCapacity;
 			pPlayer->pev->armorvalue = V_min(pPlayer->pev->armorvalue, MAX_NORMAL_BATTERY);
 
+			UTIL_ScreenFade(pPlayer, Vector(0, 180, 255), 0.5, 0.2, 100, FFADE_IN);
 			EMIT_SOUND(pPlayer->edict(), CHAN_ITEM, "items/gunpickup2.wav", 1, ATTN_NORM);
 
 			MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, NULL, pPlayer->pev);

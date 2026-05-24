@@ -21,6 +21,7 @@
 #include "items.h"
 #include "gamerules.h"
 #include "UserMessages.h"
+#include "shake.h"
 
 class CHealthKit : public CItem
 {
@@ -76,6 +77,7 @@ bool CHealthKit::MyTouch(CBasePlayer* pPlayer)
 		WRITE_STRING(STRING(pev->classname));
 		MESSAGE_END();
 
+		UTIL_ScreenFade(pPlayer, Vector(0, 255, 50), 0.5, 0.2, 100, FFADE_IN);
 		EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/smallmedkit1.wav", 1, ATTN_NORM);
 
 		//TODO: incorrect check here, but won't respawn due to respawn delay being -1 in singleplayer
