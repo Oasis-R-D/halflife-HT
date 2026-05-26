@@ -3208,6 +3208,7 @@ void CBasePlayer::Spawn()
 	m_bloodColor = BLOOD_COLOR_RED;
 	m_flNextAttack = UTIL_WeaponTimeBase();
 	StartSneaking();
+	UTIL_ScreenFade(this, Vector(0, 0, 0), 0, 0, 0, FFADE_IN);
 
 	m_iFlashBattery = 99;
 	m_flFlashLightTime = 1; // force first message

@@ -46,8 +46,10 @@ void CMP5::Spawn()
 void CMP5::Precache()
 {
 	PRECACHE_MODEL("models/v_9mmARk.mdl");
-	PRECACHE_MODEL("models/w_9mmAR.mdl");
 	PRECACHE_MODEL("models/w_9mmARk.mdl");
+	//PRECACHE_MODEL("models/p_9mmARk.mdl"); needs model
+	PRECACHE_MODEL("models/v_9mmAR.mdl");
+	PRECACHE_MODEL("models/w_9mmAR.mdl");
 	PRECACHE_MODEL("models/p_9mmAR.mdl");
 
 	m_iShell = PRECACHE_MODEL("models/shell.mdl"); // brass shellTE_MODEL
@@ -180,7 +182,6 @@ void CMP5::Reload()
 		DefaultReload(MP5_MAX_CLIP, MP5_RELOAD, 1.4f);
 	}
 }
-
 
 void CMP5::WeaponIdle()
 {
