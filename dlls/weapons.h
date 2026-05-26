@@ -141,7 +141,7 @@ public:
 #define M249_MAX_CLIP 50
 #define SPORELAUNCHER_MAX_CLIP 5
 #define SHOCKRIFLE_MAX_CLIP 10
-#define SNIPERRIFLE_MAX_CLIP 10
+#define SNIPERRIFLE_MAX_CLIP 30
 
 // the default amount of ammo that comes with each gun when it spawns
 #define GLOCK_DEFAULT_GIVE 17
@@ -164,7 +164,7 @@ public:
 #define DISPLACER_DEFAULT_GIVE 40
 #define SPORELAUNCHER_DEFAULT_GIVE 5
 #define SHOCKRIFLE_DEFAULT_GIVE 10
-#define SNIPERRIFLE_DEFAULT_GIVE 10
+#define SNIPERRIFLE_DEFAULT_GIVE 30
 #define METAL_DEFAULT_GIVE 100
 
 // The amount of ammo given to a player by an ammo item.
@@ -183,7 +183,7 @@ public:
 #define AMMO_M249_GIVE 50
 #define AMMO_EAGLE_GIVE 7
 #define AMMO_SPORE_GIVE 1
-#define AMMO_SNIPERRIFLE_GIVE 5
+#define AMMO_SNIPERRIFLE_GIVE SNIPERRIFLE_MAX_CLIP
 
 // bullet types
 typedef enum

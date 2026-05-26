@@ -123,7 +123,7 @@ bool CHudFlashlight::Draw(float flTime)
 
 	if (m_flBat < 0.20)
 	{
-		UnpackRGB(r, g, b, RGB_REDISH);
+		UnpackRGB(r, g, b, RGB_ORANGEISH);
 	}
 	else
 	{

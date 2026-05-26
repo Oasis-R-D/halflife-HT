@@ -1205,7 +1205,7 @@ bool CHudAmmo::DrawWList(float flTime)
 					}
 					else
 					{
-						UnpackRGB(r, g, b, RGB_REDISH);
+						UnpackRGB(r, g, b, RGB_ORANGEISH);
 						ScaleColors(r, g, b, 128);
 					}
 
@@ -1260,7 +1260,7 @@ bool CHudAmmo::DrawWList(float flTime)
 				}
 				else
 				{
-					UnpackRGB(r, g, b, RGB_REDISH);
+					UnpackRGB(r, g, b, RGB_ORANGEISH);
 					a = 96;
 				}
 

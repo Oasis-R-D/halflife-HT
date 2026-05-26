@@ -519,7 +519,7 @@ int CHudScoreboard::DrawPlayers(int xpos_rel, float list_slot, int nameoffset, c
 		{
 			if (g_PlayerInfoList[best_player].packetloss >= 63)
 			{
-				UnpackRGB(r, g, b, RGB_REDISH);
+				UnpackRGB(r, g, b, RGB_ORANGEISH);
 				sprintf(buf, " !!!!");
 			}
 			else
@@ -739,7 +739,7 @@ bool CHudScoreboard::MsgFunc_PlayerIcon(const char* pszName, int iSize, void* pb
 
 		if (id == CTFItem::BlackMesaFlag)
 		{
-			UnpackRGB(r, g, b, RGB_YELLOWISH);
+			UnpackRGB(r, g, b, RGB_REDISH);
 		}
 		else
 		{

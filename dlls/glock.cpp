@@ -35,12 +35,14 @@ void CGlock::Spawn()
 	FallInit(); // get ready to fall down.
 }
 
-
 void CGlock::Precache()
 {
 	PRECACHE_MODEL("models/v_9mmhandgun.mdl");
 	PRECACHE_MODEL("models/w_9mmhandgun.mdl");
 	PRECACHE_MODEL("models/p_9mmhandgun.mdl");
+	PRECACHE_MODEL("models/v_steyr.mdl");
+	PRECACHE_MODEL("models/w_steyr.mdl");
+	PRECACHE_MODEL("models/p_steyr.mdl");
 
 	m_iShell = PRECACHE_MODEL("models/shell.mdl"); // brass shell
 
@@ -50,6 +52,7 @@ void CGlock::Precache()
 	PRECACHE_SOUND("weapons/pl_gun1.wav"); //silenced handgun
 	PRECACHE_SOUND("weapons/pl_gun2.wav"); //silenced handgun
 	PRECACHE_SOUND("weapons/pl_gun3.wav"); //handgun
+	PRECACHE_SOUND("weapons/steyr_fire1.wav");
 
 	m_usFireGlock1 = PRECACHE_EVENT(1, "events/glock1.sc");
 	m_usFireGlock2 = PRECACHE_EVENT(1, "events/glock2.sc");
@@ -83,7 +86,14 @@ void CGlock::IncrementAmmo(CBasePlayer* pPlayer)
 bool CGlock::Deploy()
 {
 	// pev->body = 1;
-	return DefaultDeploy("models/v_9mmhandgun.mdl", "models/p_9mmhandgun.mdl", GLOCK_DRAW, "onehanded");
+	if (m_pPlayer->m_iTeamNum == CTFTeam::BlackMesa || m_pPlayer->m_iTeamNum == CTFTeam::None)
+	{
+		return DefaultDeploy("models/v_steyr.mdl", "models/p_steyr.mdl", GLOCK_DRAW, "onehanded");
+	}
+	else
+	{
+		return DefaultDeploy("models/v_9mmhandgun.mdl", "models/p_9mmhandgun.mdl", GLOCK_DRAW, "onehanded");
+	}
 }
 
 void CGlock::SecondaryAttack()
@@ -114,6 +124,16 @@ void CGlock::GlockFire(float flSpread, float flCycleTime, bool fUseAutoAim)
 	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
 
 	int flags;
+	int team;
+	
+	if (m_pPlayer->m_iTeamNum == CTFTeam::BlackMesa || m_pPlayer->m_iTeamNum == CTFTeam::None)
+	{
+		team = 0;
+	}
+	else
+	{
+		team = 1;
+	}
 
 #if defined(CLIENT_WEAPONS)
 	flags = UTIL_DefaultPlaybackFlags();
@@ -152,7 +172,7 @@ void CGlock::GlockFire(float flSpread, float flCycleTime, bool fUseAutoAim)
 	Vector vecDir;
 	vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, Vector(flSpread, flSpread, flSpread), 8192, BULLET_PLAYER_GLOCK, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), fUseAutoAim ? m_usFireGlock1 : m_usFireGlock2, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, (m_iClip == 0) ? 1 : 0, 0);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), fUseAutoAim ? m_usFireGlock1 : m_usFireGlock2, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, (m_iClip == 0) ? 1 : 0, (team == 0));
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = GetNextAttackDelay(flCycleTime);
 
@@ -162,7 +182,6 @@ void CGlock::GlockFire(float flSpread, float flCycleTime, bool fUseAutoAim)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
 }
-
 
 void CGlock::Reload()
 {
@@ -175,8 +194,6 @@ void CGlock::Reload()
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
 	}
 }
-
-
 
 void CGlock::WeaponIdle()
 {
@@ -211,13 +228,6 @@ void CGlock::WeaponIdle()
 		SendWeaponAnim(iAnim);
 	}
 }
-
-
-
-
-
-
-
 
 class CGlockAmmo : public CBasePlayerAmmo
 {

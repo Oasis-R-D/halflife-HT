@@ -149,11 +149,11 @@ static void SendFlagIcon(CBasePlayer* player, bool isActive, const char* flagNam
 
 	if (teamIndex == 0)
 	{
-		UnpackRGB(r, g, b, RGB_YELLOWISH);
+		UnpackRGB(r, g, b, RGB_HUD_COLOR);
 	}
 	else
 	{
-		UnpackRGB(r, g, b, RGB_HUD_COLOR);
+		UnpackRGB(r, g, b, RGB_GREENISH);
 	}
 
 	g_engfuncs.pfnWriteByte(r);
@@ -813,11 +813,11 @@ void CHalfLifeCTFplay::PlayerSpawn(CBasePlayer* pPlayer)
 			switch (pPlayer->m_iTeamNum)
 			{
 			case CTFTeam::BlackMesa:
-				UnpackRGB(r, g, b, RGB_YELLOWISH);
+				UnpackRGB(r, g, b, RGB_HUD_COLOR);
 				break;
 
 			case CTFTeam::OpposingForce:
-				UnpackRGB(r, g, b, RGB_HUD_COLOR);
+				UnpackRGB(r, g, b, RGB_GREENISH);
 				break;
 			}
 
