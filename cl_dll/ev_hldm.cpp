@@ -1846,7 +1846,7 @@ void EV_FireM249(event_args_t* args)
 
 	gEngfuncs.pEventAPI->EV_PlaySound(
 		args->entindex,
-		args->origin, CHAN_WEAPON, "weapons/saw_fire1.wav",
+		args->origin, CHAN_WEAPON, "weapons/m60_fire.wav",
 		VOL_NORM, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 15));
 
 	Vector vecSrc;
@@ -1861,7 +1861,7 @@ void EV_FireM249(event_args_t* args)
 		1,
 		vecSrc, vecAiming,
 		8192.0,
-		BULLET_PLAYER_M249,
+		BULLET_MONSTER_12MM,
 		0, nullptr,
 		args->fparam1, args->fparam2);
 }

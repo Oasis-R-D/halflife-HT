@@ -92,4 +92,5 @@ private:
 	bool m_bReloading;
 	float m_flReloadStartTime;
 	float m_flReloadStart;
+	float m_heat;
 };
