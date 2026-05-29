@@ -41,7 +41,7 @@ LINK_ENTITY_TO_CLASS(weapon_m249, CM249);
 
 void CM249::Precache()
 {
-	PRECACHE_MODEL("models/v_saw.mdl");
+	PRECACHE_MODEL("models/v_m60.mdl");
 	PRECACHE_MODEL("models/w_saw.mdl");
 	PRECACHE_MODEL("models/p_saw.mdl");
 
@@ -79,7 +79,7 @@ void CM249::Spawn()
 bool CM249::Deploy()
 {
 	m_heat = 0;
-	return DefaultDeploy("models/v_saw.mdl", "models/p_saw.mdl", M249_DRAW, "mp5");
+	return DefaultDeploy("models/v_m60.mdl", "models/p_saw.mdl", M249_DRAW, "mp5");
 }
 
 void CM249::Holster()
@@ -102,6 +102,7 @@ void CM249::Holster()
 void CM249::WeaponIdle()
 {
 	ResetEmptySound();
+	pev->armortype = 0;
 
 	if (m_heat < 0)
 	{
@@ -169,12 +170,21 @@ void CM249::PrimaryAttack()
 		return;
 	}
 
+	if (pev->armortype == 0)
+	{
+		EMIT_SOUND(edict(), CHAN_WEAPON, "weapons/357_cock1.wav", 1, ATTN_NORM);
+		pev->armortype = 1;
+		m_pPlayer->m_bInSniper = true;
+		m_flNextPrimaryAttack = 0.25f;
+		return;
+	}
+
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 0)
 	{
 		if (!m_fInReload)
 		{
 			PlayEmptySound();
-
+			
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.25f;
 		}
 
@@ -248,7 +258,7 @@ void CM249::PrimaryAttack()
 	Vector vecDir = m_pPlayer->FireBulletsPlayer(
 		1,
 		vecSrc, vecAiming, vecSpread,
-		8192.0, BULLET_MONSTER_12MM, 2, 0,
+		8192.0, BULLET_PLAYER_M249, 2, 0,
 		m_pPlayer->pev, m_pPlayer->random_seed);
 
 	int flags;
