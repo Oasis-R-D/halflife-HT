@@ -682,6 +682,7 @@ public:
 	void WeaponIdle() override;
 	float m_flNextAnimTime;
 	int m_iShell;
+	int pclass; // temporary value to test class weapons
 
 	bool UseDecrement() override
 	{

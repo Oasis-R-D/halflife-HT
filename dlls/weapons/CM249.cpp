@@ -27,6 +27,7 @@ TYPEDESCRIPTION CM249::m_SaveData[] =
 	{
 		DEFINE_FIELD(CM249, m_flReloadStartTime, FIELD_FLOAT),
 		DEFINE_FIELD(CM249, m_flReloadStart, FIELD_FLOAT),
+		DEFINE_FIELD(CM249, m_heat, FIELD_FLOAT),
 		DEFINE_FIELD(CM249, m_bReloading, FIELD_BOOLEAN),
 		DEFINE_FIELD(CM249, m_iFire, FIELD_INTEGER),
 		DEFINE_FIELD(CM249, m_iSmoke, FIELD_INTEGER),
@@ -38,6 +39,7 @@ IMPLEMENT_SAVERESTORE(CM249, CM249::BaseClass);
 #endif
 
 LINK_ENTITY_TO_CLASS(weapon_m249, CM249);
+LINK_ENTITY_TO_CLASS(weapon_m60, CM249);
 
 void CM249::Precache()
 {
@@ -78,7 +80,6 @@ void CM249::Spawn()
 
 bool CM249::Deploy()
 {
-	m_heat = 0;
 	return DefaultDeploy("models/v_m60.mdl", "models/p_saw.mdl", M249_DRAW, "mp5");
 }
 
@@ -193,7 +194,7 @@ void CM249::PrimaryAttack()
 
 	m_pPlayer->m_bInSniper = true;
 
-	m_heat = m_heat + 0.65f;
+	m_heat = m_heat + 0.45f;
 
 	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 
