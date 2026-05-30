@@ -47,6 +47,10 @@ void CM249::Precache()
 	PRECACHE_MODEL("models/w_saw.mdl");
 	PRECACHE_MODEL("models/p_saw.mdl");
 
+	PRECACHE_MODEL("models/v_12mmcannon.mdl");
+	PRECACHE_MODEL("models/w_12mmcannon.mdl");
+	//PRECACHE_MODEL("models/p_12mmcannon.mdl"); needs model
+
 	m_iShell = PRECACHE_MODEL("models/saw_shell.mdl");
 	m_iLink = PRECACHE_MODEL("models/saw_link.mdl");
 	m_iSmoke = PRECACHE_MODEL("sprites/wep_smoke_01.spr");
@@ -57,6 +61,13 @@ void CM249::Precache()
 	PRECACHE_SOUND("weapons/saw_fire1.wav");
 	PRECACHE_SOUND("weapons/m60_fire.wav");
 	PRECACHE_SOUND("weapons/overheat.wav");
+
+	PRECACHE_SOUND("hassault/hw_shoot1.wav");
+	PRECACHE_SOUND("hassault/hw_shoot2.wav");
+	PRECACHE_SOUND("hassault/hw_shoot3.wav");
+	PRECACHE_SOUND("hassault/hw_spinup.wav");
+	PRECACHE_SOUND("hassault/hw_spindown.wav");
+	PRECACHE_SOUND("hassault/hw_spin.wav");
 
 	m_usFireM249 = PRECACHE_EVENT(1, "events/m249.sc");
 }
@@ -80,7 +91,15 @@ void CM249::Spawn()
 
 bool CM249::Deploy()
 {
-	return DefaultDeploy("models/v_m60.mdl", "models/p_saw.mdl", M249_DRAW, "mp5");
+	// pev->body = 1;
+	if (m_pPlayer->m_iTeamNum == CTFTeam::BlackMesa || m_pPlayer->m_iTeamNum == CTFTeam::None)
+	{
+		return DefaultDeploy("models/v_m60.mdl", "models/p_saw.mdl", M249_DRAW, "mp5");
+	}
+	else
+	{
+		return DefaultDeploy("models/v_12mmcannon.mdl", "models/p_saw.mdl", M249_DRAW, "mp5");
+	}
 }
 
 void CM249::Holster()
@@ -105,6 +124,10 @@ void CM249::WeaponIdle()
 	ResetEmptySound();
 	pev->armortype = 0;
 
+	if (m_pPlayer->m_bInSniper == true && (m_pPlayer->m_iTeamNum != CTFTeam::BlackMesa && m_pPlayer->m_iTeamNum != CTFTeam::None) && m_overheated == false)
+	{
+		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "hassault/hw_spindown.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	}
 	if (m_heat < 0)
 	{
 		m_heat = 0;
@@ -114,7 +137,9 @@ void CM249::WeaponIdle()
 		m_heat = m_heat - 0.05f;
 	}
 
+	m_overheated = false;
 	m_pPlayer->m_bInSniper = false;
+	STOP_SOUND(m_pPlayer->edict(), CHAN_ITEM, "hassault/hw_spin.wav"); // currently doesn't play due to sound overlap
 
 	//Update auto-aim
 	m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
@@ -151,6 +176,17 @@ void CM249::WeaponIdle()
 
 void CM249::PrimaryAttack()
 {
+	int team;
+
+	if (m_pPlayer->m_iTeamNum == CTFTeam::BlackMesa || m_pPlayer->m_iTeamNum == CTFTeam::None)
+	{
+		team = 0;
+	}
+	else
+	{
+		team = 1;
+	}
+
 	if (m_pPlayer->pev->waterlevel == WATERLEVEL_HEAD)
 	{
 		PlayEmptySound();
@@ -163,20 +199,33 @@ void CM249::PrimaryAttack()
 	{
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 6;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 6;
-		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/overheat.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/overheat.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		if (team == 1)
+		{
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "hassault/hw_spindown.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		}
 		SendWeaponAnim(M249_IDLE2);
 		m_heat = 79;
 		PlayEmptySound();
 		pev->dmg = gpGlobals->time + 6;
+		m_overheated = true;
 		return;
 	}
 
 	if (pev->armortype == 0)
 	{
-		EMIT_SOUND(edict(), CHAN_WEAPON, "weapons/357_cock1.wav", 1, ATTN_NORM);
 		pev->armortype = 1;
 		m_pPlayer->m_bInSniper = true;
-		m_flNextPrimaryAttack = 0.25f;
+		if (team == 0)
+		{
+			m_flNextPrimaryAttack = 0.25f;
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/357_cock1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		}
+		else
+		{
+			m_flNextPrimaryAttack = 1.15f;
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "hassault/hw_spinup.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		}
 		return;
 	}
 
@@ -194,7 +243,7 @@ void CM249::PrimaryAttack()
 
 	m_pPlayer->m_bInSniper = true;
 
-	m_heat = m_heat + 0.45f;
+	m_heat += 0.45f;
 
 	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 
@@ -256,12 +305,6 @@ void CM249::PrimaryAttack()
 		}
 	}
 
-	Vector vecDir = m_pPlayer->FireBulletsPlayer(
-		1,
-		vecSrc, vecAiming, vecSpread,
-		8192.0, BULLET_PLAYER_M249, 2, 0,
-		m_pPlayer->pev, m_pPlayer->random_seed);
-
 	int flags;
 #if defined(CLIENT_WEAPONS)
 	flags = UTIL_DefaultPlaybackFlags();
@@ -269,12 +312,17 @@ void CM249::PrimaryAttack()
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(
-		flags, m_pPlayer->edict(), m_usFireM249, 0,
-		g_vecZero, g_vecZero,
-		vecDir.x, vecDir.y,
-		pev->body, 0,
-		m_bAlternatingEject ? 1 : 0, 0);
+	if (team == 0)
+	{
+		Vector vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, vecSpread, 8192.0, BULLET_PLAYER_M249, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
+		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM249, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, pev->body, 0, m_bAlternatingEject ? 1 : 0, (team == 0));
+	}
+	else
+	{
+		Vector vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, vecSpread, 8192.0, BULLET_MONSTER_12MM, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
+		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM249, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, pev->body, 0, m_bAlternatingEject ? 1 : 0, (team == 0));
+		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "hassault/hw_spin.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM); // currently doesn't play due to sound overlap
+	}
 
 	if (0 == m_iClip)
 	{

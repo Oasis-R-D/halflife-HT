@@ -93,4 +93,5 @@ private:
 	float m_flReloadStartTime;
 	float m_flReloadStart;
 	float m_heat;
+	bool m_overheated;
 };
