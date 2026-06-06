@@ -1861,7 +1861,7 @@ void EV_FireM249(event_args_t* args)
 		1,
 		vecSrc, vecAiming,
 		8192.0,
-		BULLET_PLAYER_M249,
+		BULLET_MONSTER_12MM,
 		0, nullptr,
 		args->fparam1, args->fparam2);
 }
