@@ -3904,7 +3904,7 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 		gEvilImpulse101 = true;
 		GiveNamedItem("item_suit");
 		GiveNamedItem("item_battery");
-		//GiveNamedItem("weapon_crowbar");
+		GiveNamedItem("weapon_crowbar");
 		GiveNamedItem("weapon_9mmhandgun");
 		GiveNamedItem("ammo_9mmclip");
 		GiveNamedItem("weapon_shotgun");
@@ -3929,9 +3929,9 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 		GiveNamedItem("weapon_hornetgun");
 		GiveNamedItem("weapon_eagle");
 		//GiveNamedItem("weapon_sporelauncher");
-		//GiveNamedItem("weapon_shockrifle");
+		GiveNamedItem("weapon_shockrifle");
 		GiveNamedItem("weapon_knife");
-		GiveNamedItem("weapon_m60");
+		GiveNamedItem("weapon_m249");
 		GiveNamedItem("weapon_pipewrench");
 		//GiveNamedItem("weapon_grapple");
 		GiveNamedItem("weapon_sniperrifle");

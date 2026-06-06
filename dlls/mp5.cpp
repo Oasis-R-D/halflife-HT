@@ -36,8 +36,9 @@ void CMP5::Spawn()
 	Precache();
 	SET_MODEL(ENT(pev), "models/w_9mmARk.mdl");
 	m_iId = WEAPON_MP5K;
+
 	m_iDefaultAmmo = MP5_DEFAULT_GIVE;
-	pclass = 0; // for now i'm using direct assignment of the 'pclass' variable, change to 1 if you want to test the m/45
+
 	FallInit(); // get ready to fall down.
 }
 
@@ -51,9 +52,6 @@ void CMP5::Precache()
 	PRECACHE_MODEL("models/w_9mmAR.mdl");
 	PRECACHE_MODEL("models/p_9mmAR.mdl");
 
-	PRECACHE_MODEL("models/v_m45.mdl");
-	PRECACHE_MODEL("models/w_m45.mdl");
-
 	m_iShell = PRECACHE_MODEL("models/shell.mdl"); // brass shellTE_MODEL
 
 	PRECACHE_MODEL("models/w_9mmARclip.mdl");
@@ -65,7 +63,6 @@ void CMP5::Precache()
 	PRECACHE_SOUND("weapons/hks1.wav"); // H to the K
 	PRECACHE_SOUND("weapons/hks2.wav"); // H to the K
 	PRECACHE_SOUND("weapons/hks3.wav"); // H to the K
-	PRECACHE_SOUND("weapons/m45_fire1.wav");
 
 	PRECACHE_SOUND("weapons/357_cock1.wav");
 
@@ -99,14 +96,7 @@ void CMP5::IncrementAmmo(CBasePlayer* pPlayer)
 
 bool CMP5::Deploy()
 {
-	if (pclass == 1)
-	{
-		return DefaultDeploy("models/v_m45.mdl", "models/p_9mmAR.mdl", MP5_DEPLOY, "mp5");
-	}
-	else
-	{
-		return DefaultDeploy("models/v_9mmARk.mdl", "models/p_9mmAR.mdl", MP5_DEPLOY, "mp5");
-	}
+	return DefaultDeploy("models/v_9mmARk.mdl", "models/p_9mmAR.mdl", MP5_DEPLOY, "mp5");
 }
 
 
@@ -164,27 +154,16 @@ void CMP5::PrimaryAttack()
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usMP5, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, pclass != 0, 0);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usMP5, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
 
 	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		// HEV suit - indicate out of ammo condition
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);
 
+	m_flNextPrimaryAttack = GetNextAttackDelay(0.075);
 
-	if (pclass == 1)
-	{
-		m_flNextPrimaryAttack = GetNextAttackDelay(0.1);
-
-		if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1;
-	}
-	else
-	{
-		m_flNextPrimaryAttack = GetNextAttackDelay(0.075);
-
-		if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.075;
-	}
+	if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.075;
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
 }
@@ -206,8 +185,6 @@ void CMP5::Reload()
 
 void CMP5::WeaponIdle()
 {
-	pclass = 0; // for now i'm using direct assignment of the 'pclass' variable, change to 1 if you want to test the m/45
-
 	ResetEmptySound();
 
 	m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
