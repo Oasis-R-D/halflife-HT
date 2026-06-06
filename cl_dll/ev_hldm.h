@@ -34,7 +34,14 @@ void EV_TripmineFire(event_args_t* args);
 void EV_SnarkFire(event_args_t* args);
 void EV_FireEagle(event_args_t* args);
 void EV_Pipewrench(event_args_t* args);
-void EV_FireM249(event_args_t* args);
+
+void EV_TFC_Assault_WindUp( event_args_s *args );
+void EV_TFC_Assault_WindDown( event_args_s *args );
+void EV_TFC_Assault_Start( event_args_s *args );
+void EV_TFC_Assault_Fire( event_args_s *args );
+void EV_TFC_Assault_Spin( event_args_s *args );
+void EV_TFC_Assault_StartSpin( event_args_s *args );
+
 void EV_FireDisplacer(event_args_t* args);
 void EV_FireShockRifle(event_args_t* args);
 void EV_FireSpore(event_args_t* args);

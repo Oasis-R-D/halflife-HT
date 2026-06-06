@@ -54,7 +54,14 @@ void Game_HookEvents()
 	gEngfuncs.pfnHookEvent("events/snarkfire.sc", EV_SnarkFire);
 	gEngfuncs.pfnHookEvent("events/eagle.sc", EV_FireEagle);
 	gEngfuncs.pfnHookEvent("events/pipewrench.sc", EV_Pipewrench);
-	gEngfuncs.pfnHookEvent("events/m249.sc", EV_FireM249);
+	
+	gEngfuncs.pfnHookEvent( "events/wpn/tf_acwu.sc", EV_TFC_Assault_WindUp );
+	gEngfuncs.pfnHookEvent( "events/wpn/tf_acwd.sc", EV_TFC_Assault_WindDown );
+	gEngfuncs.pfnHookEvent( "events/wpn/tf_acstart.sc", EV_TFC_Assault_Start );
+	gEngfuncs.pfnHookEvent( "events/wpn/tf_acfire.sc", EV_TFC_Assault_Fire );
+	gEngfuncs.pfnHookEvent( "events/wpn/tf_acspin.sc", EV_TFC_Assault_Spin );
+	gEngfuncs.pfnHookEvent( "events/wpn/tf_acsspin.sc", EV_TFC_Assault_StartSpin );
+
 	gEngfuncs.pfnHookEvent("events/displacer.sc", EV_FireDisplacer);
 	gEngfuncs.pfnHookEvent("events/shock.sc", EV_FireShockRifle);
 	gEngfuncs.pfnHookEvent("events/spore.sc", EV_FireSpore);

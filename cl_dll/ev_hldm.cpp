@@ -1786,7 +1786,7 @@ void EV_Pipewrench(event_args_t* args)
 //======================
 //	 PIPE WRENCH END
 //======================
-
+/*
 void EV_FireM249(event_args_t* args)
 {
 	int iBody = args->iparam1;
@@ -1842,6 +1842,150 @@ void EV_FireM249(event_args_t* args)
 		BULLET_PLAYER_M249,
 		0, nullptr,
 		args->fparam1, args->fparam2);
+}
+*/
+
+// TO-DO: all commented out code needs re-added at some point, IDK what the globals are for
+void EV_TFC_Assault_WindUp( event_args_t *args )
+{
+	int idx;
+	Vector origin;
+
+	idx = args->entindex;
+	VectorCopy( args->origin, origin );
+
+	//g_flSpinDownTime[idx - 1] = 0.0f;
+	//g_flSpinUpTime[idx - 1] = gEngfuncs.GetClientTime() + 3.5f;
+	//g_bACSpinning[idx - 1] = 0;
+
+	if ( EV_IsLocal( idx ) )
+	{
+		gEngfuncs.pEventAPI->EV_WeaponAnimation( AC_SPINUP, 2 );
+	}
+
+	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_STATIC, "weapons/asscan2.wav" );
+	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_STATIC, "weapons/asscan4.wav" );
+	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_WEAPON, "weapons/asscan3.wav" );
+	gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_WEAPON, "weapons/asscan1.wav", 0.98f, ATTN_NORM, 0, 125 );
+}
+
+void EV_TFC_Assault_WindDown( event_args_t *args )
+{
+	int idx;
+	Vector origin;
+
+	idx = args->entindex;
+	VectorCopy( args->origin, origin );
+
+	//if ( g_flSpinUpTime[idx - 1] == 0.0f )
+	//{
+		//g_flSpinDownTime[idx - 1] = gEngfuncs.GetClientTime() + 3.0f;
+	//}
+
+	if ( EV_IsLocal( idx ) )
+	{
+		gEngfuncs.pEventAPI->EV_WeaponAnimation( AC_SPINDOWN, 2 );
+	}
+
+	//g_bACSpinning[idx - 1] = false;
+
+	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_STATIC, "weapons/asscan2.wav" );
+	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_STATIC, "weapons/asscan4.wav" );
+	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_WEAPON, "weapons/asscan1.wav" );
+
+	if ( !args->bparam1 )
+	{
+		gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_WEAPON, "weapons/asscan3.wav", 0.98f, ATTN_NORM, 0, 125 );
+	}
+}
+
+void EV_TFC_Assault_Start( event_args_t *args )
+{
+	int idx;
+	Vector origin;
+
+	idx = args->entindex;
+	VectorCopy( args->origin, origin );
+
+	//g_flSpinDownTime[idx - 1] = 0.0f;
+	//g_flSpinUpTime[idx - 1] = 0.0f;
+	//g_bACSpinning[idx - 1] = false;
+
+	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_STATIC, "weapons/asscan2.wav" );
+	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_STATIC, "weapons/asscan4.wav" );
+	gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_STATIC, "weapons/asscan2.wav", 0.98f, ATTN_NORM, 0, 125 );
+}
+
+void EV_TFC_Assault_Fire( event_args_t *args )
+{
+	int idx, oddammo, shell;
+	Vector ShellOrigin, ShellVelocity;
+	Vector up, right, forward;
+	Vector vecSrc, vecAiming;
+	Vector origin, angles, velocity;
+	Vector vecSpread;
+
+	idx = args->entindex;
+	shell = gEngfuncs.pEventAPI->EV_FindModelIndex( "models/shell.mdl" );
+	oddammo = args->bparam1;
+
+	VectorCopy( args->origin, origin );
+	VectorCopy( args->angles, angles );
+	VectorCopy( args->velocity, velocity );
+	AngleVectors( angles, forward, right, up );
+
+	if ( EV_IsLocal( idx ) )
+	{
+		EV_MuzzleFlash();
+		gEngfuncs.pEventAPI->EV_WeaponAnimation( AC_FIRE, 2 );
+	}
+
+	//g_bACSpinning[idx - 1] = false;
+
+	if ( oddammo )
+	{
+		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 15.0f, -25.0f, 6.0f );
+		EV_EjectBrass( ShellOrigin, ShellVelocity, angles.y, shell, TE_BOUNCE_SHELL );
+	}
+
+	EV_GetGunPosition( args, vecSrc, origin );
+	VectorCopy( forward, vecAiming );
+
+	for ( int i = 0; i < 3; i++ )
+	{
+		vecSrc[i] = right[i] * 2.0f + up[i] * -4.0f + vecSrc[i];
+	}
+
+	EV_HLDM_FireBullets( idx, forward, right, up, 5, vecSrc, vecAiming, 8192.0f, BULLET_PLAYER_M249, 8, &tracerCount[idx - 1], 0.1, 0.1 );
+}
+
+void EV_TFC_Assault_Spin( event_args_t *args )
+{
+	int idx;
+
+	idx = args->entindex;
+
+	if ( EV_IsLocal( idx ) )
+	{
+		gEngfuncs.pEventAPI->EV_WeaponAnimation( AC_FIRE, 2 );
+	}
+
+	//g_bACSpinning[idx - 1] = true;
+}
+
+void EV_TFC_Assault_StartSpin( event_args_t *args )
+{
+	int idx;
+	Vector origin;
+
+	idx = args->entindex;
+	VectorCopy( args->origin, origin );
+
+	//g_bACSpinning[idx - 1] = true;
+
+	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_STATIC, "weapons/asscan2.wav" );
+	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_STATIC, "weapons/asscan4.wav" );
+	gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_STATIC, "weapons/asscan4.wav", 0.98f, ATTN_NORM, 0, 125 );
 }
 
 void EV_FireDisplacer(event_args_t* args)

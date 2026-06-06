@@ -93,7 +93,7 @@ public:
 #define EAGLE_WEIGHT 15
 #define SHOCKRIFLE_WEIGHT 15
 #define PIPEWRENCH_WEIGHT 2
-#define M249_WEIGHT 20
+#define M249_WEIGHT 15
 #define DISPLACER_WEIGHT 10
 #define SPORELAUNCHER_WEIGHT 20
 #define SNIPERRIFLE_WEIGHT 10
@@ -138,7 +138,6 @@ public:
 #define TRIPMINE_MAX_CLIP WEAPON_NOCLIP
 #define SNARK_MAX_CLIP WEAPON_NOCLIP
 #define EAGLE_MAX_CLIP 7
-#define M249_MAX_CLIP 50
 #define SPORELAUNCHER_MAX_CLIP 5
 #define SHOCKRIFLE_MAX_CLIP 10
 #define SNIPERRIFLE_MAX_CLIP 30
@@ -160,7 +159,7 @@ public:
 #define TRIPMINE_DEFAULT_GIVE 1
 #define SNARK_DEFAULT_GIVE 5
 #define HIVEHAND_DEFAULT_GIVE 8
-#define M249_DEFAULT_GIVE 50
+#define M249_DEFAULT_GIVE 25
 #define DISPLACER_DEFAULT_GIVE 40
 #define SPORELAUNCHER_DEFAULT_GIVE 5
 #define SHOCKRIFLE_DEFAULT_GIVE 10
@@ -407,6 +406,9 @@ public:
 	// hle time creep vars
 	float m_flPrevPrimaryAttack;
 	float m_flLastFireTime;
+
+	// TFC
+	int m_iWeaponState;
 };
 
 
