@@ -66,6 +66,16 @@ int g_fGruntQuestion; // true if an idle grunt asked a question. Cleared when so
 #define HEAD_COMMANDER 1
 #define HEAD_SHOTGUN 2
 #define HEAD_M203 3
+#define HEAD_HELM_BAC 4
+#define HEAD_GRUNT_GOGHELM 5
+#define HEAD_GRUNT_NOMASK 6
+#define HEAD_GRUNT_NOMASK_GOGHELM 7
+#define HEAD_SNIPER 8
+#define HEAD_SNIPER2 9
+#define HEAD_SHOTGUN2 10
+
+#define HEAD_NONE 11
+
 #define GUN_GROUP 2
 #define GUN_MP5 0
 #define GUN_SHOTGUN 1
@@ -605,7 +615,7 @@ void CHGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir,
 	if (ptr->iHitgroup == 11)
 	{
 		// make sure we're wearing one
-		if (GetBodygroup(1) == HEAD_GRUNT && (bitsDamageType & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)) != 0)
+		if ((GetBodygroup(HEAD_GROUP) == HEAD_GRUNT || (GetBodygroup(HEAD_GROUP) >= HEAD_HELM_BAC && GetBodygroup(HEAD_GROUP) <= HEAD_GRUNT_NOMASK_GOGHELM)) && (bitsDamageType & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)) != 0)
 		{
 			// absorb damage
 			flDamage -= 20;
@@ -1016,6 +1026,15 @@ void CHGrunt::Spawn()
 	}
 	else
 	{
+		switch (RANDOM_LONG(0, 4))
+		{
+			case 0: break; // default skin
+			case 1: SetBodygroup(HEAD_GROUP, HEAD_GRUNT_GOGHELM); break;
+			case 2: SetBodygroup(HEAD_GROUP, HEAD_GRUNT_NOMASK); break;
+			case 3: SetBodygroup(HEAD_GROUP, HEAD_GRUNT_NOMASK_GOGHELM); break;
+			case 4: SetBodygroup(HEAD_GROUP, HEAD_HELM_BAC); break;
+		}
+
 		m_cClipSize = GRUNT_CLIP_SIZE;
 	}
 	m_cAmmoLoaded = m_cClipSize;
@@ -1027,7 +1046,7 @@ void CHGrunt::Spawn()
 
 	if (FBitSet(pev->weapons, HGRUNT_SHOTGUN))
 	{
-		SetBodygroup(HEAD_GROUP, HEAD_SHOTGUN);
+		RANDOM_LONG(0, 1) == 1 ? SetBodygroup(HEAD_GROUP, HEAD_SHOTGUN) : SetBodygroup(HEAD_GROUP, HEAD_SHOTGUN2);
 	}
 	else if (FBitSet(pev->weapons, HGRUNT_GRENADELAUNCHER))
 	{
