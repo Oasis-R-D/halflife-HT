@@ -53,7 +53,6 @@ void CShotgun::Precache()
 
 	PRECACHE_SOUND("items/9mmclip1.wav");
 
-	PRECACHE_SOUND("weapons/sbarrel1.wav");		 // shotgun
 	PRECACHE_SOUND("weapons/dbarrel1.wav"); //shotgun
 	PRECACHE_SOUND("weapons/sbarrel1_msbg.wav"); //shotgun
 
@@ -132,16 +131,6 @@ void CShotgun::PrimaryAttack()
 	flags = 0;
 #endif
 
-	int team;
-	if (m_pPlayer->m_iTeamNum == CTFTeam::BlackMesa || m_pPlayer->m_iTeamNum == CTFTeam::None)
-	{
-		team = 0;
-	}
-	else
-	{
-		team = 1;
-	}
-
 	// player "shoot" animation
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
@@ -154,7 +143,7 @@ void CShotgun::PrimaryAttack()
 
 	vecDir = m_pPlayer->FireBulletsPlayer(6, vecSrc, vecAiming, VECTOR_CONE_DM_SHOTGUN, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usSingleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, (team == 0));
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usSingleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
 
 	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		// HEV suit - indicate out of ammo condition
@@ -195,30 +184,22 @@ void CShotgun::SecondaryAttack()
 		return;
 	}
 
-	if (m_pPlayer->m_iTeamNum == CTFTeam::BlackMesa || m_pPlayer->m_iTeamNum == CTFTeam::None)
+	// fire twice
+	if (pev->armorvalue == 1) // second shot
 	{
-		// fire twice
-		if (pev->armorvalue == 1) // second shot
-		{
-			pev->armorvalue = 0;
+		pev->armorvalue = 0;
 
-			m_flPumpTime = gpGlobals->time + 0.5;
+		m_flPumpTime = gpGlobals->time + 0.5;
 
-			m_flNextPrimaryAttack = GetNextAttackDelay(1.275);
-			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.575;
-		}
-		else // first shot
-		{
-			pev->armorvalue = 1;
-
-			m_flNextPrimaryAttack = GetNextAttackDelay(0.15);
-			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.125;
-		}
+		m_flNextPrimaryAttack = GetNextAttackDelay(1.275);
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.575;
 	}
-	else
+	else // first shot
 	{
+		pev->armorvalue = 1;
+
 		m_flNextPrimaryAttack = GetNextAttackDelay(0.15);
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.25;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.125;
 	}
 
 	m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
@@ -233,16 +214,6 @@ void CShotgun::SecondaryAttack()
 	flags = 0;
 #endif
 
-	int team;
-	if (m_pPlayer->m_iTeamNum == CTFTeam::BlackMesa || m_pPlayer->m_iTeamNum == CTFTeam::None)
-	{
-		team = 0;
-	}
-	else
-	{
-		team = 1;
-	}
-
 	// player "shoot" animation
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
@@ -255,7 +226,7 @@ void CShotgun::SecondaryAttack()
 
 	vecDir = m_pPlayer->FireBulletsPlayer(7, vecSrc, vecAiming, VECTOR_CONE_DM_SHOTGUN, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usDoubleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, (team == 0));
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usDoubleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
 
 	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		// HEV suit - indicate out of ammo condition
