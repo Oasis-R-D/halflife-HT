@@ -76,7 +76,6 @@ public:
 	void WeaponIdle() override;
 
 	void Shoot(double time);
-	void Shoot2();
 
 	void SecondaryAttack() override;
 
@@ -107,7 +106,6 @@ private:
 	CSniperLaser* m_pLaser;
 
 	unsigned short m_usSniper;
-	unsigned short m_usAG36;
 
 	bool m_bReloading;
 	float m_flReloadStart;

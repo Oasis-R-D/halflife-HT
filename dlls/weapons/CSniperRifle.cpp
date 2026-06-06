@@ -70,9 +70,6 @@ void CSniperRifle::Precache()
 	PRECACHE_SOUND("weapons/sniper_miss.wav");
 	PRECACHE_SOUND("weapons/sniper_bolt1.wav");
 	PRECACHE_SOUND("weapons/sniper_bolt2.wav");
-	PRECACHE_SOUND("weapons/g36_fire1.wav"); // H to the K
-	PRECACHE_SOUND("weapons/g36_fire2.wav"); // H to the K
-	PRECACHE_SOUND("weapons/g36_fire3.wav"); // H to the K
 
 	m_usSniper = PRECACHE_EVENT(1, "events/sniper.sc");
 }
@@ -165,19 +162,12 @@ void CSniperRifle::ItemPostFrame()
 	{
 		if ((m_pPlayer->pev->button & IN_ATTACK) != 0 && CanAttackSniper(m_flNextPrimaryAttack, gpGlobals->time, UseDecrement()))
 		{
-			if (m_pPlayer->m_iFOV == 0)
+			if (m_iClip > 0 && m_pPlayer->pev->waterlevel != WATERLEVEL_HEAD && FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 			{
-				Shoot2();
-			}
-			else
-			{
-				if (m_iClip > 0 && m_pPlayer->pev->waterlevel != WATERLEVEL_HEAD && FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-				{
-					SendWeaponAnim(TFCRIFLE_AIM);
-					m_flChargeTime = 0;
-					m_pPlayer->m_bInSniper = true;
-					return;
-				}
+				SendWeaponAnim(TFCRIFLE_AIM);
+				m_flChargeTime = 0;
+				m_pPlayer->m_bInSniper = true;
+				return;
 			}
 		}
 	}
@@ -278,84 +268,19 @@ void CSniperRifle::Shoot(double time)
 		8192, BULLET_PLAYER_SNIPER, 0, damage,
 		m_pPlayer->pev, m_pPlayer->random_seed);
 
-	PLAYBACK_EVENT_FULL(UTIL_DefaultPlaybackFlags(), m_pPlayer->edict(), m_usSniper, 0, g_vecZero, g_vecZero, vecShot.x, vecShot.y, m_iClip, m_pPlayer->m_rgAmmo[PrimaryAmmoIndex()], m_pPlayer->m_iFOV != 0, 0);
+	PLAYBACK_EVENT_FULL(UTIL_DefaultPlaybackFlags(),
+		m_pPlayer->edict(), m_usSniper, 0,
+		g_vecZero, g_vecZero,
+		vecShot.x, vecShot.y,
+		m_iClip, m_pPlayer->m_rgAmmo[PrimaryAmmoIndex()],
+		0, 0);
 
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
-}
-
-void CSniperRifle::Shoot2()
-{
-	// don't fire underwater
-	if (m_pPlayer->pev->waterlevel == 3)
-	{
-		PlayEmptySound();
-		m_flNextPrimaryAttack = 0.15;
-		return;
-	}
-
-	if (m_iClip <= 0)
-	{
-		PlayEmptySound();
-		m_flNextPrimaryAttack = 0.15;
-		return;
-	}
-
-	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
-	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
-
-	m_iClip--;
-
-	m_pPlayer->pev->effects = (int)(m_pPlayer->pev->effects) | EF_MUZZLEFLASH;
-
-	// player "shoot" animation
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecAiming = m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
-	Vector vecDir;
-
-#ifdef CLIENT_DLL
-	if (bIsMultiplayer())
-#else
-	if (g_pGameRules->IsMultiplayer())
-#endif
-	{
-		// optimized multiplayer. Widened to make it easier to hit a moving player
-		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, Vector(0.02618, 0.02618, 0.02618), 8192, BULLET_PLAYER_AG36, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
-	}
-	else
-	{
-		// single player spread
-		vecDir = m_pPlayer->FireBulletsPlayer(1, vecSrc, vecAiming, Vector(0.01745, 0.01745, 0.01745), 8192, BULLET_PLAYER_AG36, 2, 0, m_pPlayer->pev, m_pPlayer->random_seed);
-	}
-
-	int flags;
-#if defined(CLIENT_WEAPONS)
-	flags = UTIL_DefaultPlaybackFlags();
-#else
-	flags = 0;
-#endif
-
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usSniper, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, m_pPlayer->m_iFOV != 0, 0);
-
-	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
-		// HEV suit - indicate out of ammo condition
-		m_pPlayer->SetSuitUpdate("!HEV_AMO0", false, 0);
-
-	m_flNextPrimaryAttack = GetNextAttackDelay(0.1);
-
-	if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.1;
-
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10, 15);
 }
 
 void CSniperRifle::SecondaryAttack()
 {
-	if (m_flChargeTime != -1)
-		return;
-
 	EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/sniper_zoom.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 	ToggleZoom();
@@ -397,7 +322,7 @@ void CSniperRifle::Reload()
 		// PLACEHOLDER SINCE TFC HAS NO RELOADS
 		if (DefaultReload(SNIPERRIFLE_MAX_CLIP, TFCRIFLE_DRAW, 2))
 		{ // empty reload
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2.102;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 4.102;
 			m_flReloadStart = gpGlobals->time;
 			m_bReloading = true;
 		}
