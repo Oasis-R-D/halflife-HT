@@ -1822,7 +1822,6 @@ void EV_FireM249(event_args_t* args)
 	int iBody = args->iparam1;
 
 	const bool bAlternatingEject = args->bparam1 != 0;
-	bool team = args->bparam2;
 
 	Vector up, right, forward;
 
@@ -1853,33 +1852,26 @@ void EV_FireM249(event_args_t* args)
 
 	EV_EjectBrass(ShellOrigin, ShellVelocity, args->angles[1], iShell, TE_BOUNCE_SHELL);
 
+	gEngfuncs.pEventAPI->EV_PlaySound(
+		args->entindex,
+		args->origin, CHAN_WEAPON, "weapons/m60_fire.wav",
+		VOL_NORM, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 15));
+
 	Vector vecSrc;
 
 	EV_GetGunPosition(args, vecSrc, args->origin);
 
 	Vector vecAiming = forward;
-	
-	if (team == true)
-	{
-		gEngfuncs.pEventAPI->EV_PlaySound(args->entindex, args->origin, CHAN_WEAPON, "weapons/m60_fire.wav", VOL_NORM, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 15));
-		EV_HLDM_FireBullets(args->entindex, forward, right, up,	1, vecSrc, vecAiming, 8192.0, BULLET_PLAYER_M249, 0, nullptr, args->fparam1, args->fparam2);
-	}
-	else
-	{
-		switch (gEngfuncs.pfnRandomLong(0, 2))
-		{
-		case 0:
-			gEngfuncs.pEventAPI->EV_PlaySound(args->entindex, args->origin, CHAN_WEAPON, "hassault/hw_shoot1.wav", VOL_NORM, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 3));
-			break;
-		case 1:
-			gEngfuncs.pEventAPI->EV_PlaySound(args->entindex, args->origin, CHAN_WEAPON, "hassault/hw_shoot2.wav", VOL_NORM, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 3));
-			break;
-		case 2:
-			gEngfuncs.pEventAPI->EV_PlaySound(args->entindex, args->origin, CHAN_WEAPON, "hassault/hw_shoot3.wav", VOL_NORM, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 3));
-			break;
-		}
-		EV_HLDM_FireBullets(args->entindex, forward, right, up, 1, vecSrc, vecAiming, 8192.0, BULLET_MONSTER_12MM, 0, nullptr, args->fparam1, args->fparam2);
-	}
+
+	EV_HLDM_FireBullets(
+		args->entindex,
+		forward, right, up,
+		1,
+		vecSrc, vecAiming,
+		8192.0,
+		BULLET_PLAYER_M249,
+		0, nullptr,
+		args->fparam1, args->fparam2);
 }
 
 void EV_FireDisplacer(event_args_t* args)
