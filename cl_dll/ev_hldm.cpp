@@ -1926,7 +1926,7 @@ void EV_TFC_Assault_Fire( event_args_t *args )
 	Vector vecSpread;
 
 	idx = args->entindex;
-	shell = gEngfuncs.pEventAPI->EV_FindModelIndex( "models/shell.mdl" );
+	shell = gEngfuncs.pEventAPI->EV_FindModelIndex( "models/saw_shell.mdl" );
 	oddammo = args->bparam1;
 
 	VectorCopy( args->origin, origin );
@@ -1937,16 +1937,15 @@ void EV_TFC_Assault_Fire( event_args_t *args )
 	if ( EV_IsLocal( idx ) )
 	{
 		EV_MuzzleFlash();
+		V_PunchAxis(0, gEngfuncs.pfnRandomFloat(-2, 2));
+		V_PunchAxis(1, gEngfuncs.pfnRandomFloat(-1, 1));
 		gEngfuncs.pEventAPI->EV_WeaponAnimation( AC_FIRE, 2 );
 	}
 
 	//g_bACSpinning[idx - 1] = false;
 
-	if ( oddammo )
-	{
-		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 15.0f, -25.0f, 6.0f );
-		EV_EjectBrass( ShellOrigin, ShellVelocity, angles.y, shell, TE_BOUNCE_SHELL );
-	}
+	EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 15.0f, -25.0f, 6.0f );
+	EV_EjectBrass( ShellOrigin, ShellVelocity, angles.y, shell, TE_BOUNCE_SHELL );
 
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );
@@ -1956,7 +1955,16 @@ void EV_TFC_Assault_Fire( event_args_t *args )
 		vecSrc[i] = right[i] * 2.0f + up[i] * -4.0f + vecSrc[i];
 	}
 
-	EV_HLDM_FireBullets( idx, forward, right, up, 5, vecSrc, vecAiming, 8192.0f, BULLET_PLAYER_M249, 8, &tracerCount[idx - 1], 0.1, 0.1 );
+	// TO-DO: figure out why this fires one to the top right always
+	bool multiplayer = gEngfuncs.GetMaxClients() != 1;
+	if (multiplayer)
+	{
+		// EV_HLDM_FireBullets( idx, forward, right, up, 5, vecSrc, vecAiming, 8192.0f, BULLET_PLAYER_M249, 8, &tracerCount[idx - 1], 0.1, 0.1 );
+	}
+	else
+	{
+		// EV_HLDM_FireBullets( idx, forward, right, up, 2, vecSrc, vecAiming, 8192.0f, BULLET_PLAYER_M249, 4, &tracerCount[idx - 1], 0.1, 0.1 );
+	}
 }
 
 void EV_TFC_Assault_Spin( event_args_t *args )

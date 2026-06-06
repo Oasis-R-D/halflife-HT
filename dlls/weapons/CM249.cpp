@@ -43,7 +43,7 @@ void CM249::Precache()
 	PRECACHE_SOUND( "weapons/asscan2.wav" );
 	PRECACHE_SOUND( "weapons/asscan3.wav" );
 	PRECACHE_SOUND( "weapons/asscan4.wav" );
-	m_iShell =		PRECACHE_MODEL( "models/shell.mdl" );
+	m_iShell =		PRECACHE_MODEL( "models/saw_shell.mdl" );
 	m_usWindUp =	PRECACHE_EVENT( 1, "events/wpn/tf_acwu.sc" );
 	m_usWindDown =	PRECACHE_EVENT( 1, "events/wpn/tf_acwd.sc" );
 	m_usFire =		PRECACHE_EVENT( 1, "events/wpn/tf_acfire.sc" );
@@ -111,7 +111,7 @@ void CM249::Fire()
 	{
 		Vector p_vecSrc, p_VecDirShooting, p_vecSpread;
 
-		PLAYBACK_EVENT_FULL( FEV_NOTHOST | FEV_UPDATE, m_pPlayer->edict(), m_usFire, 0.0f, g_vecZero, g_vecZero, 0.0f, 0.0f, 0, 0, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] & 1, 0 );
+		PLAYBACK_EVENT_FULL( FEV_NOTHOST | FEV_UPDATE, m_pPlayer->edict(), m_usFire, 0.0f, g_vecZero, g_vecZero, 0.0f, 0.0f, 0, 0, 0, 0 );
 		m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 		m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
@@ -119,9 +119,12 @@ void CM249::Fire()
 		UTIL_MakeVectors( m_pPlayer->pev->v_angle );
 		p_vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_up * -4.0f + gpGlobals->v_right * 2.0f;
 		p_VecDirShooting = m_pPlayer->GetAutoaimVector( AUTOAIM_5DEGREES );
-		p_vecSpread = Vector( 0.1f, 0.1f, 0.0f );
+		p_vecSpread = Vector( 0.1, 0.1, 0.1 );
 		//m_pPlayer->FireBullets( 5, p_vecSrc, p_VecDirShooting, p_vecSpread, 8192.0f, BULLET_PLAYER_TF_ASSAULT, 8, 7, NULL );
-		m_pPlayer->FireBullets( 5, p_vecSrc, p_VecDirShooting, p_vecSpread, 8192.0f, BULLET_PLAYER_M249, 8, 7, NULL );
+		if (g_pGameRules->IsMultiplayer())
+			m_pPlayer->FireBullets( 5, p_vecSrc, p_VecDirShooting, p_vecSpread, 8192.0f, BULLET_PLAYER_M249, 8, 7, NULL );
+		else
+			m_pPlayer->FireBullets( 2, p_vecSrc, p_VecDirShooting, p_vecSpread, 8192.0f, BULLET_PLAYER_M249, 8, 7, NULL );
 		//DB_LogShots( 1 );
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 	}
