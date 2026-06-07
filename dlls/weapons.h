@@ -1378,8 +1378,6 @@ public:
 	void PrimaryAttack() override;
 	bool Deploy() override;
 	void WeaponIdle() override;
-	float m_flNextAnimTime;
-	int m_iShell;
 
 	bool UseDecrement() override
 	{

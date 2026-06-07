@@ -55,12 +55,12 @@ bool COrbStrike::GetItemInfo(ItemInfo* p)
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "power";
 	p->iMaxAmmo1 = SATCHEL_MAX_CARRY;
-	p->pszAmmo2 = nullptr;
-	p->iMaxAmmo2 = WEAPON_NOCLIP;
+	p->pszAmmo2 = 0;
+	p->iMaxAmmo2 = -1;
 	p->iMaxClip = WEAPON_NOCLIP;
 	p->iSlot = 4;
 	p->iPosition = 5;
-	p->iFlags = 0;
+	p->iFlags = ITEM_FLAG_LIMITINWORLD;
 	p->iId = m_iId = WEAPON_ORBITALSTRIKE;
 	p->iWeight = SATCHEL_WEIGHT;
 
