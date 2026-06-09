@@ -616,6 +616,7 @@ void EV_FireShotGunDouble(event_args_t* args)
 	VectorCopy(args->origin, origin);
 	VectorCopy(args->angles, angles);
 	VectorCopy(args->velocity, velocity);
+	int secondshot = args->bparam1;
 
 	AngleVectors(angles, forward, right, up);
 
@@ -625,7 +626,8 @@ void EV_FireShotGunDouble(event_args_t* args)
 	{
 		// Add muzzle flash to current weapon model
 		EV_MuzzleFlash();
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(SHOTGUN_FIRE, 0);
+		if (secondshot != true)
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(SHOTGUN_FIRE2, 0);
 
 		V_PunchAxis(0, -5.0);
 	}

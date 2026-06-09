@@ -48,11 +48,15 @@ void CShotgun::Precache()
 	PRECACHE_MODEL("models/v_shotgun.mdl");
 	PRECACHE_MODEL("models/w_shotgun.mdl");
 	PRECACHE_MODEL("models/p_shotgun.mdl");
+	PRECACHE_MODEL("models/v_mossberg.mdl");
+	// PRECACHE_MODEL("models/w_mossberg.mdl"); model pending
+	// PRECACHE_MODEL("models/p_mossberg.mdl"); model pending
 
 	m_iShell = PRECACHE_MODEL("models/shotgunshell.mdl"); // shotgun shell
 
 	PRECACHE_SOUND("items/9mmclip1.wav");
 
+	PRECACHE_SOUND("weapons/sbarrel1.wav");		 // shotgun
 	PRECACHE_SOUND("weapons/dbarrel1.wav"); //shotgun
 	PRECACHE_SOUND("weapons/sbarrel1_msbg.wav"); //shotgun
 
@@ -96,7 +100,7 @@ void CShotgun::IncrementAmmo(CBasePlayer* pPlayer)
 
 bool CShotgun::Deploy()
 {
-	return DefaultDeploy("models/v_shotgun.mdl", "models/p_shotgun.mdl", SHOTGUN_DRAW, "shotgun");
+	return DefaultDeploy("models/v_mossberg.mdl", "models/p_shotgun.mdl", SHOTGUN_DRAW, "shotgun");
 }
 
 void CShotgun::PrimaryAttack()
@@ -226,7 +230,7 @@ void CShotgun::SecondaryAttack()
 
 	vecDir = m_pPlayer->FireBulletsPlayer(7, vecSrc, vecAiming, VECTOR_CONE_DM_SHOTGUN, 2048, BULLET_PLAYER_BUCKSHOT, 0, 0, m_pPlayer->pev, m_pPlayer->random_seed);
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usDoubleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, 0, 0);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usDoubleFire, 0.0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, 0, 0, pev->armorvalue == 0, 0);
 
 	if (0 == m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		// HEV suit - indicate out of ammo condition

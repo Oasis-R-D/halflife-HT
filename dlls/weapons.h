@@ -800,7 +800,8 @@ enum shotgun_e
 	SHOTGUN_DRAW,
 	SHOTGUN_HOLSTER,
 	SHOTGUN_IDLE4,
-	SHOTGUN_IDLE_DEEP
+	SHOTGUN_IDLE_DEEP,
+	SHOTGUN_FIDGET
 };
 
 class CShotgun : public CBasePlayerWeapon
