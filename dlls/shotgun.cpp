@@ -346,7 +346,7 @@ void CShotgun::WeaponIdle()
 		else
 		{
 			int iAnim;
-			float flRand = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 0, 5);
+			float flRand = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 0, 2);
 			if (flRand <= 0.8)
 			{
 				iAnim = SHOTGUN_IDLE_DEEP;
@@ -357,7 +357,7 @@ void CShotgun::WeaponIdle()
 				iAnim = SHOTGUN_IDLE4;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.80;
 			}
-			else if (flRand <= 4.95)
+			else if (flRand <= 1.90)
 			{
 				iAnim = SHOTGUN_IDLE;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.03;
