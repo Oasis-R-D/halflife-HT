@@ -284,8 +284,8 @@ void CShotgun::Reload()
 
 		SendWeaponAnim(SHOTGUN_RELOAD);
 
-		m_flNextReload = UTIL_WeaponTimeBase() + 0.375;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.375;
+		m_flNextReload = UTIL_WeaponTimeBase() + 0.78;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.78;
 	}
 	else
 	{
@@ -338,7 +338,7 @@ void CShotgun::WeaponIdle()
 				SendWeaponAnim(SHOTGUN_PUMP);
 
 				// play cocking sound
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/scock1.wav", 1, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 0x1f));
+				// EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/scock1.wav", 1, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 0x1f));
 				m_fInSpecialReload = 0;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5;
 			}
@@ -346,21 +346,26 @@ void CShotgun::WeaponIdle()
 		else
 		{
 			int iAnim;
-			float flRand = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 0, 1);
+			float flRand = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 0, 5);
 			if (flRand <= 0.8)
 			{
 				iAnim = SHOTGUN_IDLE_DEEP;
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + (60.0 / 12.0); // * RANDOM_LONG(2, 5);
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 6.47; // * RANDOM_LONG(2, 5);
 			}
 			else if (flRand <= 0.95)
 			{
+				iAnim = SHOTGUN_IDLE4;
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.80;
+			}
+			else if (flRand <= 4.95)
+			{
 				iAnim = SHOTGUN_IDLE;
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + (20.0 / 9.0);
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.03;
 			}
 			else
 			{
-				iAnim = SHOTGUN_IDLE4;
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + (20.0 / 9.0);
+				iAnim = SHOTGUN_FIDGET;
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 7.53;
 			}
 			SendWeaponAnim(iAnim);
 		}
@@ -383,7 +388,7 @@ void CShotgun::ItemPostFrame()
 	if (0 != m_flPumpTime && m_flPumpTime < gpGlobals->time)
 	{
 		// play pumping sound
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/scock1.wav", 1, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 0x1f));
+		// EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/scock1.wav", 1, ATTN_NORM, 0, 95 + RANDOM_LONG(0, 0x1f));
 		m_flPumpTime = 0;
 	}
 
