@@ -183,6 +183,7 @@ public:
 	bool m_fThrowGrenade;
 	bool m_fStanding;
 	bool m_fFirstEncounter; // only put on the handsign show in the squad's first encounter.
+	bool m_gibbed;
 	int m_cClipSize;
 
 	int m_voicePitch;
@@ -252,6 +253,11 @@ enum HGRUNT_SENTENCE_TYPES
 //=========================================================
 void CHGrunt::SpeakSentence()
 {
+	if ((GetBodygroup(HEAD_GROUP) == HEAD_NONE) || m_gibbed == true)
+	{
+		return;
+	}
+
 	if (m_iSentence == HGRUNT_SENT_NONE)
 	{
 		// no sentence cued up.
@@ -284,6 +290,8 @@ int CHGrunt::IRelationship(CBaseEntity* pTarget)
 //=========================================================
 void CHGrunt::GibMonster()
 {
+	m_gibbed = true;
+
 	Vector vecGunPos;
 	Vector vecGunAngles;
 
@@ -628,6 +636,31 @@ void CHGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir,
 		// it's head shot anyways
 		ptr->iHitgroup = HITGROUP_HEAD;
 	}
+
+	if ((ptr->iHitgroup == 11 || ptr->iHitgroup == 1) && (bitsDamageType & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)) != 0)
+	{
+		if (flDamage >= pev->health * 1.5 && pev->health <= HGRUNT_LIMP_HEALTH && (GetBodygroup(HEAD_GROUP) != HEAD_NONE))
+		{
+			m_gibbed = true;
+			SetBodygroup(HEAD_GROUP, HEAD_NONE);
+			CGib::SpawnHeadGib(pev);
+			EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "common/bodysplat.wav", 1, ATTN_NORM, 0, 200);
+			UTIL_BloodDrips(pev->origin, UTIL_RandomBloodVector(), BloodColor(), 80);
+		}
+	}
+
+	//// shoddy fix to make gibbed grunts shut up
+	//if ((bitsDamageType & (DMG_ALWAYSGIB)) != 0)
+	//{
+	//	m_gibbed = true;
+	//}
+	//else if ((bitsDamageType & (DMG_BLAST | DMG_SONIC | DMG_CRUSH)) != 0)
+	//{
+	//	if (flDamage >= gSkillData.hgruntHealth)
+	//	{
+	//		m_gibbed = true;
+	//	}
+	//}
 	CSquadMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 }
 
@@ -1180,6 +1213,11 @@ void CHGrunt::RunTask(Task_t* pTask)
 //=========================================================
 void CHGrunt::PainSound()
 {
+	if ((GetBodygroup(HEAD_GROUP) == HEAD_NONE) || m_gibbed == true)
+	{
+		return;
+	}
+
 	if (gpGlobals->time > m_flNextPainTime)
 	{
 #if 0
@@ -1222,6 +1260,11 @@ void CHGrunt::PainSound()
 //=========================================================
 void CHGrunt::DeathSound()
 {
+	if ((GetBodygroup(HEAD_GROUP) == HEAD_NONE) || m_gibbed == true)
+	{
+		return;
+	}
+
 	switch (RANDOM_LONG(0, 2))
 	{
 	case 0:
