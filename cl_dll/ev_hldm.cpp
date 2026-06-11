@@ -616,7 +616,7 @@ void EV_FireShotGunDouble(event_args_t* args)
 	VectorCopy(args->origin, origin);
 	VectorCopy(args->angles, angles);
 	VectorCopy(args->velocity, velocity);
-	int secondshot = args->bparam1;
+	bool secondshot = args->bparam1;
 
 	AngleVectors(angles, forward, right, up);
 
@@ -728,13 +728,16 @@ void EV_FireMP5(event_args_t* args)
 
 	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
 
-	switch (gEngfuncs.pfnRandomLong(0, 1))
+	switch (gEngfuncs.pfnRandomLong(0, 2))
 	{
 	case 0:
 		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/hk5s1.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
 		break;
 	case 1:
 		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/hk5s2.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+		break;
+	case 2:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/hk5s3.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
 		break;
 	}
 
@@ -786,13 +789,16 @@ void EV_FireAG36(event_args_t* args)
 
 	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
 
-	switch (gEngfuncs.pfnRandomLong(0, 1))
+	switch (gEngfuncs.pfnRandomLong(0, 2))
 	{
 	case 0:
 		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/g36_fire1.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
 		break;
 	case 1:
 		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/g36_fire2.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+		break;
+	case 2:
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/g36_fire3.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
 		break;
 	}
 
@@ -2108,6 +2114,7 @@ void EV_SniperRifle(event_args_t* args)
 	const int idx = args->entindex;
 	Vector vecOrigin = args->origin;
 	Vector vecAngles = args->angles;
+	bool sniper = args->bparam1;
 
 	const int iClip = args->iparam1;
 
@@ -2118,14 +2125,32 @@ void EV_SniperRifle(event_args_t* args)
 	if (EV_IsLocal(idx))
 	{
 		EV_MuzzleFlash();
-		//gEngfuncs.pEventAPI->EV_WeaponAnimation(iClip <= 0 ? SNIPERRIFLE_FIRELASTROUND : SNIPERRIFLE_FIRE, 0);
+		// gEngfuncs.pEventAPI->EV_WeaponAnimation(iClip <= 0 ? SNIPERRIFLE_FIRELASTROUND : SNIPERRIFLE_FIRE, 0);
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(TFCRIFLE_FIRE, 0);
 		V_PunchAxis(0, -2.0);
+		if (sniper == false)
+			V_PunchAxis(1, gEngfuncs.pfnRandomFloat(-2, 2));
 	}
 
-	gEngfuncs.pEventAPI->EV_PlaySound(idx, vecOrigin,
-		CHAN_WEAPON, "weapons/sniper_fire.wav",
-		gEngfuncs.pfnRandomFloat(0.9f, 1.0f), ATTN_NORM, 0, 98 + gEngfuncs.pfnRandomLong(0, 3));
+	if (sniper == true)
+	{
+		gEngfuncs.pEventAPI->EV_PlaySound(idx, vecOrigin, CHAN_WEAPON, "weapons/sniper_fire.wav", gEngfuncs.pfnRandomFloat(0.9f, 1.0f), ATTN_NORM, 0, 98 + gEngfuncs.pfnRandomLong(0, 3));
+	}
+	else
+	{
+		switch (gEngfuncs.pfnRandomLong(0, 2))
+		{
+		case 0:
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, vecOrigin, CHAN_WEAPON, "weapons/g36_fire1.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+			break;
+		case 1:
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, vecOrigin, CHAN_WEAPON, "weapons/g36_fire2.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+			break;
+		case 2:
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, vecOrigin, CHAN_WEAPON, "weapons/g36_fire3.wav", 1, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
+			break;
+		}
+	}
 
 	Vector vecSrc;
 	Vector vecAiming = forward;
