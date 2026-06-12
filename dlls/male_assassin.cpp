@@ -86,7 +86,8 @@ enum MAssassinHead
 	Random = -1,
 	White = 0,
 	Black,
-	ThermalVision
+	ThermalVision,
+	None
 };
 }
 
@@ -669,11 +670,13 @@ void CMOFAssassin::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector ve
 
 void CMOFAssassin::GibHead()
 {
+	Vector vecBloodPos, vecBloodAngles;
+	GetAttachment(2, vecBloodPos, vecBloodAngles);
 	m_decapitated = true;
-	// SetBodygroup(HEAD_GROUP, HEAD_NONE);
+	SetBodygroup(MAssassinBodygroup::Heads, MAssassinHead::None);
 	CGib::SpawnHeadGib(pev);
 	EMIT_SOUND(ENT(pev), CHAN_BODY, "common/bodysplat.wav", 1, ATTN_NORM);
-	UTIL_BloodDrips(pev->origin, UTIL_RandomBloodVector(), BloodColor(), 80);
+	UTIL_BloodDrips(vecBloodPos, UTIL_RandomBloodVector(), BloodColor(), 150);
 }
 
 //=========================================================

@@ -649,11 +649,13 @@ void CHGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir,
 
 void CHGrunt::GibHead()
 {
+	Vector vecBloodPos, vecBloodAngles;
+	GetAttachment(2, vecBloodPos, vecBloodAngles);
 	m_decapitated = true;
 	SetBodygroup(HEAD_GROUP, HEAD_NONE);
 	CGib::SpawnHeadGib(pev);
 	EMIT_SOUND(ENT(pev), CHAN_BODY, "common/bodysplat.wav", 1, ATTN_NORM);
-	UTIL_BloodDrips(pev->origin, UTIL_RandomBloodVector(), BloodColor(), 80);
+	UTIL_BloodDrips(vecBloodPos, UTIL_RandomBloodVector(), BloodColor(), 150);
 }
 
 //=========================================================
