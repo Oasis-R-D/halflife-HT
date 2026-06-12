@@ -665,7 +665,7 @@ bool CHGrunt::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float 
 {
 	Forget(bits_MEMORY_INCOVER);
 
-	if ((flDamage >= pev->health) && (GetBodygroup(HEAD_GROUP) != HEAD_NONE) && m_headshot == true)
+	if ((flDamage >= pev->health) && m_decapitated != true && m_headshot == true)
 	{
 		GibHead();
 	}

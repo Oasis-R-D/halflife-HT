@@ -169,6 +169,7 @@ public:
 	void PrescheduleThink() override;
 	void GibMonster(bool headless) override;
 	void SpeakSentence();
+	void GibHead();
 
 	bool Save(CSave& save) override;
 	bool Restore(CRestore& restore) override;
@@ -214,6 +215,8 @@ public:
 	int m_iSentence;
 
 	int m_iAssassinHead;
+	bool m_decapitated;
+	bool m_headshot;
 
 	int m_iTargetRanderamt;
 
@@ -649,15 +652,29 @@ bool CMOFAssassin::CheckRangeAttack2(float flDot, float flDist)
 void CMOFAssassin::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
 {
 	// check for helmet shot
-	if (ptr->iHitgroup == 11)
+	if (ptr->iHitgroup == 11 || ptr->iHitgroup == 1)
 	{
 		// it's head shot anyways
 		ptr->iHitgroup = HITGROUP_HEAD;
 	}
 
+	if ((ptr->iHitgroup == 11 || ptr->iHitgroup == 1) && (bitsDamageType & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)) != 0 && cangib == true)
+	{
+		AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
+		m_headshot = true;
+	}
+
 	CSquadMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
 }
 
+void CMOFAssassin::GibHead()
+{
+	m_decapitated = true;
+	// SetBodygroup(HEAD_GROUP, HEAD_NONE);
+	CGib::SpawnHeadGib(pev);
+	EMIT_SOUND(ENT(pev), CHAN_BODY, "common/bodysplat.wav", 1, ATTN_NORM);
+	UTIL_BloodDrips(pev->origin, UTIL_RandomBloodVector(), BloodColor(), 80);
+}
 
 //=========================================================
 // TakeDamage - overridden for the grunt because the grunt
@@ -667,6 +684,15 @@ void CMOFAssassin::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector ve
 bool CMOFAssassin::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
 	Forget(bits_MEMORY_INCOVER);
+
+	//if ((flDamage >= pev->health) && (GetBodygroup(HEAD_GROUP) != HEAD_NONE) && m_headshot == true)
+
+	if ((flDamage >= pev->health) && m_decapitated != true && m_headshot == true)
+	{
+		GibHead();
+	}
+
+	m_headshot = false;
 
 	return CSquadMonster::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
@@ -1041,6 +1067,8 @@ void CMOFAssassin::Precache()
 	PRECACHE_SOUND("weapons/glauncher.wav");
 
 	PRECACHE_SOUND("weapons/sbarrel1.wav");
+
+	PRECACHE_SOUND("debris/beamstart1.wav");
 
 	PRECACHE_SOUND("zombie/claw_miss2.wav"); // because we use the basemonster SWIPE animation event
 
