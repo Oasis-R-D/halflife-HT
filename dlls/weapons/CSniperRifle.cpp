@@ -356,6 +356,9 @@ void CSniperRifle::Shoot2()
 
 void CSniperRifle::SecondaryAttack()
 {
+	if (m_flChargeTime != -1)
+		return;
+
 	EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/sniper_zoom.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 	ToggleZoom();

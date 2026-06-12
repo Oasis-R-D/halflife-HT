@@ -2115,12 +2115,21 @@ void EV_SniperRifle(event_args_t* args)
 	Vector vecOrigin = args->origin;
 	Vector vecAngles = args->angles;
 	bool sniper = args->bparam1;
+	Vector origin;
+	Vector angles;
+	Vector velocity;
+
+	Vector ShellVelocity;
+	Vector ShellOrigin;
+	int shell;
 
 	const int iClip = args->iparam1;
 
 	Vector up, right, forward;
 
 	AngleVectors(vecAngles, forward, right, up);
+
+	shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/saw_shell.mdl"); // brass shell
 
 	if (EV_IsLocal(idx))
 	{
@@ -2131,6 +2140,14 @@ void EV_SniperRifle(event_args_t* args)
 		if (sniper == false)
 			V_PunchAxis(1, gEngfuncs.pfnRandomFloat(-2, 2));
 	}
+
+	//EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 8, -16, 4);
+
+	//EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], shell, TE_BOUNCE_SHELL);
+
+	EV_GetDefaultShellInfo(args, vecOrigin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 8, -16, 4);
+
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles.y, shell, TE_BOUNCE_SHELL);
 
 	if (sniper == true)
 	{
