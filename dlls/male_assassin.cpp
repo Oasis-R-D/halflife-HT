@@ -215,6 +215,8 @@ public:
 
 	int m_iAssassinHead;
 
+	int m_iTargetRanderamt;
+
 	static const char* pGruntSentences[];
 };
 
@@ -1108,6 +1110,30 @@ void CMOFAssassin::StartTask(Task_t* pTask)
 //=========================================================
 void CMOFAssassin::RunTask(Task_t* pTask)
 {
+	// always visible if moving
+	// always visible is not on hard
+	if (g_iSkillLevel != SKILL_HARD || m_hEnemy == NULL || pev->deadflag != DEAD_NO || m_Activity == ACT_RUN || m_Activity == ACT_WALK || (pev->flags & FL_ONGROUND) == 0)
+		m_iTargetRanderamt = 255;
+	else
+		m_iTargetRanderamt = 20;
+
+	if (pev->renderamt > m_iTargetRanderamt)
+	{
+		if (pev->renderamt == 255)
+		{
+			EMIT_SOUND(ENT(pev), CHAN_BODY, "debris/beamstart1.wav", 0.2, ATTN_NORM);
+		}
+
+		pev->renderamt = V_max(pev->renderamt - 50, m_iTargetRanderamt);
+		pev->rendermode = kRenderTransTexture;
+	}
+	else if (pev->renderamt < m_iTargetRanderamt)
+	{
+		pev->renderamt = V_min(pev->renderamt + 50, m_iTargetRanderamt);
+		if (pev->renderamt == 255)
+			pev->rendermode = kRenderNormal;
+	}
+
 	switch (pTask->iTask)
 	{
 	case TASK_MASSASSIN_FACE_TOSS_DIR:
