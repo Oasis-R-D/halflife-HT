@@ -562,7 +562,7 @@ public:
 	int BloodColor() override { return BLOOD_COLOR_GREEN; }
 
 	//Don't gib ever
-	void GibMonster() override {}
+	void GibMonster(bool headless) override {}
 
 	void SetObjectCollisionBox() override
 	{

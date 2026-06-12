@@ -34,7 +34,7 @@ class CApache : public CBaseMonster
 	int Classify() override { return CLASS_HUMAN_MILITARY; }
 	int BloodColor() override { return DONT_BLEED; }
 	void Killed(entvars_t* pevAttacker, int iGib) override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 
 	void SetObjectCollisionBox() override
 	{
@@ -439,7 +439,7 @@ void CApache::CrashTouch(CBaseEntity* pOther)
 
 
 
-void CApache::GibMonster()
+void CApache::GibMonster(bool headless)
 {
 	// EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "common/bodysplat.wav", 0.75, ATTN_NORM, 0, 200);
 }

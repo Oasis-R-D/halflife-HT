@@ -167,7 +167,7 @@ public:
 	Vector GetGunPosition() override;
 	void Shoot();
 	void PrescheduleThink() override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 	void SpeakSentence();
 
 	bool Save(CSave& save) override;
@@ -309,7 +309,7 @@ int CMOFAssassin::IRelationship(CBaseEntity* pTarget)
 //=========================================================
 // GibMonster - make gun fly through the air.
 //=========================================================
-void CMOFAssassin::GibMonster()
+void CMOFAssassin::GibMonster(bool headless)
 {
 	Vector vecGunPos;
 	Vector vecGunAngles;
@@ -344,7 +344,7 @@ void CMOFAssassin::GibMonster()
 		}
 	}
 
-	CBaseMonster::GibMonster();
+	CBaseMonster::GibMonster(false);
 }
 
 //=========================================================

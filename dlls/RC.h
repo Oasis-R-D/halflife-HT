@@ -36,7 +36,7 @@ public:
 	int Classify() override;
 
 	int BloodColor() override { return DONT_BLEED; } // don't bleed
-	void GibMonster() override {} // don't gib
+	void GibMonster(bool headless) override {}		 // don't gib
 
 	void EXPORT Impact(CBaseEntity* pOther);
 	//int ShouldCollide(CBaseEntity* pentTouched) override;

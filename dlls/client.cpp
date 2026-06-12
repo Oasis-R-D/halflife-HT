@@ -1229,6 +1229,9 @@ void ClientPrecache()
 	PRECACHE_SOUND("common/npc_step3.wav");
 	PRECACHE_SOUND("common/npc_step4.wav");
 
+	PRECACHE_SOUND("common/npc_scuff1.wav"); // NPC scuff
+	PRECACHE_SOUND("common/npc_scuff2.wav");
+
 	PRECACHE_SOUND("player/pl_metal1.wav"); // walk on metal
 	PRECACHE_SOUND("player/pl_metal2.wav");
 	PRECACHE_SOUND("player/pl_metal3.wav");

@@ -41,7 +41,7 @@ class CSqueakGrenade : public CGrenade
 	void EXPORT HuntThink();
 	int BloodColor() override { return BLOOD_COLOR_YELLOW; }
 	void Killed(entvars_t* pevAttacker, int iGib) override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 
 	bool Save(CSave& save) override;
 	bool Restore(CRestore& restore) override;
@@ -180,7 +180,7 @@ void CSqueakGrenade::Killed(entvars_t* pevAttacker, int iGib)
 	CBaseMonster::Killed(pevAttacker, GIB_ALWAYS);
 }
 
-void CSqueakGrenade::GibMonster()
+void CSqueakGrenade::GibMonster(bool headless)
 {
 	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "common/bodysplat.wav", 0.75, ATTN_NORM, 0, 200);
 }

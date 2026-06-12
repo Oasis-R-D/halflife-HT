@@ -64,7 +64,7 @@ public:
 	int Classify() override;
 
 	int BloodColor() override { return DONT_BLEED; }
-	void GibMonster() override {} // UNDONE: Throw turret gibs?
+	void GibMonster(bool headless) override {} // UNDONE: Throw turret gibs?
 
 	// Think functions
 

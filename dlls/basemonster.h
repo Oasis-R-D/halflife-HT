@@ -307,7 +307,7 @@ public:
 	virtual Activity GetDeathActivity();
 	Activity GetSmallFlinchActivity();
 	void Killed(entvars_t* pevAttacker, int iGib) override;
-	virtual void GibMonster();
+	virtual void GibMonster(bool headless);
 	bool ShouldGibMonster(int iGib);
 	void CallGibMonster();
 	virtual bool HasHumanGibs();

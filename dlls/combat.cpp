@@ -324,7 +324,7 @@ void CBaseMonster::FadeMonster()
 // GibMonster - create some gore and get rid of a monster's
 // model.
 //=========================================================
-void CBaseMonster::GibMonster()
+void CBaseMonster::GibMonster(bool headless)
 {
 	TraceResult tr;
 	bool gibbed = false;
@@ -336,7 +336,10 @@ void CBaseMonster::GibMonster()
 	{
 		if (CVAR_GET_FLOAT("violence_hgibs") != 0) // Only the player will ever get here
 		{
-			CGib::SpawnHeadGib(pev);
+			if (headless == false)
+			{
+				CGib::SpawnHeadGib(pev);
+			}
 			CGib::SpawnRandomGibs(pev, 4, true); // throw some human gibs.
 		}
 		gibbed = true;
@@ -590,7 +593,7 @@ void CBaseMonster::CallGibMonster()
 	else
 	{
 		pev->effects = EF_NODRAW; // make the model invisible.
-		GibMonster();
+		GibMonster(false);
 	}
 
 	pev->deadflag = DEAD_DEAD;

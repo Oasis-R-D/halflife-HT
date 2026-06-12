@@ -165,7 +165,7 @@ public:
 	Vector GetGunPosition() override;
 	void Shoot();
 	void PrescheduleThink() override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 	void SpeakSentence();
 
 	bool Save(CSave& save) override;
@@ -319,7 +319,7 @@ void COFTorchAlly::SpeakSentence()
 //=========================================================
 // GibMonster - make gun fly through the air.
 //=========================================================
-void COFTorchAlly::GibMonster()
+void COFTorchAlly::GibMonster(bool headless)
 {
 	if (m_hWaitMedic)
 	{
@@ -357,7 +357,7 @@ void COFTorchAlly::GibMonster()
 		m_pTorchBeam = nullptr;
 	}
 
-	COFSquadTalkMonster::GibMonster();
+	COFSquadTalkMonster::GibMonster(false);
 }
 
 //=========================================================

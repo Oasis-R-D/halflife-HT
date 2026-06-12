@@ -80,7 +80,7 @@ public:
 	int ObjectCaps() override { return 0; }
 
 	//Don't gib ever
-	void GibMonster() override {}
+	void GibMonster(bool headless) override {}
 
 	void SetObjectCollisionBox() override
 	{

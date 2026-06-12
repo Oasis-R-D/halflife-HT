@@ -36,7 +36,7 @@ public:
 	int Classify() override { return CLASS_ALIEN_MILITARY; }
 	int BloodColor() override { return BLOOD_COLOR_YELLOW; }
 	void Killed(entvars_t* pevAttacker, int iGib) override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 
 	void SetObjectCollisionBox() override
 	{
@@ -557,7 +557,7 @@ void CNihilanth::CrashTouch(CBaseEntity* pOther)
 
 
 
-void CNihilanth::GibMonster()
+void CNihilanth::GibMonster(bool headless)
 {
 	// EMIT_SOUND_DYN(edict(), CHAN_VOICE, "common/bodysplat.wav", 0.75, ATTN_NORM, 0, 200);
 }

@@ -365,7 +365,7 @@ public:
 
 	virtual void DeathGibThink();
 
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 
 	void Killed(entvars_t* pevAttacker, int iGib) override;
 
@@ -1295,7 +1295,7 @@ void COFVoltigore::DeathGibThink()
 
 	if (m_fSequenceFinished)
 	{
-		GibMonster();
+		GibMonster(false);
 	}
 	else
 	{
@@ -1379,7 +1379,7 @@ const GibLimit VoltigoreGibLimits[] =
 
 const GibData VoltigoreGibs = {"models/vgibs.mdl", 0, 9, VoltigoreGibLimits};
 
-void COFVoltigore::GibMonster()
+void COFVoltigore::GibMonster(bool headless)
 {
 	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat.wav", 1, ATTN_NORM);
 

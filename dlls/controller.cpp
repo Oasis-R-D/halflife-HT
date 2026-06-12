@@ -87,7 +87,7 @@ public:
 
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 	void Killed(entvars_t* pevAttacker, int iGib) override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 
 	CSprite* m_pBall[2];   // hand balls
 	int m_iBall[2];		   // how bright it should be
@@ -213,7 +213,7 @@ void CController::Killed(entvars_t* pevAttacker, int iGib)
 }
 
 
-void CController::GibMonster()
+void CController::GibMonster(bool headless)
 {
 	// delete balls
 	if (m_pBall[0])
@@ -226,7 +226,7 @@ void CController::GibMonster()
 		UTIL_Remove(m_pBall[1]);
 		m_pBall[1] = NULL;
 	}
-	CSquadMonster::GibMonster();
+	CSquadMonster::GibMonster(false);
 }
 
 

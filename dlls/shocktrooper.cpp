@@ -147,7 +147,7 @@ public:
 	Vector GetGunPosition() override;
 	void Shoot();
 	void PrescheduleThink() override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 	void SpeakSentence();
 
 	bool Save(CSave& save) override;
@@ -289,7 +289,7 @@ const GibData ShockTrooperGibs = {"models/strooper_gibs.mdl", 0, 8};
 //=========================================================
 // GibMonster - make gun fly through the air.
 //=========================================================
-void CShockTrooper::GibMonster()
+void CShockTrooper::GibMonster(bool headless)
 {
 	Vector vecGunPos;
 	Vector vecGunAngles;

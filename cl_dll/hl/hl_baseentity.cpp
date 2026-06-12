@@ -210,7 +210,7 @@ bool CBaseMonster::ShouldFadeOnDeath() { return false; }
 void CBaseMonster::RadiusDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int iClassIgnore, int bitsDamageType) {}
 void CBaseMonster::RadiusDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int iClassIgnore, int bitsDamageType) {}
 void CBaseMonster::FadeMonster() {}
-void CBaseMonster::GibMonster() {}
+void CBaseMonster::GibMonster(bool headless) {}
 bool CBaseMonster::HasHumanGibs() { return false; }
 bool CBaseMonster::HasAlienGibs() { return false; }
 Activity CBaseMonster::GetDeathActivity() { return ACT_DIE_HEADSHOT; }

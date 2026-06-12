@@ -178,7 +178,7 @@ public:
 	Vector GetGunPosition() override;
 	void Shoot();
 	void PrescheduleThink() override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 	void SpeakSentence();
 
 	bool Save(CSave& save) override;
@@ -362,7 +362,7 @@ void COFMedicAlly::SpeakSentence()
 //=========================================================
 // GibMonster - make gun fly through the air.
 //=========================================================
-void COFMedicAlly::GibMonster()
+void COFMedicAlly::GibMonster(bool headless)
 {
 	Vector vecGunPos;
 	Vector vecGunAngles;
@@ -395,7 +395,7 @@ void COFMedicAlly::GibMonster()
 		SetBodygroup(MedicAllyBodygroup::Weapons, MedicAllyWeapon::None);
 	}
 
-	COFSquadTalkMonster::GibMonster();
+	COFSquadTalkMonster::GibMonster(false);
 }
 
 //=========================================================

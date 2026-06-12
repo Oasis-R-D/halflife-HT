@@ -252,7 +252,7 @@ public:
 	int IgnoreConditions() override;
 
 	void CheckAmmo() override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 	bool KeyValue(KeyValueData* pkvd) override;
 
 	bool Save(CSave& save) override;
@@ -1195,7 +1195,7 @@ void CPitdrone::CheckAmmo()
 
 const GibData PitDroneGibs = {"models/pit_drone_gibs.mdl", 0, 7};
 
-void CPitdrone::GibMonster()
+void CPitdrone::GibMonster(bool headless)
 {
 	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/bodysplat.wav", 1, ATTN_NORM);
 

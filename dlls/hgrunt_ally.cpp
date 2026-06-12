@@ -194,7 +194,7 @@ public:
 	void Shoot();
 	void Shotgun();
 	void PrescheduleThink() override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 	void SpeakSentence();
 
 	bool Save(CSave& save) override;
@@ -338,7 +338,7 @@ void CHGruntAlly::SpeakSentence()
 //=========================================================
 // GibMonster - make gun fly through the air.
 //=========================================================
-void CHGruntAlly::GibMonster()
+void CHGruntAlly::GibMonster(bool headless)
 {
 	if (m_hWaitMedic)
 	{
@@ -389,7 +389,7 @@ void CHGruntAlly::GibMonster()
 		m_iWeaponIdx = HGruntAllyWeapon::None;
 	}
 
-	CBaseMonster::GibMonster();
+	CBaseMonster::GibMonster(false);
 }
 
 //=========================================================

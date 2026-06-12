@@ -144,7 +144,7 @@ public:
 	void Shoot();
 	void Shotgun();
 	void PrescheduleThink() override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 	void SpeakSentence();
 
 	bool Save(CSave& save) override;
@@ -278,7 +278,7 @@ int CHFGrunt::IRelationship(CBaseEntity* pTarget)
 //=========================================================
 // GibMonster - make gun fly through the air.
 //=========================================================
-void CHFGrunt::GibMonster()
+void CHFGrunt::GibMonster(bool headless)
 {
 	Vector vecGunPos;
 	Vector vecGunAngles;
@@ -313,7 +313,7 @@ void CHFGrunt::GibMonster()
 		}
 	}
 
-	CBaseMonster::GibMonster();
+	CBaseMonster::GibMonster(false);
 }
 
 //=========================================================

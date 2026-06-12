@@ -152,8 +152,9 @@ public:
 	void Shoot();
 	void Shotgun();
 	void PrescheduleThink() override;
-	void GibMonster() override;
+	void GibMonster(bool headless) override;
 	void SpeakSentence();
+	void GibHead();
 
 	bool Save(CSave& save) override;
 	bool Restore(CRestore& restore) override;
@@ -212,6 +213,7 @@ TYPEDESCRIPTION CHGrunt::m_SaveData[] =
 		//  DEFINE_FIELD( CShotgun, m_iBrassShell, FIELD_INTEGER ),
 		//  DEFINE_FIELD( CShotgun, m_iShotgunShell, FIELD_INTEGER ),
 		DEFINE_FIELD(CHGrunt, m_iSentence, FIELD_INTEGER),
+		DEFINE_FIELD(CHGrunt, m_gibbed, FIELD_BOOLEAN),
 };
 
 IMPLEMENT_SAVERESTORE(CHGrunt, CSquadMonster);
@@ -288,10 +290,8 @@ int CHGrunt::IRelationship(CBaseEntity* pTarget)
 //=========================================================
 // GibMonster - make gun fly through the air.
 //=========================================================
-void CHGrunt::GibMonster()
+void CHGrunt::GibMonster(bool headless)
 {
-	m_gibbed = true;
-
 	Vector vecGunPos;
 	Vector vecGunAngles;
 
@@ -325,7 +325,7 @@ void CHGrunt::GibMonster()
 		}
 	}
 
-	CBaseMonster::GibMonster();
+	CBaseMonster::GibMonster(m_gibbed != false);
 }
 
 //=========================================================
@@ -639,31 +639,24 @@ void CHGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir,
 
 	if ((ptr->iHitgroup == 11 || ptr->iHitgroup == 1) && (bitsDamageType & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)) != 0)
 	{
-		if (flDamage >= pev->health * 1.5 && pev->health <= HGRUNT_LIMP_HEALTH && (GetBodygroup(HEAD_GROUP) != HEAD_NONE))
+		if (flDamage >= pev->health * 2 && (GetBodygroup(HEAD_GROUP) != HEAD_NONE))
 		{
-			m_gibbed = true;
-			SetBodygroup(HEAD_GROUP, HEAD_NONE);
-			CGib::SpawnHeadGib(pev);
-			EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "common/bodysplat.wav", 1, ATTN_NORM, 0, 200);
-			UTIL_BloodDrips(pev->origin, UTIL_RandomBloodVector(), BloodColor(), 80);
+			GibHead();
+			AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
 		}
 	}
 
-	//// shoddy fix to make gibbed grunts shut up
-	//if ((bitsDamageType & (DMG_ALWAYSGIB)) != 0)
-	//{
-	//	m_gibbed = true;
-	//}
-	//else if ((bitsDamageType & (DMG_BLAST | DMG_SONIC | DMG_CRUSH)) != 0)
-	//{
-	//	if (flDamage >= gSkillData.hgruntHealth)
-	//	{
-	//		m_gibbed = true;
-	//	}
-	//}
 	CSquadMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 }
 
+void CHGrunt::GibHead()
+{
+	m_gibbed = true;
+	SetBodygroup(HEAD_GROUP, HEAD_NONE);
+	CGib::SpawnHeadGib(pev);
+	EMIT_SOUND(ENT(pev), CHAN_BODY, "common/bodysplat.wav", 1, ATTN_NORM);
+	UTIL_BloodDrips(pev->origin, UTIL_RandomBloodVector(), BloodColor(), 80);
+}
 
 //=========================================================
 // TakeDamage - overridden for the grunt because the grunt
