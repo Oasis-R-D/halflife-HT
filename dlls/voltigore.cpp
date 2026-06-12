@@ -354,7 +354,7 @@ public:
 	void RunTask(Task_t* pTask) override;
 	void AlertSound() override;
 	void PainSound() override;
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
 	int IRelationship(CBaseEntity* pTarget) override;
 	void StopTalking();
 	bool ShouldSpeak();
@@ -470,7 +470,7 @@ int COFVoltigore::ISoundMask()
 //=========================================================
 // TraceAttack
 //=========================================================
-void COFVoltigore::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+void COFVoltigore::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
 {
 	//Ignore shock damage since we have a shock based attack
 	//TODO: use a filter based on attacker to identify self harm

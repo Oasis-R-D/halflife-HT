@@ -162,7 +162,7 @@ public:
 	CBaseEntity* Kick();
 	Schedule_t* GetSchedule() override;
 	Schedule_t* GetScheduleOfType(int Type) override;
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
 	int IRelationship(CBaseEntity* pTarget) override;
@@ -184,7 +184,8 @@ public:
 	bool m_fThrowGrenade;
 	bool m_fStanding;
 	bool m_fFirstEncounter; // only put on the handsign show in the squad's first encounter.
-	bool m_gibbed;
+	bool m_decapitated;
+	bool m_headshot;
 	int m_cClipSize;
 
 	int m_voicePitch;
@@ -213,7 +214,7 @@ TYPEDESCRIPTION CHGrunt::m_SaveData[] =
 		//  DEFINE_FIELD( CShotgun, m_iBrassShell, FIELD_INTEGER ),
 		//  DEFINE_FIELD( CShotgun, m_iShotgunShell, FIELD_INTEGER ),
 		DEFINE_FIELD(CHGrunt, m_iSentence, FIELD_INTEGER),
-		DEFINE_FIELD(CHGrunt, m_gibbed, FIELD_BOOLEAN),
+		DEFINE_FIELD(CHGrunt, m_decapitated, FIELD_BOOLEAN),
 };
 
 IMPLEMENT_SAVERESTORE(CHGrunt, CSquadMonster);
@@ -255,7 +256,7 @@ enum HGRUNT_SENTENCE_TYPES
 //=========================================================
 void CHGrunt::SpeakSentence()
 {
-	if ((GetBodygroup(HEAD_GROUP) == HEAD_NONE) || m_gibbed == true)
+	if ((GetBodygroup(HEAD_GROUP) == HEAD_NONE) || m_decapitated == true)
 	{
 		return;
 	}
@@ -325,7 +326,7 @@ void CHGrunt::GibMonster(bool headless)
 		}
 	}
 
-	CBaseMonster::GibMonster(m_gibbed != false);
+	CBaseMonster::GibMonster(m_decapitated != false);
 }
 
 //=========================================================
@@ -617,7 +618,7 @@ bool CHGrunt::CheckRangeAttack2(float flDot, float flDist)
 //=========================================================
 // TraceAttack - make sure we're not taking it in the helmet
 //=========================================================
-void CHGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+void CHGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
 {
 	// check for helmet shot
 	if (ptr->iHitgroup == 11)
@@ -637,21 +638,18 @@ void CHGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir,
 		ptr->iHitgroup = HITGROUP_HEAD;
 	}
 
-	if ((ptr->iHitgroup == 11 || ptr->iHitgroup == 1) && (bitsDamageType & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)) != 0)
+	if ((ptr->iHitgroup == 11 || ptr->iHitgroup == 1) && (bitsDamageType & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)) != 0 && cangib == true)
 	{
-		if (flDamage >= pev->health * 2 && (GetBodygroup(HEAD_GROUP) != HEAD_NONE))
-		{
-			GibHead();
-			AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
-		}
+		AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
+		m_headshot = true;
 	}
 
-	CSquadMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+	CSquadMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
 }
 
 void CHGrunt::GibHead()
 {
-	m_gibbed = true;
+	m_decapitated = true;
 	SetBodygroup(HEAD_GROUP, HEAD_NONE);
 	CGib::SpawnHeadGib(pev);
 	EMIT_SOUND(ENT(pev), CHAN_BODY, "common/bodysplat.wav", 1, ATTN_NORM);
@@ -666,6 +664,13 @@ void CHGrunt::GibHead()
 bool CHGrunt::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
 	Forget(bits_MEMORY_INCOVER);
+
+	if ((flDamage >= pev->health) && (GetBodygroup(HEAD_GROUP) != HEAD_NONE) && m_headshot == true)
+	{
+		GibHead();
+	}
+
+	m_headshot = false;
 
 	return CSquadMonster::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
@@ -1206,7 +1211,7 @@ void CHGrunt::RunTask(Task_t* pTask)
 //=========================================================
 void CHGrunt::PainSound()
 {
-	if ((GetBodygroup(HEAD_GROUP) == HEAD_NONE) || m_gibbed == true)
+	if ((GetBodygroup(HEAD_GROUP) == HEAD_NONE) || m_decapitated == true)
 	{
 		return;
 	}
@@ -1253,7 +1258,7 @@ void CHGrunt::PainSound()
 //=========================================================
 void CHGrunt::DeathSound()
 {
-	if ((GetBodygroup(HEAD_GROUP) == HEAD_NONE) || m_gibbed == true)
+	if ((GetBodygroup(HEAD_GROUP) == HEAD_NONE) || m_decapitated == true)
 	{
 		return;
 	}

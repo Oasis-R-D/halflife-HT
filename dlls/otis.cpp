@@ -100,7 +100,7 @@ public:
 
 	void TalkInit();
 
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
 	void Killed(entvars_t* pevAttacker, int iGib) override;
 
 	bool KeyValue(KeyValueData* pkvd) override;
@@ -625,7 +625,7 @@ void COtis::DeathSound()
 }
 
 
-void COtis::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+void COtis::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
 {
 	switch (ptr->iHitgroup)
 	{
@@ -652,7 +652,7 @@ void COtis::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, T
 		break;
 	}
 
-	CTalkMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+	CTalkMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
 }
 
 

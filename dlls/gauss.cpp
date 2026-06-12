@@ -426,7 +426,7 @@ void CGauss::Fire(Vector vecOrigSrc, Vector vecDir, float flDamage)
 				tr.iHitgroup = 0;
 			}
 
-			pEntity->TraceAttack(m_pPlayer->pev, flDamage, vecDir, &tr, DMG_BULLET);
+			pEntity->TraceAttack(m_pPlayer->pev, flDamage, vecDir, &tr, DMG_BULLET, false);
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 		}
 

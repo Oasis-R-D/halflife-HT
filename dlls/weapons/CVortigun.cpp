@@ -247,7 +247,7 @@ void CVortigun::ZapBeam()
 	pEntity = CBaseEntity::Instance(tr.pHit);
 	if (pEntity != NULL)
 	{
-		pEntity->TraceAttack(m_pPlayer->pev, gSkillData.plrDmg762, vecAim, &tr, DMG_SHOCK); // TO-DO: add separate skill value
+		pEntity->TraceAttack(m_pPlayer->pev, gSkillData.plrDmg762, vecAim, &tr, DMG_SHOCK, false); // TO-DO: add separate skill value
 
 		TraceResult tr2 = tr;
 		CBaseEntity* pTrack = NULL;
@@ -314,7 +314,7 @@ void CVortigun::ZapBeam()
 				m_pBeam[m_iBeams]->pev->spawnflags |= SF_BEAM_TEMPORARY; // Flag these to be destroyed on save/restore or level transition
 			m_iBeams++;
 
-			pNearest->TraceAttack(m_pPlayer->pev, gSkillData.plrDmg762, (vecOrg - tr2.vecEndPos).Normalize(), &tr2, DMG_SHOCK); // TO-DO: add separate skill value
+			pNearest->TraceAttack(m_pPlayer->pev, gSkillData.plrDmg762, (vecOrg - tr2.vecEndPos).Normalize(), &tr2, DMG_SHOCK, false); // TO-DO: add separate skill value
 			
 			vecOrg = tr2.vecEndPos;
 
