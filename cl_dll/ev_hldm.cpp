@@ -1890,19 +1890,19 @@ void EV_TFC_Assault_WindDown( event_args_t *args )
 		//g_flSpinDownTime[idx - 1] = gEngfuncs.GetClientTime() + 3.0f;
 	//}
 
-	if ( EV_IsLocal( idx ) )
-	{
-		gEngfuncs.pEventAPI->EV_WeaponAnimation( AC_SPINDOWN, 2 );
-	}
-
 	//g_bACSpinning[idx - 1] = false;
 
 	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_STATIC, "weapons/asscan2.wav" );
 	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_STATIC, "weapons/asscan4.wav" );
 	gEngfuncs.pEventAPI->EV_StopSound( idx, CHAN_WEAPON, "weapons/asscan1.wav" );
 
-	if ( !args->bparam1 )
+	if ( args->bparam1 == false)
 	{
+		if ( EV_IsLocal( idx ) )
+		{
+			gEngfuncs.pEventAPI->EV_WeaponAnimation( AC_SPINDOWN, 2 );
+		}
+
 		gEngfuncs.pEventAPI->EV_PlaySound( idx, origin, CHAN_WEAPON, "weapons/asscan3.wav", 0.98f, ATTN_NORM, 0, 125 );
 	}
 }
