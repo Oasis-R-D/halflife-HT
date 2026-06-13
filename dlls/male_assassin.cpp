@@ -107,10 +107,10 @@ namespace MAssassinWeaponFlag
 {
 enum MAssassinWeaponFlag
 {
-	MP5 = 1 << 0,
-	HandGrenade = 1 << 1,
-	Shotgun = 1 << 2,
-	SniperRifle = 1 << 3,
+	MP5 = 1,
+	HandGrenade = 2,
+	Shotgun = 5,
+	SniperRifle = 8,
 };
 }
 
