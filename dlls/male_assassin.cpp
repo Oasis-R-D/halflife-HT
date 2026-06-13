@@ -335,7 +335,7 @@ void CMOFAssassin::GibMonster(bool headless)
 		}
 		else if (FBitSet(pev->weapons, MAssassinWeaponFlag::Shotgun))
 		{
-			pGun = DropItem("weapon_shotgun", vecGunPos, vecGunAngles);
+			pGun = DropItem("ammo_buckshot", vecGunPos, vecGunAngles);
 		}
 		else
 		{
