@@ -77,11 +77,7 @@ bool CM249::Deploy()
 void CM249::Holster()
 {
 	WindDown( true );
-	m_fInReload = false;
-	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.1f;
-	SendWeaponAnim( AC_HOLSTER );
-
-	m_flTimeWeaponIdle = UTIL_SharedRandomFloat(m_pPlayer->random_seed, 10.0, 15.0);
+	CBasePlayerWeapon::Holster();
 }
 
 void CM249::WeaponIdle()
