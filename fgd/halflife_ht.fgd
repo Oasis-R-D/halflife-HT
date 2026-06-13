@@ -3224,7 +3224,7 @@
         0 : "None"
         1 : "9mmAR"
         3 : "9mmAR + HG"
-        5 : "9mmAR + GL"
+        4 : "Shotgun"
         8 : "Sniper Rifle"
     ]
     standgroundrange(string) : "Stand Ground Range" : "0.0"

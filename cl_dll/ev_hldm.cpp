@@ -1692,7 +1692,7 @@ void EV_FireEagle(event_args_t* args)
 
 	gEngfuncs.pEventAPI->EV_PlaySound(
 		args->entindex,
-		args->origin, CHAN_WEAPON, "weapons/desert_eagle_fire.wav",
+		args->origin, CHAN_WEAPON, "weapons/automag_fire1.wav",
 		gEngfuncs.pfnRandomFloat(0.92, 1), ATTN_NORM, 0, 98 + gEngfuncs.pfnRandomLong(0, 3));
 
 	Vector vecSrc;

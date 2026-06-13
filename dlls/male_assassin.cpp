@@ -49,6 +49,7 @@ extern DLL_GLOBAL int g_iSkillLevel;
 //=========================================================
 #define MASSASSIN_MP5_CLIP_SIZE 36 // how many bullets in a clip? - NOTE: 3 round burst sound, so keep as 3 * x!
 #define MASSN_SNIPER_CLIP_SIZE 1
+#define MASSN_SHOTGUN_CLIP_SIZE 8
 #define GRUNT_VOL 0.35		 // volume of grunt sounds
 #define GRUNT_ATTN ATTN_NORM // attenutation of grunt sentences
 #define HGRUNT_LIMP_HEALTH 20
@@ -96,6 +97,7 @@ namespace MAssassinWeapon
 enum MAssassinWeapon
 {
 	MP5 = 0,
+	Shotgun,
 	SniperRifle,
 	None
 };
@@ -107,7 +109,7 @@ enum MAssassinWeaponFlag
 {
 	MP5 = 1 << 0,
 	HandGrenade = 1 << 1,
-	GrenadeLauncher = 1 << 2,
+	Shotgun = 1 << 2,
 	SniperRifle = 1 << 3,
 };
 }
@@ -167,6 +169,7 @@ public:
 	void IdleSound() override;
 	Vector GetGunPosition() override;
 	void Shoot();
+	void Shotgun();
 	void PrescheduleThink() override;
 	void GibMonster(bool headless) override;
 	void SpeakSentence();
@@ -330,6 +333,10 @@ void CMOFAssassin::GibMonster(bool headless)
 		{
 			pGun = DropItem("ammo_mp5drop", vecGunPos, vecGunAngles);
 		}
+		else if (FBitSet(pev->weapons, MAssassinWeaponFlag::Shotgun))
+		{
+			pGun = DropItem("weapon_shotgun", vecGunPos, vecGunAngles);
+		}
 		else
 		{
 			pGun = DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
@@ -339,19 +346,9 @@ void CMOFAssassin::GibMonster(bool headless)
 			pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
 			pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
 		}
-
-		if (FBitSet(pev->weapons, MAssassinWeaponFlag::GrenadeLauncher))
-		{
-			pGun = DropItem("ammo_ARgrenades", vecGunPos, vecGunAngles);
-			if (pGun)
-			{
-				pGun->pev->velocity = Vector(RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(-100, 100), RANDOM_FLOAT(200, 300));
-				pGun->pev->avelocity = Vector(0, RANDOM_FLOAT(200, 400), 0);
-			}
-		}
 	}
 
-	CBaseMonster::GibMonster(false);
+	CBaseMonster::GibMonster(m_decapitated != false);
 }
 
 //=========================================================
@@ -487,6 +484,8 @@ bool CMOFAssassin::CheckRangeAttack1(float flDot, float flDist)
 {
 	if (pev->weapons != 0)
 	{
+		const auto maxDistance = (pev->weapons & MAssassinWeaponFlag::Shotgun) != 0 ? 640 : 1024;
+
 		if (m_fStandingGround && m_flStandGroundRange >= flDist)
 		{
 			m_fStandingGround = false;
@@ -523,7 +522,7 @@ bool CMOFAssassin::CheckRangeAttack1(float flDot, float flDist)
 //=========================================================
 bool CMOFAssassin::CheckRangeAttack2(float flDot, float flDist)
 {
-	if (!FBitSet(pev->weapons, (MAssassinWeaponFlag::HandGrenade | MAssassinWeaponFlag::GrenadeLauncher)))
+	if (!FBitSet(pev->weapons, (MAssassinWeaponFlag::HandGrenade)))
 	{
 		return false;
 	}
@@ -814,6 +813,28 @@ Vector CMOFAssassin::GetGunPosition()
 //=========================================================
 // Shoot
 //=========================================================
+void CMOFAssassin::Shotgun()
+{
+	if (m_hEnemy == NULL)
+	{
+		return;
+	}
+
+	Vector vecShootOrigin = GetGunPosition();
+	Vector vecShootDir = ShootAtEnemy(vecShootOrigin);
+
+	UTIL_MakeVectors(pev->angles);
+
+	Vector vecShellVelocity = gpGlobals->v_right * RANDOM_FLOAT(40, 90) + gpGlobals->v_up * RANDOM_FLOAT(75, 200) + gpGlobals->v_forward * RANDOM_FLOAT(-40, 40);
+	EjectBrass(vecShootOrigin - vecShootDir * 24, vecShellVelocity, pev->angles.y, m_iShotgunShell, TE_BOUNCE_SHOTSHELL);
+	FireBullets(gSkillData.hgruntAllyShotgunPellets, vecShootOrigin, vecShootDir, VECTOR_CONE_15DEGREES, 2048, BULLET_PLAYER_BUCKSHOT, 0); // shoot +-7.5 degrees
+
+	m_cAmmoLoaded--; // take away a bullet!
+
+	Vector angDir = UTIL_VecToAngles(vecShootDir);
+	SetBlending(0, angDir.x);
+}
+
 void CMOFAssassin::Shoot()
 {
 	if (m_hEnemy == NULL)
@@ -841,9 +862,8 @@ void CMOFAssassin::Shoot()
 	{
 		//TODO: why is this 556? is 762 too damaging?
 		FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_1DEGREES, 2048, BULLET_PLAYER_M249);
+		pev->effects |= EF_MUZZLEFLASH;
 	}
-
-	pev->effects |= EF_MUZZLEFLASH;
 
 	m_cAmmoLoaded--; // take away a bullet!
 
@@ -878,13 +898,13 @@ void CMOFAssassin::HandleAnimEvent(MonsterEvent_t* pEvent)
 		{
 			DropItem("ammo_mp5drop", vecGunPos, vecGunAngles);
 		}
+		else if (FBitSet(pev->weapons, MAssassinWeaponFlag::Shotgun))
+		{
+			DropItem("weapon_shotgun", vecGunPos, vecGunAngles);
+		}
 		else
 		{
 			DropItem("weapon_sniperrifle", vecGunPos, vecGunAngles);
-		}
-		if (FBitSet(pev->weapons, MAssassinWeaponFlag::GrenadeLauncher))
-		{
-			DropItem("ammo_ARgrenades", BodyTarget(pev->origin), vecGunAngles);
 		}
 	}
 	break;
@@ -907,18 +927,6 @@ void CMOFAssassin::HandleAnimEvent(MonsterEvent_t* pEvent)
 	}
 	break;
 
-	case MASSASSIN_AE_GREN_LAUNCH:
-	{
-		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/glauncher.wav", 0.8, ATTN_NORM);
-		CGrenade::ShootContact(pev, GetGunPosition(), m_vecTossVelocity);
-		m_fThrowGrenade = false;
-		if (g_iSkillLevel == SKILL_HARD)
-			m_flNextGrenadeCheck = gpGlobals->time + RANDOM_FLOAT(2, 5); // wait a random amount of time before shooting again
-		else
-			m_flNextGrenadeCheck = gpGlobals->time + 6; // wait six seconds before even looking again to see if a grenade can be thrown.
-	}
-	break;
-
 	case MASSASSIN_AE_GREN_DROP:
 	{
 		UTIL_MakeVectors(pev->angles);
@@ -935,12 +943,18 @@ void CMOFAssassin::HandleAnimEvent(MonsterEvent_t* pEvent)
 			// the first round of the three round burst plays the sound and puts a sound in the world sound list.
 			if (RANDOM_LONG(0, 1))
 			{
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_mgun1.wav", 1, ATTN_NORM);
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "ops/mp5sd_burst1.wav", 1, ATTN_NORM);
 			}
 			else
 			{
-				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "hgrunt/gr_mgun2.wav", 1, ATTN_NORM);
+				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "ops/mp5sd_burst2.wav", 1, ATTN_NORM);
 			}
+		}
+		else if (FBitSet(pev->weapons, MAssassinWeaponFlag::Shotgun))
+		{
+			Shotgun();
+
+			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/shotgun_silencer.wav", 1, ATTN_NORM);
 		}
 		else
 		{
@@ -1025,6 +1039,11 @@ void CMOFAssassin::Spawn()
 		weaponModel = MAssassinWeapon::MP5;
 		m_cClipSize = MASSASSIN_MP5_CLIP_SIZE;
 	}
+	else if (FBitSet(pev->weapons, MAssassinWeaponFlag::Shotgun))
+	{
+		weaponModel = MAssassinWeapon::Shotgun;
+		m_cClipSize = MASSN_SHOTGUN_CLIP_SIZE;
+	}
 	else if (FBitSet(pev->weapons, MAssassinWeaponFlag::SniperRifle))
 	{
 		weaponModel = MAssassinWeapon::SniperRifle;
@@ -1059,8 +1078,8 @@ void CMOFAssassin::Precache()
 {
 	PRECACHE_MODEL("models/massn.mdl");
 
-	PRECACHE_SOUND("hgrunt/gr_mgun1.wav");
-	PRECACHE_SOUND("hgrunt/gr_mgun2.wav");
+	PRECACHE_SOUND("ops/mp5sd_burst1.wav");
+	PRECACHE_SOUND("ops/mp5sd_burst2.wav");
 
 	PRECACHE_SOUND("hgrunt/gr_die1.wav");
 	PRECACHE_SOUND("hgrunt/gr_die2.wav");
@@ -1070,7 +1089,7 @@ void CMOFAssassin::Precache()
 
 	PRECACHE_SOUND("weapons/glauncher.wav");
 
-	PRECACHE_SOUND("weapons/sbarrel1.wav");
+	PRECACHE_SOUND("weapons/shotgun_silencer.wav");
 
 	PRECACHE_SOUND("debris/beamstart1.wav");
 
@@ -1083,6 +1102,7 @@ void CMOFAssassin::Precache()
 		m_voicePitch = 100;
 
 	m_iBrassShell = PRECACHE_MODEL("models/shell.mdl"); // brass shell
+	m_iShotgunShell = PRECACHE_MODEL("models/shotgunshell.mdl");
 }
 
 //=========================================================
@@ -1827,15 +1847,31 @@ void CMOFAssassin::SetActivity(Activity NewActivity)
 	case ACT_RANGE_ATTACK1:
 		// grunt is either shooting standing or shooting crouched
 		//Sniper uses the same set
-		if (m_fStanding)
+		if (FBitSet(pev->weapons, MAssassinWeaponFlag::MP5))
 		{
-			// get aimable sequence
-			iSequence = LookupSequence("standing_mp5");
+			if (m_fStanding)
+			{
+				// get aimable sequence
+				iSequence = LookupSequence("standing_mp5");
+			}
+			else
+			{
+				// get crouching shoot
+				iSequence = LookupSequence("crouching_mp5");
+			}
 		}
-		else
+		else if (FBitSet(pev->weapons, MAssassinWeaponFlag::Shotgun))
 		{
-			// get crouching shoot
-			iSequence = LookupSequence("crouching_mp5");
+			if (m_fStanding)
+			{
+				// get aimable sequence
+				iSequence = LookupSequence("standing_shotgun");
+			}
+			else
+			{
+				// get crouching shoot
+				iSequence = LookupSequence("crouching_shotgun");
+			}
 		}
 		break;
 	case ACT_RANGE_ATTACK2:
@@ -2024,13 +2060,6 @@ Schedule_t* CMOFAssassin::GetSchedule()
 		else if (HasConditions(bits_COND_CAN_MELEE_ATTACK1))
 		{
 			return GetScheduleOfType(SCHED_MELEE_ATTACK1);
-		}
-		// can grenade launch
-
-		else if (FBitSet(pev->weapons, MAssassinWeaponFlag::GrenadeLauncher) && HasConditions(bits_COND_CAN_RANGE_ATTACK2) && OccupySlot(bits_SLOTS_HGRUNT_GRENADE))
-		{
-			// shoot a grenade if you can
-			return GetScheduleOfType(SCHED_RANGE_ATTACK2);
 		}
 		// can shoot
 		else if (HasConditions(bits_COND_CAN_RANGE_ATTACK1))
