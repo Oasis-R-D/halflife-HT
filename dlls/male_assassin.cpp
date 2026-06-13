@@ -244,6 +244,7 @@ TYPEDESCRIPTION CMOFAssassin::m_SaveData[] =
 		DEFINE_FIELD(CMOFAssassin, m_flLastShot, FIELD_TIME),
 		DEFINE_FIELD(CMOFAssassin, m_fStandingGround, FIELD_BOOLEAN),
 		DEFINE_FIELD(CMOFAssassin, m_flStandGroundRange, FIELD_FLOAT),
+		DEFINE_FIELD(CMOFAssassin, m_decapitated, FIELD_BOOLEAN),
 };
 
 IMPLEMENT_SAVERESTORE(CMOFAssassin, CSquadMonster);
