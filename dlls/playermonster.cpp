@@ -32,7 +32,6 @@ public:
 	bool StartCopying(CBasePlayer* pController);
 	int ISoundMask ( void );
 	void MoveThink();
-	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 	void HandleAnimEvent(MonsterEvent_t* pEvent) override;
 
 protected:
@@ -101,7 +100,7 @@ void CPlayerMonster :: Spawn()
 	UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
 
 	pev->solid = SOLID_NOT;
-	pev->movetype = MOVETYPE_STEP;
+	pev->movetype = MOVETYPE_FLY;
 	m_bloodColor = BLOOD_COLOR_RED;
 	pev->health = 8;
 	pev->takedamage = DAMAGE_NO;
@@ -117,12 +116,6 @@ void CPlayerMonster :: Spawn()
 void CPlayerMonster :: Precache()
 {
 	PRECACHE_MODEL("models/player.mdl");
-}	
-
-bool CPlayerMonster::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
-{
-	// Don't take damage
-	return true;
 }
 
 //=========================================================
@@ -134,7 +127,11 @@ bool CPlayerMonster::StartCopying(CBasePlayer* pController)
 		return false;
 
 	m_pController = pController;
+	SetThink(&CPlayerMonster::MoveThink);
+	pev->nextthink = gpGlobals->time + 0.01
 	return true;
+
+	
 }
 
 void CPlayerMonster::HandleAnimEvent(MonsterEvent_t* pEvent)
@@ -150,8 +147,10 @@ void CPlayerMonster::MoveThink()
 		return;
 	}
 
-	//---------------------------------
-	//	INPUT HANDLING
-	//---------------------------------
-
+	pev->nextthink = gpGlobals->time + 0.01 // NOTE: this would be better called in the player's post/pre frame instead of on a think
+	
+	pev->origin = m_pController->pev->origin
+	pev->angles = m_pController->pev->angles
+	pev->sequence = m_pController->pev->sequence
+	// TO-DO: copy model blending and weapon model (if we do have this used where a player has a weapon
 }
