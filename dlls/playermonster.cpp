@@ -29,9 +29,16 @@ public:
 	void SetYawSpeed( void );
 	int  Classify ( void );
 	void HandleAnimEvent( MonsterEvent_t *pEvent );
+	bool StartCopying(CBasePlayer* pController);
 	int ISoundMask ( void );
+	void MoveThink();
+	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+	void HandleAnimEvent(MonsterEvent_t* pEvent) override;
+
+protected:
+	CBasePlayer* m_pController;
 };
-LINK_ENTITY_TO_CLASS( monster_player, CPlayerMonster );
+LINK_ENTITY_TO_CLASS(monster_player, CPlayerMonster );
 
 //=========================================================
 // Classify - indicates this monster's place in the 
@@ -93,20 +100,15 @@ void CPlayerMonster :: Spawn()
 	SET_MODEL(ENT(pev), "models/player.mdl");
 	UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
 
-	pev->solid			= SOLID_SLIDEBOX;
-	pev->movetype		= MOVETYPE_STEP;
-	m_bloodColor		= BLOOD_COLOR_RED;
-	pev->health			= 8;
-	m_flFieldOfView		= 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
-	m_MonsterState		= MONSTERSTATE_NONE;
-
+	pev->solid = SOLID_NOT;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = BLOOD_COLOR_RED;
+	pev->health = 8;
+	pev->takedamage = DAMAGE_NO;
+	m_flFieldOfView = 0.5f;
+	m_MonsterState = MONSTERSTATE_NONE;
 
 	MonsterInit();
-	if ( pev->spawnflags & SF_MONSTERPLAYER_NOTSOLID )
-	{
-		pev->solid = SOLID_NOT;
-		pev->takedamage = DAMAGE_NO;
-	}
 }
 
 //=========================================================
@@ -117,6 +119,39 @@ void CPlayerMonster :: Precache()
 	PRECACHE_MODEL("models/player.mdl");
 }	
 
+bool CPlayerMonster::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	// Don't take damage
+	return true;
+}
+
 //=========================================================
 // AI Schedules Specific to this monster
 //=========================================================
+bool CPlayerMonster::StartCopying(CBasePlayer* pController)
+{
+	if (m_pController != NULL)
+		return false;
+
+	m_pController = pController;
+	return true;
+}
+
+void CPlayerMonster::HandleAnimEvent(MonsterEvent_t* pEvent)
+{
+	CBaseMonster::HandleAnimEvent(pEvent);
+}
+
+void CPlayerMonster::MoveThink()
+{
+	if (!m_pController)
+	{
+		ALERT(at_console, "Player is dead!\n");
+		return;
+	}
+
+	//---------------------------------
+	//	INPUT HANDLING
+	//---------------------------------
+
+}
