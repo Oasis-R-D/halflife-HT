@@ -271,8 +271,19 @@ void CVortigun::ZapBeam()
 				if ((pTrack->pev->flags & (FL_CLIENT | FL_MONSTER)) == 0)
 					continue;
 
+				// don't hit firer
+				if (pTrack == m_pPlayer)
+					continue;
+
+				// only hit alive and damagable NPCs
+				if (pTrack->pev->deadflag >= DEAD_DYING || pTrack->pev->takedamage == DAMAGE_NO)
+					continue;
+
 				// only hit visible enemies
-				if (!pTrack->FVisible(vecOrg))
+				TraceResult tr;
+				UTIL_TraceLine(vecOrg, pTrack->Center(), ignore_monsters, ignore_glass, ENT(pev) /*pentIgnore*/, &tr);
+
+				if (tr.flFraction != 1.0)
 					continue;
 
 				// dont hit an enemy twice
@@ -280,14 +291,13 @@ void CVortigun::ZapBeam()
 				for (const auto& ent : pHit)
 				{
 					if (ent == pTrack)
+					{
 						cont = true;
+						break;
+					}
 				}
 
 				if (cont)
-					continue;
-
-				// don't hit firer
-				if (pTrack == m_pPlayer)
 					continue;
 
 				dist = (pev->origin - pTrack->pev->origin).Length();
