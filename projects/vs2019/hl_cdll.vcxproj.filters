@@ -396,6 +396,9 @@
     <ClCompile Include="..\..\cl_dll\discord_manager.cpp">
       <Filter>Header Files\cl_dll</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dlls\nailgun.cpp">
+      <Filter>Source Files\_hl\dlls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cl_dll\kbutton.h">

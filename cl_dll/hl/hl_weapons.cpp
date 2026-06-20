@@ -89,6 +89,7 @@ CSniperRifle g_SniperRifle;
 CKnife g_Knife;
 CRCWeapon g_RC;
 COrbStrike g_OrbitalStrike;
+CNailgun g_Nailgun;
 
 /*
 ======================
@@ -520,6 +521,7 @@ void HUD_InitClientWeapons()
 	HUD_PrepEntity(&g_Knife, &player);
 	HUD_PrepEntity(&g_RC, &player);
 	HUD_PrepEntity(&g_OrbitalStrike, &player);
+	HUD_PrepEntity(&g_Nailgun, &player);
 }
 
 /*
@@ -619,6 +621,8 @@ CBasePlayerWeapon* GetLocalWeapon(int id)
 		return &g_RC;
 	case WEAPON_ORBITALSTRIKE:
 		return &g_OrbitalStrike;
+	case WEAPON_NAILGUN:
+		return &g_Nailgun;
 	default:
 		return nullptr;
 	}
@@ -758,6 +762,7 @@ void HUD_WeaponsPostThink(local_state_s* from, local_state_s* to, usercmd_t* cmd
 	player.ammo_357 = (int)from->client.vuser1[1];
 	player.ammo_argrens = (int)from->client.vuser1[2];
 	player.ammo_bolts = (int)from->client.ammo_nails; //is an int anyways...
+	player.ammo_nails = (int)from->client.ammo_nails; // is an int anyways...
 	player.ammo_buckshot = (int)from->client.ammo_shells;
 	player.ammo_uranium = (int)from->client.ammo_cells;
 	player.ammo_hornets = (int)from->client.vuser2[0];
@@ -842,6 +847,7 @@ void HUD_WeaponsPostThink(local_state_s* from, local_state_s* to, usercmd_t* cmd
 	to->client.ammo_rockets = player.ammo_rockets;
 	to->client.vuser2.y = player.ammo_spores;
 	to->client.vuser2.z = player.ammo_556;
+	to->client.ammo_nails = player.ammo_nails;
 
 	if (player.m_pActiveItem->m_iId == WEAPON_RPG)
 	{

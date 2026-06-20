@@ -2233,6 +2233,38 @@ void EV_Knife(event_args_t* args)
 	}
 }
 
+//======================
+//	  Nail START
+//======================
+void EV_NailCallback(struct tempent_s* ent, float frametime, float currenttime)
+{
+	ent->entity.origin = ent->entity.baseline.vuser1;
+	ent->entity.angles = ent->entity.baseline.vuser2;
+}
+
+// TODO: Fully predict the fliying bolt.
+void EV_FireNailgun(event_args_t* args)
+{
+	int idx;
+	Vector origin;
+
+	idx = args->entindex;
+	VectorCopy(args->origin, origin);
+
+	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/nailgun.wav", 1, ATTN_NORM, 0, 93 + gEngfuncs.pfnRandomLong(0, 0xF));
+
+	// Only play the weapon anims if I shot it.
+	if (EV_IsLocal(idx))
+	{
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(NAILGUN_FIRE1 + gEngfuncs.pfnRandomLong(0, 1), 0);
+
+		V_PunchAxis(0, -2.0);
+	}
+}
+//======================
+//	   NAILGUN END
+//======================
+
 void EV_TrainPitchAdjust(event_args_t* args)
 {
 	int idx;

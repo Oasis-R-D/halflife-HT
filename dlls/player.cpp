@@ -3938,6 +3938,8 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 		GiveNamedItem("weapon_displacer");
 		GiveNamedItem("weapon_rc");
 		GiveNamedItem("weapon_skystrike");
+		GiveNamedItem("weapon_nailgun");
+		GiveNamedItem("ammo_nails");
 
 		//TODO: not given
 		//GiveNamedItem( "ammo_223" );

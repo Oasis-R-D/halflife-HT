@@ -329,6 +329,10 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_crossbow");
 	UTIL_PrecacheOther("ammo_crossbow");
 
+	// nailgun
+	UTIL_PrecacheOtherWeapon("weapon_nailgun");
+	UTIL_PrecacheOther("ammo_nails");
+
 	// egon
 	//UTIL_PrecacheOtherWeapon("weapon_egon");
 

@@ -47,6 +47,7 @@ void EV_FireShockRifle(event_args_t* args);
 void EV_FireSpore(event_args_t* args);
 void EV_SniperRifle(event_args_t* args);
 void EV_Knife(event_args_t* args);
+void EV_FireNailgun(event_args_t* args);
 
 
 void EV_TrainPitchAdjust(event_args_t* args);

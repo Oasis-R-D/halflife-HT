@@ -414,6 +414,10 @@ cvar_t sk_plr_xbow_bolt_monster1 = {"sk_plr_xbow_bolt_monster1", "0"};
 cvar_t sk_plr_xbow_bolt_monster2 = {"sk_plr_xbow_bolt_monster2", "0"};
 cvar_t sk_plr_xbow_bolt_monster3 = {"sk_plr_xbow_bolt_monster3", "0"};
 
+// Nailgun
+cvar_t sk_plr_nail1 = {"sk_plr_nail1", "0"};
+cvar_t sk_plr_nail2 = {"sk_plr_nail2", "0"};
+cvar_t sk_plr_nail3 = {"sk_plr_nail3", "0"};
 
 // RPG
 cvar_t sk_plr_rpg1 = {"sk_plr_rpg1", "0"};
@@ -1017,6 +1021,10 @@ void GameDLLInit()
 	CVAR_REGISTER(&sk_plr_xbow_bolt_client2); // {"sk_plr_xbow_bolt2","0"};
 	CVAR_REGISTER(&sk_plr_xbow_bolt_client3); // {"sk_plr_xbow_bolt3","0"};
 
+	// Nailgun
+	CVAR_REGISTER(&sk_plr_nail1); // {"sk_plr_xbow_bolt1","0"};
+	CVAR_REGISTER(&sk_plr_nail2); // {"sk_plr_xbow_bolt2","0"};
+	CVAR_REGISTER(&sk_plr_nail3); // {"sk_plr_xbow_bolt3","0"};
 
 	// RPG
 	CVAR_REGISTER(&sk_plr_rpg1); // {"sk_plr_rpg1","0"};

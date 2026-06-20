@@ -142,6 +142,9 @@ void CHalfLifeMultiplay::RefreshSkillData()
 	// Crossbow
 	gSkillData.plrDmgCrossbowClient = 20;
 
+	// Nailgun
+	gSkillData.plrDmgNail = 11;
+
 	// Sniper
 	gSkillData.plrDmg762 = 50; // match TFC value
 

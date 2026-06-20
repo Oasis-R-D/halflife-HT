@@ -398,6 +398,9 @@ void CGameRules::RefreshSkillData()
 	gSkillData.plrDmgCrossbowClient = GetSkillCvar("sk_plr_xbow_bolt_client");
 	gSkillData.plrDmgCrossbowMonster = GetSkillCvar("sk_plr_xbow_bolt_monster");
 
+	// Nailgun
+	gSkillData.plrDmgNail = GetSkillCvar("sk_plr_nail");
+
 	// RPG
 	gSkillData.plrDmgRPG = GetSkillCvar("sk_plr_rpg");
 

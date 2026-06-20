@@ -97,6 +97,7 @@ public:
 #define DISPLACER_WEIGHT 10
 #define SPORELAUNCHER_WEIGHT 20
 #define SNIPERRIFLE_WEIGHT 10
+#define NAILGUN_WEIGHT 10
 
 
 // weapon clip/carry ammo capacities
@@ -116,6 +117,7 @@ public:
 #define SPORELAUNCHER_MAX_CARRY 20
 #define SNIPERRIFLE_MAX_CARRY 20
 #define METAL_MAX_CARRY 200
+#define NAIL_MAX_CARRY 150
 
 // the maximum amount of ammo each weapon's clip can hold
 #define WEAPON_NOCLIP -1
@@ -141,6 +143,7 @@ public:
 #define SPORELAUNCHER_MAX_CLIP 5
 #define SHOCKRIFLE_MAX_CLIP 10
 #define SNIPERRIFLE_MAX_CLIP 30
+#define NAILGUN_MAX_CLIP 30
 
 // the default amount of ammo that comes with each gun when it spawns
 #define GLOCK_DEFAULT_GIVE 17
@@ -165,6 +168,7 @@ public:
 #define SHOCKRIFLE_DEFAULT_GIVE 10
 #define SNIPERRIFLE_DEFAULT_GIVE 30
 #define METAL_DEFAULT_GIVE 100
+#define NAIL_DEFAULT_GIVE 30
 
 // The amount of ammo given to a player by an ammo item.
 #define AMMO_URANIUMBOX_GIVE 20
@@ -183,6 +187,7 @@ public:
 #define AMMO_EAGLE_GIVE 7
 #define AMMO_SPORE_GIVE 1
 #define AMMO_SNIPERRIFLE_GIVE SNIPERRIFLE_MAX_CLIP
+#define AMMO_NAILGUN_GIVE NAILGUN_MAX_CLIP
 
 // bullet types
 typedef enum
@@ -696,6 +701,50 @@ public:
 
 private:
 	unsigned short m_usMP5;
+};
+
+enum nailgun_e
+{
+	NAILGUN_IDLE1 = 0,
+	NAILGUN_IDLE2,
+	NAILGUN_IDLE3,
+	NAILGUN_FIRE1,
+	NAILGUN_FIRE2,
+	NAILGUN_RELOAD,
+	NAILGUN_RELOADEMPTY,
+	NAILGUN_DEPLOY,
+	NAILGUN_HOLSTER,
+};
+
+class CNailgun : public CBasePlayerWeapon
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	int iItemSlot() override { return 3; }
+	bool GetItemInfo(ItemInfo* p) override;
+	void IncrementAmmo(CBasePlayer* pPlayer) override;
+
+	void FireNail();
+	void PrimaryAttack() override;
+	void SecondaryAttack() override;
+	bool Deploy() override;
+	void Reload() override;
+	void WeaponIdle() override;
+	float m_flNextAnimTime;
+	int m_iShell;
+
+	bool UseDecrement() override
+	{
+#if defined(CLIENT_WEAPONS)
+		return UTIL_DefaultUseDecrement();
+#else
+		return false;
+#endif
+	}
+
+private:
+	unsigned short m_usNailgun;
 };
 
 enum ag36_e

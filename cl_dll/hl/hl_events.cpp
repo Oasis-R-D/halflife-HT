@@ -67,4 +67,5 @@ void Game_HookEvents()
 	gEngfuncs.pfnHookEvent("events/spore.sc", EV_FireSpore);
 	gEngfuncs.pfnHookEvent("events/sniper.sc", EV_SniperRifle);
 	gEngfuncs.pfnHookEvent("events/knife.sc", EV_Knife);
+	gEngfuncs.pfnHookEvent("events/nailgun.sc", EV_FireNailgun);
 }

@@ -28,7 +28,6 @@ public:
 	void Precache( void );
 	void SetYawSpeed( void );
 	int  Classify ( void );
-	void HandleAnimEvent( MonsterEvent_t *pEvent );
 	bool StartCopying(CBasePlayer* pController);
 	int ISoundMask ( void );
 	void MoveThink();
@@ -128,15 +127,8 @@ bool CPlayerMonster::StartCopying(CBasePlayer* pController)
 
 	m_pController = pController;
 	SetThink(&CPlayerMonster::MoveThink);
-	pev->nextthink = gpGlobals->time + 0.01
+	pev->nextthink = gpGlobals->time + 0.01;
 	return true;
-
-	
-}
-
-void CPlayerMonster::HandleAnimEvent(MonsterEvent_t* pEvent)
-{
-	CBaseMonster::HandleAnimEvent(pEvent);
 }
 
 void CPlayerMonster::MoveThink()
@@ -147,10 +139,10 @@ void CPlayerMonster::MoveThink()
 		return;
 	}
 
-	pev->nextthink = gpGlobals->time + 0.01 // NOTE: this would be better called in the player's post/pre frame instead of on a think
-	
-	pev->origin = m_pController->pev->origin
-	pev->angles = m_pController->pev->angles
-	pev->sequence = m_pController->pev->sequence
+	pev->nextthink = gpGlobals->time + 0.01; // NOTE: this would be better called in the player's post/pre frame instead of on a think
+
+	//pev->origin = m_pController->pev->origin;
+	//pev->angles = m_pController->pev->angles;
+	//pev->sequence = m_pController->pev->sequence;
 	// TO-DO: copy model blending and weapon model (if we do have this used where a player has a weapon
 }
