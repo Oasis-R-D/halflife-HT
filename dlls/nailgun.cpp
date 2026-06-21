@@ -41,6 +41,7 @@ class CNail : public CBaseEntity
 	void EXPORT NailTouch(CBaseEntity* pOther);
 
 	int m_iTrail;
+	Vector n_startpos;
 
 public:
 	static CNail* NailCreate();
@@ -73,6 +74,7 @@ void CNail::Spawn()
 	SetTouch(&CNail::NailTouch);
 	SetThink(&CNail::BubbleThink);
 	pev->nextthink = gpGlobals->time + 0.2;
+	n_startpos = pev->origin;
 }
 
 
@@ -96,6 +98,8 @@ void CNail::NailTouch(CBaseEntity* pOther)
 {
 	SetTouch(NULL);
 	SetThink(NULL);
+	float n_dist = (n_startpos - pev->origin).Length();
+	float n_damage = (gSkillData.plrDmgNail * (n_dist - 100)/10);
 
 	if (0 != pOther->pev->takedamage)
 	{
@@ -107,7 +111,9 @@ void CNail::NailTouch(CBaseEntity* pOther)
 		// UNDONE: this needs to call TraceAttack instead
 		ClearMultiDamage();
 
-		pOther->TraceAttack(pevOwner, gSkillData.plrDmgNail, pev->velocity.Normalize(), &tr, DMG_NEVERGIB, true);
+		pOther->TraceAttack(pevOwner, n_damage, pev->velocity.Normalize(), &tr, DMG_NEVERGIB, true);
+		ALERT(at_console, "length: %f\n", n_dist);
+		ALERT(at_console, "damage: %f\n", n_damage);
 
 		ApplyMultiDamage(pev, pevOwner);
 
