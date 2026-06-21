@@ -41,16 +41,16 @@ class CNail : public CBaseEntity
 	void EXPORT NailTouch(CBaseEntity* pOther);
 
 	int m_iTrail;
-	Vector n_startpos;
 
 public:
+	Vector n_startpos;
 	static CNail* NailCreate();
 };
 LINK_ENTITY_TO_CLASS(nailgun_nail, CNail);
 
 CNail* CNail::NailCreate()
 {
-	// Create a new entity with CCrossbowBolt private data
+	// Create a new entity with CNail private data
 	CNail* pNail = GetClassPtr((CNail*)NULL);
 	pNail->pev->classname = MAKE_STRING("nail");
 	pNail->Spawn();
@@ -98,8 +98,22 @@ void CNail::NailTouch(CBaseEntity* pOther)
 {
 	SetTouch(NULL);
 	SetThink(NULL);
-	float n_dist = (n_startpos - pev->origin).Length();
-	float n_damage = (gSkillData.plrDmgNail * (n_dist - 100)/10);
+	float n_dist = (pev->origin - n_startpos).Length();
+	float n_damage = (-0.0025*n_dist + gSkillData.plrDmgNail);
+
+	if (n_damage < 0)
+	{
+		UTIL_Remove(this);
+		return;
+	}
+	else if (n_damage > gSkillData.plrDmgNail)
+	{
+		ALERT(at_error, "CNail: Nail doing more damage than defined!");
+		n_damage = gSkillData.plrDmgNail;
+	}
+
+	ALERT(at_console, "damage: %f\n", n_damage);
+	ALERT(at_console, "length: %f\n", n_dist);
 
 	if (0 != pOther->pev->takedamage)
 	{
@@ -108,16 +122,10 @@ void CNail::NailTouch(CBaseEntity* pOther)
 
 		pevOwner = VARS(pev->owner);
 
-		// UNDONE: this needs to call TraceAttack instead
 		ClearMultiDamage();
-
 		pOther->TraceAttack(pevOwner, n_damage, pev->velocity.Normalize(), &tr, DMG_NEVERGIB, true);
-		ALERT(at_console, "length: %f\n", n_dist);
-		ALERT(at_console, "damage: %f\n", n_damage);
-
 		ApplyMultiDamage(pev, pevOwner);
 
-		pev->velocity = Vector(0, 0, 0);
 		// play body "thwack" sound
 		switch (RANDOM_LONG(0, 1))
 		{
@@ -278,6 +286,7 @@ void CNailgun::PrimaryAttack()
 #ifndef CLIENT_DLL
 	CNail* pNail = CNail::NailCreate();
 	pNail->pev->origin = vecSrc;
+	pNail->n_startpos = vecSrc;
 	pNail->pev->angles = anglesAim;
 	pNail->pev->owner = m_pPlayer->edict();
 
@@ -344,6 +353,7 @@ void CNailgun::SecondaryAttack()
 #ifndef CLIENT_DLL
 	CNail* pNail = CNail::NailCreate();
 	pNail->pev->origin = vecSrc;
+	pNail->n_startpos = vecSrc;
 	pNail->pev->angles = anglesAim;
 	pNail->pev->owner = m_pPlayer->edict();
 

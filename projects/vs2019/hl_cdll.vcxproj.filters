@@ -381,20 +381,20 @@
     <ClCompile Include="..\..\cl_dll\particleman\CBaseParticle.cpp">
       <Filter>Source Files\cl_dll\particleman</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dlls\RC_weapon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dlls\ag36.cpp">
       <Filter>Source Files\_hl\dlls</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dlls\orbital_strike.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\cl_dll\discord\DelayLoad.cpp">
       <Filter>Header Files\cl_dll</Filter>
     </ClCompile>
     <ClCompile Include="..\..\cl_dll\discord_manager.cpp">
       <Filter>Header Files\cl_dll</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\orbital_strike.cpp">
+      <Filter>Source Files\_hl\dlls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dlls\RC_weapon.cpp">
+      <Filter>Source Files\_hl\dlls</Filter>
     </ClCompile>
     <ClCompile Include="..\..\dlls\nailgun.cpp">
       <Filter>Source Files\_hl\dlls</Filter>
