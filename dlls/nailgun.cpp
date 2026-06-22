@@ -99,17 +99,18 @@ void CNail::NailTouch(CBaseEntity* pOther)
 	SetTouch(NULL);
 	SetThink(NULL);
 	float n_dist = (pev->origin - n_startpos).Length();
-	float n_damage = (-0.0025*n_dist + gSkillData.plrDmgNail);
+	float n_damage = (-0.1 * n_dist + pev->dmg);
 
 	if (n_damage < 0)
 	{
-		UTIL_Remove(this);
-		return;
+		// override the nail damage if it doesn't do anything
+		ALERT(at_error, "CNail: Nail doing absolutely no fucking damage. Defaulting to 3.\n");
+		n_damage = 3;
 	}
-	else if (n_damage > gSkillData.plrDmgNail)
+	else if (n_damage > pev->dmg || n_dist <= 30)
 	{
-		ALERT(at_error, "CNail: Nail doing more damage than defined!");
-		n_damage = gSkillData.plrDmgNail;
+		ALERT(at_error, "CNail: Nail doing more damage than defined!\n");
+		n_damage = pev->dmg;
 	}
 
 	ALERT(at_console, "damage: %f\n", n_damage);
@@ -198,7 +199,6 @@ void CNailgun::Spawn()
 	FallInit(); // get ready to fall down.
 }
 
-
 void CNailgun::Precache()
 {
 	PRECACHE_MODEL("models/v_nailgun.mdl");
@@ -247,12 +247,15 @@ void CNailgun::IncrementAmmo(CBasePlayer* pPlayer)
 bool CNailgun::Deploy()
 {
 	return DefaultDeploy("models/v_nailgun.mdl", "models/p_nailgun.mdl", NAILGUN_DEPLOY, "nailgun");
+	m_bIsAuto = false;
 }
 
 
 void CNailgun::PrimaryAttack()
 {
 	TraceResult tr;
+
+	m_bIsAuto = false;
 
 	if (m_iClip == 0)
 	{
@@ -289,6 +292,7 @@ void CNailgun::PrimaryAttack()
 	pNail->n_startpos = vecSrc;
 	pNail->pev->angles = anglesAim;
 	pNail->pev->owner = m_pPlayer->edict();
+	pNail->pev->dmg = gSkillData.plrDmgNail;
 
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
@@ -327,6 +331,8 @@ void CNailgun::SecondaryAttack()
 		return;
 	}
 
+	m_bIsAuto = true;
+
 	m_pPlayer->m_iWeaponVolume = QUIET_GUN_VOLUME;
 
 	m_iClip--;
@@ -356,6 +362,7 @@ void CNailgun::SecondaryAttack()
 	pNail->n_startpos = vecSrc;
 	pNail->pev->angles = anglesAim;
 	pNail->pev->owner = m_pPlayer->edict();
+	pNail->pev->dmg = gSkillData.plrDmgNail/2.5;
 
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
@@ -402,6 +409,8 @@ void CNailgun::Reload()
 void CNailgun::WeaponIdle()
 {
 	ResetEmptySound();
+
+	m_bIsAuto = false;
 
 	m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
 

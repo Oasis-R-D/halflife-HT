@@ -733,6 +733,7 @@ public:
 	void WeaponIdle() override;
 	float m_flNextAnimTime;
 	int m_iShell;
+	bool m_bIsAuto;
 
 	bool UseDecrement() override
 	{
