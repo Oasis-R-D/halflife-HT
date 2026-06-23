@@ -575,7 +575,7 @@ public:
 
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 
 	void Killed(entvars_t* pevAttacker, int iGib) override
 	{
@@ -1394,7 +1394,7 @@ bool COFGeneWorm::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, fl
 	return true;
 }
 
-void COFGeneWorm::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void COFGeneWorm::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	const auto isLaser = 0 == strcmp("env_laser", STRING(pevAttacker->classname));
 

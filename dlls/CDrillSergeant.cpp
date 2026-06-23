@@ -62,7 +62,7 @@ public:
 
 	void Killed(entvars_t* pevAttacker, int iGib) override;
 
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 
 	void DeathSound() override;
 
@@ -338,7 +338,7 @@ void CDrillSergeant::Killed(entvars_t* pevAttacker, int iGib)
 	CTalkMonster::Killed(pevAttacker, iGib);
 }
 
-void CDrillSergeant::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void CDrillSergeant::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	switch (ptr->iHitgroup)
 	{
@@ -364,7 +364,7 @@ void CDrillSergeant::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector 
 		break;
 	}
 
-	CTalkMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
+	CTalkMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 }
 
 void CDrillSergeant::DeathSound()

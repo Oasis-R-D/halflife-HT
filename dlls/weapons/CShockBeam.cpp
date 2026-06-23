@@ -172,7 +172,7 @@ void CShockBeam::BallTouch(CBaseEntity* pOther)
 			}
 		}
 
-		pOther->TraceAttack(VARS(pev->owner), damage, pev->velocity.Normalize(), &tr, bitsDamageTypes, false);
+		pOther->TraceAttack(VARS(pev->owner), damage, pev->velocity.Normalize(), &tr, bitsDamageTypes);
 
 		if (pMonster)
 		{

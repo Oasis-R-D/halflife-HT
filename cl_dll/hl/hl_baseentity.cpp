@@ -186,7 +186,7 @@ void CBaseAnimating::GetAutomovement(Vector& origin, Vector& angles, float flInt
 void CBaseAnimating::SetBodygroup(int iGroup, int iValue) {}
 int CBaseAnimating::GetBodygroup(int iGroup) { return 0; }
 Vector CBaseMonster::GetGunPosition() { return g_vecZero; }
-void CBaseEntity::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) {}
+void CBaseEntity::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) {}
 void CBaseEntity::FireBullets(unsigned int cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, int iBulletType, int iTracerFreq, int iDamage, entvars_t* pevAttacker) {}
 void CBaseEntity::TraceBleed(float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) {}
 void CBaseMonster::MakeDamageBloodDecal(int cCount, float flNoise, TraceResult* ptr, const Vector& vecDir) {}
@@ -204,7 +204,7 @@ void CBaseMonster::CorpseFallThink() {}
 void CBaseMonster::MonsterInitDead() {}
 bool CBaseMonster::BBoxFlat() { return true; }
 bool CBaseMonster::GetEnemy() { return false; }
-void CBaseMonster::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) {}
+void CBaseMonster::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) {}
 CBaseEntity* CBaseMonster::DropItem(const char* pszItemName, const Vector& vecPos, const Vector& vecAng) { return NULL; }
 bool CBaseMonster::ShouldFadeOnDeath() { return false; }
 void CBaseMonster::RadiusDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int iClassIgnore, int bitsDamageType) {}
@@ -231,7 +231,7 @@ bool CBaseMonster::Save(class CSave&) { return true; }
 int TrainSpeed(int iSpeed, int iMax) { return 0; }
 void CBasePlayer::DeathSound() {}
 bool CBasePlayer::TakeHealth(float flHealth, int bitsDamageType) { return false; }
-void CBasePlayer::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) {}
+void CBasePlayer::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) {}
 bool CBasePlayer::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) { return false; }
 void CBasePlayer::PackDeadPlayerItems() {}
 void CBasePlayer::RemoveAllItems(bool removeSuit) {}

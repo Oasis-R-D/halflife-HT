@@ -70,7 +70,7 @@ public:
 
 	void TalkInit();
 
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 	void Killed(entvars_t* pevAttacker, int iGib) override;
 
 	bool Save(CSave& save) override;
@@ -561,7 +561,7 @@ void CBarney::DeathSound()
 }
 
 
-void CBarney::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void CBarney::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	switch (ptr->iHitgroup)
 	{
@@ -587,7 +587,7 @@ void CBarney::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir,
 		break;
 	}
 
-	CTalkMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
+	CTalkMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 }
 
 

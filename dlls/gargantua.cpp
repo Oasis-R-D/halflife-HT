@@ -226,7 +226,7 @@ public:
 	void SetYawSpeed() override;
 	int Classify() override;
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 	void HandleAnimEvent(MonsterEvent_t* pEvent) override;
 
 	bool CheckMeleeAttack1(float flDot, float flDist) override; // Swipe
@@ -677,7 +677,7 @@ void CGargantua::FlameDamage(Vector vecStart, Vector vecEnd, entvars_t* pevInfli
 				if (tr.flFraction != 1.0)
 				{
 					ClearMultiDamage();
-					pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType, false);
+					pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 					ApplyMultiDamage(pevInflictor, pevAttacker);
 				}
 				else
@@ -816,13 +816,13 @@ void CGargantua::Precache()
 }
 
 
-void CGargantua::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void CGargantua::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	ALERT(at_aiconsole, "CGargantua::TraceAttack\n");
 
 	if (!IsAlive())
 	{
-		CBaseMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
+		CBaseMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 		return;
 	}
 
@@ -850,7 +850,7 @@ void CGargantua::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecD
 		flDamage = 0;
 	}
 
-	CBaseMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
+	CBaseMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 }
 
 

@@ -433,7 +433,7 @@ void CRC::Impact(CBaseEntity* pOther)
 	return;
 }
 
-void CRC::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void CRC::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	/*
 	if (ptr->iHitgroup == 10)

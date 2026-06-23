@@ -124,7 +124,7 @@ void CNail::NailTouch(CBaseEntity* pOther)
 		pevOwner = VARS(pev->owner);
 
 		ClearMultiDamage();
-		pOther->TraceAttack(pevOwner, n_damage, pev->velocity.Normalize(), &tr, DMG_NEVERGIB, true);
+		pOther->TraceAttack(pevOwner, n_damage, pev->velocity.Normalize(), &tr, DMG_NEVERGIB | DMG_GIBHEADS);
 		ApplyMultiDamage(pev, pevOwner);
 
 		// play body "thwack" sound

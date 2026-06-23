@@ -153,7 +153,7 @@ public:
 	CBaseEntity* Kick();
 	Schedule_t* GetSchedule() override;
 	Schedule_t* GetScheduleOfType(int Type) override;
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
 	int IRelationship(CBaseEntity* pTarget) override;
@@ -605,7 +605,7 @@ bool CHFGrunt::CheckRangeAttack2(float flDot, float flDist)
 //=========================================================
 // TraceAttack - make sure we're not taking it in the helmet
 //=========================================================
-void CHFGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void CHFGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	// check for helmet shot
 	if (ptr->iHitgroup == 11)
@@ -624,7 +624,7 @@ void CHFGrunt::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir
 		// it's head shot anyways
 		ptr->iHitgroup = HITGROUP_HEAD;
 	}
-	CSquadMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
+	CSquadMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 }
 
 

@@ -37,7 +37,7 @@ public:
 
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 
 	void HandleAnimEvent(MonsterEvent_t* pEvent) override;
 
@@ -92,7 +92,7 @@ bool COFLoader::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, floa
 	return true;
 }
 
-void COFLoader::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void COFLoader::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	UTIL_Ricochet(ptr->vecEndPos, g_engfuncs.pfnRandomFloat(1.0, 2.0));
 }

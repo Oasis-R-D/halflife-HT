@@ -181,7 +181,7 @@ public:
 	CBaseEntity* Kick();
 	Schedule_t* GetSchedule() override;
 	Schedule_t* GetScheduleOfType(int Type) override;
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
 	int IRelationship(CBaseEntity* pTarget) override;
@@ -650,7 +650,7 @@ bool CMOFAssassin::CheckRangeAttack2(float flDot, float flDist)
 //=========================================================
 // TraceAttack - make sure we're not taking it in the helmet
 //=========================================================
-void CMOFAssassin::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void CMOFAssassin::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	// check for helmet shot
 	if (ptr->iHitgroup == 11 || ptr->iHitgroup == 1)
@@ -659,13 +659,13 @@ void CMOFAssassin::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector ve
 		ptr->iHitgroup = HITGROUP_HEAD;
 	}
 
-	if ((ptr->iHitgroup == 11 || ptr->iHitgroup == 1) && (bitsDamageType & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)) != 0 && cangib == true)
+	if ((ptr->iHitgroup == 11 || ptr->iHitgroup == 1) && (bitsDamageType & (DMG_BULLET | DMG_SLASH | DMG_BLAST | DMG_CLUB)) != 0 && (bitsDamageType & DMG_GIBHEADS) != 0)
 	{
 		AddMultiDamage(pevAttacker, this, flDamage, bitsDamageType);
 		m_headshot = true;
 	}
 
-	CSquadMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
+	CSquadMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 }
 
 void CMOFAssassin::GibHead()

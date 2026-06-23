@@ -1221,7 +1221,7 @@ void CControllerHeadBall::HuntThink()
 		if (pEntity != NULL && 0 != pEntity->pev->takedamage)
 		{
 			ClearMultiDamage();
-			pEntity->TraceAttack(m_hOwner->pev, gSkillData.controllerDmgZap, pev->velocity, &tr, DMG_SHOCK, false);
+			pEntity->TraceAttack(m_hOwner->pev, gSkillData.controllerDmgZap, pev->velocity, &tr, DMG_SHOCK);
 			ApplyMultiDamage(pev, m_hOwner->pev);
 		}
 
@@ -1403,7 +1403,7 @@ void CControllerZapBall::ExplodeTouch(CBaseEntity* pOther)
 		}
 
 		ClearMultiDamage();
-		pOther->TraceAttack(pevOwner, gSkillData.controllerDmgBall, pev->velocity.Normalize(), &tr, DMG_ENERGYBEAM, false);
+		pOther->TraceAttack(pevOwner, gSkillData.controllerDmgBall, pev->velocity.Normalize(), &tr, DMG_ENERGYBEAM);
 		ApplyMultiDamage(pevOwner, pevOwner);
 
 		UTIL_EmitAmbientSound(ENT(pev), tr.vecEndPos, "weapons/electro4.wav", 0.3, ATTN_NORM, 0, RANDOM_LONG(90, 99));

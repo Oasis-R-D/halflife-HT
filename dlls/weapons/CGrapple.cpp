@@ -355,7 +355,7 @@ void CGrapple::PrimaryAttack()
 							flDamage *= 2;
 						}
 
-						pHit->TraceAttack(pev, flDamage, gpGlobals->v_forward, &tr, DMG_ALWAYSGIB | DMG_CLUB, false);
+						pHit->TraceAttack(pev, flDamage, gpGlobals->v_forward, &tr, DMG_ALWAYSGIB | DMG_CLUB);
 
 						ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 #endif

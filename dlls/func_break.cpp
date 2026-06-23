@@ -501,7 +501,7 @@ void CBreakable::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 }
 
 
-void CBreakable::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void CBreakable::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	// random spark if this is a 'computer' object
 	if (RANDOM_LONG(0, 1))
@@ -531,7 +531,7 @@ void CBreakable::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecD
 		}
 	}
 
-	CBaseDelay::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
+	CBaseDelay::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 }
 
 //=========================================================

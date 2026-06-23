@@ -49,7 +49,7 @@ void CBuildable::SetActivity(Activity act)
 	}
 }
 
-void CBuildable::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void CBuildable::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	if (pev->dmgtime != gpGlobals->time || (RANDOM_LONG(0, 10) < 1))
 	{

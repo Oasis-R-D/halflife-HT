@@ -187,7 +187,7 @@ public:
 	CBaseEntity* Kick();
 	Schedule_t* GetSchedule() override;
 	Schedule_t* GetScheduleOfType(int Type) override;
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
 	bool FOkToSpeak();
@@ -702,7 +702,7 @@ bool COFMedicAlly::CheckRangeAttack2(float flDot, float flDist)
 //=========================================================
 // TraceAttack - make sure we're not taking it in the helmet
 //=========================================================
-void COFMedicAlly::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void COFMedicAlly::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	// check for helmet shot
 	if (ptr->iHitgroup == 11)
@@ -728,7 +728,7 @@ void COFMedicAlly::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector ve
 		flDamage *= 0.5;
 	}
 
-	COFSquadTalkMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
+	COFSquadTalkMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 }
 
 

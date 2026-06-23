@@ -57,7 +57,7 @@ class COFBlackOpsApache : public CBaseMonster
 	bool FireGun();
 
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 
 	int m_iRockets;
 	float m_flForce;
@@ -967,7 +967,7 @@ bool COFBlackOpsApache::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttack
 
 
 
-void COFBlackOpsApache::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void COFBlackOpsApache::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	// ALERT( at_console, "%d %.0f\n", ptr->iHitgroup, flDamage );
 

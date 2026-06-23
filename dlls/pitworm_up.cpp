@@ -94,7 +94,7 @@ public:
 
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 
 	bool FVisible(CBaseEntity* pEntity) override;
 
@@ -806,8 +806,8 @@ void COFPitWormUp::ShootBeam()
 			if (pHit && pHit->pev->takedamage != DAMAGE_NO)
 			{
 				ClearMultiDamage();
-				pHit->TraceAttack(pev, gSkillData.pitWormDmgBeam, m_vecBeam, &tr, 1024, false);
-				pHit->TakeDamage(pev, pev, gSkillData.pitWormDmgBeam, 1024);
+				pHit->TraceAttack(pev, gSkillData.pitWormDmgBeam, m_vecBeam, &tr, DMG_ENERGYBEAM);
+				pHit->TakeDamage(pev, pev, gSkillData.pitWormDmgBeam, DMG_ENERGYBEAM);
 			}
 			else if (tr.flFraction != 1.0)
 			{
@@ -888,7 +888,7 @@ void COFPitWormUp::StrafeBeam()
 	{
 		ClearMultiDamage();
 
-		pHit->TraceAttack(pev, gSkillData.pitWormDmgBeam, m_vecBeam, &tr, DMG_ENERGYBEAM, false);
+		pHit->TraceAttack(pev, gSkillData.pitWormDmgBeam, m_vecBeam, &tr, DMG_ENERGYBEAM);
 		pHit->TakeDamage(pev, pev, gSkillData.pitWormDmgBeam, DMG_ENERGYBEAM);
 
 		//TODO: missing an ApplyMultiDamage call here
@@ -1230,7 +1230,7 @@ bool COFPitWormUp::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, f
 	return false;
 }
 
-void COFPitWormUp::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void COFPitWormUp::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	if (ptr->iHitgroup == 1)
 	{
@@ -1731,7 +1731,7 @@ public:
 		return false;
 	}
 
-	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
 
 	void Move(float flInterval) override;
 
@@ -2021,7 +2021,7 @@ void COFPitWorm::Spawn()
 	m_pBeam = nullptr;
 }
 
-void COFPitWorm::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void COFPitWorm::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	if (ptr->iHitgroup != 1)
 	{
@@ -2062,7 +2062,7 @@ void COFPitWorm::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecD
 	}
 
 
-	CBaseMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType, cangib);
+	CBaseMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 }
 
 #define DIST_TO_CHECK 200
@@ -2258,7 +2258,7 @@ void COFPitWorm::ShootBeam()
 			if (target && target->pev->takedamage != DAMAGE_NO)
 			{
 				ClearMultiDamage();
-				target->TraceAttack(pev, 10, m_vecBeam, &tr, DMG_ENERGYBEAM, false);
+				target->TraceAttack(pev, 10, m_vecBeam, &tr, DMG_ENERGYBEAM);
 				target->TakeDamage(pev, pev, 10, DMG_ENERGYBEAM);
 			}
 			else if (tr.flFraction != 1.0)
@@ -2374,7 +2374,7 @@ void COFPitWorm::StrafeBeam()
 	if (hit && hit->pev->takedamage != DAMAGE_NO)
 	{
 		ClearMultiDamage();
-		hit->TraceAttack(pev, 0x41200000, m_vecBeam, &tr, 1024, false);
+		hit->TraceAttack(pev, 0x41200000, m_vecBeam, &tr, 1024);
 		hit->TakeDamage(pev, pev, 0x41200000, 1024);
 	}
 	else if (tr.flFraction != 1)

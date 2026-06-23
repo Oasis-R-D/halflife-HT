@@ -321,7 +321,7 @@ Vector CBasePlayer::GetGunPosition()
 //=========================================================
 // TraceAttack
 //=========================================================
-void CBasePlayer::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType, bool cangib)
+void CBasePlayer::TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
 	if (0 != pev->takedamage)
 	{
