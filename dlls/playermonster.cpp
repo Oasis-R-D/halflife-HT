@@ -13,6 +13,7 @@
 #include	"cbase.h"
 #include	"monsters.h"
 #include	"schedule.h"
+#include	"player.h"
 
 // For holograms, make them not solid so the player can walk through them
 #define	SF_MONSTERPLAYER_NOTSOLID					4 
@@ -135,14 +136,14 @@ void CPlayerMonster::MoveThink()
 {
 	if (!m_pController)
 	{
-		ALERT(at_console, "Player is dead!\n");
+		ALERT(at_console, "CPlayerMonster: Player is NULL!\n");
 		return;
 	}
 
 	pev->nextthink = gpGlobals->time + 0.01; // NOTE: this would be better called in the player's post/pre frame instead of on a think
 
-	//pev->origin = m_pController->pev->origin;
-	//pev->angles = m_pController->pev->angles;
-	//pev->sequence = m_pController->pev->sequence;
-	// TO-DO: copy model blending and weapon model (if we do have this used where a player has a weapon
+	pev->origin = m_pController->pev->origin;
+	pev->angles = m_pController->pev->angles;
+	pev->sequence = m_pController->pev->sequence;
+	// TO-DO: copy model blending and weapon model (if we do have this used where a player has a weapon)
 }
