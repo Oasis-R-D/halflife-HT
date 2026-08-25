@@ -303,16 +303,6 @@ void CShotgun::WeaponIdle()
 
 	m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
 
-	//Moved to ItemPostFrame
-	/*
-	if ( m_flPumpTime && m_flPumpTime < gpGlobals->time )
-	{
-		// play pumping sound
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/scock1.wav", 1, ATTN_NORM, 0, 95 + RANDOM_LONG(0,0x1f));
-		m_flPumpTime = 0;
-	}
-	*/
-
 	if (m_flTimeWeaponIdle < UTIL_WeaponTimeBase())
 	{
 		if (m_iClip == 0 && m_fInSpecialReload == 0 && 0 != m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
