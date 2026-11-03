@@ -49,7 +49,7 @@ public:
 	bool AttackThink();
 	void ExplodeThink();
 
-	int m_Flare;
+	int m_iType;
 
 	Vector m_SpawnPos;
 	Vector m_direction;

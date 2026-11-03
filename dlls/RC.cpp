@@ -58,7 +58,7 @@ CRC* CRC::RC_Create(unsigned int RCDamage, Vector VecSpawnPos, Vector vecDir, in
 	pRC->m_iDamage = RCDamage;
 	pRC->m_SpawnPos = VecSpawnPos;
 	pRC->m_direction = vecDir;
-	pRC->m_Flare = RCType; // tracer type
+	pRC->m_iType = RCType; // tracer type
 	pRC->pev->owner = NULL;
 	pRC->m_pCamera = pRCcam;
 	pRC->Spawn();
@@ -176,7 +176,7 @@ bool CRC::AttackThink()
 		ExplodeThink();
 		return true;
 	}
-	else if (m_Flare == RC_GUN)
+	else if (m_iType == RC_GUN)
 	{
 		if ((m_pController->pev->button & IN_ATTACK) != 0 && m_fAttackDelay < gpGlobals->time)
 		{
@@ -315,7 +315,11 @@ void CRC::DriveThink()
 	//	KEEP CAMERA UPDATED
 	//---------------------------------
 
-	m_pCamera->pev->origin = pev->origin + Vector(0, 0, RC_CAM_OFFSET);
+	if (!g_pGameRules->IsMultiplayer())
+		m_pCamera->pev->origin = pev->origin + Vector(0, 0, RC_CAM_OFFSET);
+	else // TO-DO: DT here should be the connection delay (how to get?)
+		m_pCamera->pev->origin = pev->origin + Vector(0, 0, RC_CAM_OFFSET) + pev->velocity * DT;
+
 	m_pCamera->pev->angles = pev->angles;
 
 	// report status
@@ -331,7 +335,7 @@ void CRC::ExplodeThink()
 
 	STOP_SOUND(edict(), CHAN_ITEM, "rc/drive_loop2.wav");
 
-	if (m_Flare == RC_EXPLODE && m_pController)
+	if (m_iType == RC_EXPLODE && m_pController)
 	{
 		int iContents = UTIL_PointContents(pev->origin);
 
