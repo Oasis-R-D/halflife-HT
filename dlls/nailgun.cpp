@@ -64,7 +64,7 @@ void CNail::Spawn()
 	pev->movetype = MOVETYPE_FLY;
 	pev->solid = SOLID_BBOX;
 
-	pev->gravity = 0.5;
+	pev->gravity = 0.8;
 
 	SET_MODEL(ENT(pev), "models/nail.mdl");
 
@@ -101,17 +101,11 @@ void CNail::NailTouch(CBaseEntity* pOther)
 	float n_dist = (pev->origin - n_startpos).Length();
 	float n_damage = (-0.1 * n_dist + pev->dmg);
 
-	if (n_damage < 0)
-	{
-		// override the nail damage if it doesn't do anything
-		ALERT(at_error, "CNail: Nail doing absolutely no fucking damage. Defaulting to 3.\n");
-		n_damage = 3;
-	}
+	// override the nail damage if it doesn't do anything
+	if (n_damage < 2)`	
+		n_damage = 2;
 	else if (n_damage > pev->dmg || n_dist <= 30)
-	{
-		ALERT(at_error, "CNail: Nail doing more damage than defined!\n");
 		n_damage = pev->dmg;
-	}
 
 	ALERT(at_console, "damage: %f\n", n_damage);
 	ALERT(at_console, "length: %f\n", n_dist);
@@ -127,6 +121,9 @@ void CNail::NailTouch(CBaseEntity* pOther)
 		pOther->TraceAttack(pevOwner, n_damage, pev->velocity.Normalize(), &tr, DMG_NEVERGIB | DMG_GIBHEADS);
 		ApplyMultiDamage(pev, pevOwner);
 
+		if (!g_pGameRules->IsMultiplayer())
+			Killed(pev, GIB_NEVER);
+
 		// play body "thwack" sound
 		switch (RANDOM_LONG(0, 1))
 		{
@@ -137,11 +134,6 @@ void CNail::NailTouch(CBaseEntity* pOther)
 			EMIT_SOUND(ENT(pev), CHAN_BODY, "weapons/xbow_hitbod2.wav", 1, ATTN_NORM);
 			break;
 		}
-
-		if (!g_pGameRules->IsMultiplayer())
-		{
-			Killed(pev, GIB_NEVER);
-		}
 	}
 	else
 	{
@@ -149,6 +141,9 @@ void CNail::NailTouch(CBaseEntity* pOther)
 
 		SetThink(&CNail::SUB_Remove);
 		pev->nextthink = gpGlobals->time; // this will get changed below if the bolt is allowed to stick in what it hit.
+
+		if (UTIL_PointContents(pev->origin) != CONTENTS_WATER)
+			UTIL_Sparks(pev->origin);
 
 		if (FClassnameIs(pOther->pev, "worldspawn"))
 		{
@@ -163,11 +158,6 @@ void CNail::NailTouch(CBaseEntity* pOther)
 			pev->angles.z = RANDOM_LONG(0, 360);
 			pev->nextthink = gpGlobals->time + 10.0;
 		}
-
-		if (UTIL_PointContents(pev->origin) != CONTENTS_WATER)
-		{
-			UTIL_Sparks(pev->origin);
-		}
 	}
 }
 
@@ -175,8 +165,19 @@ void CNail::BubbleThink()
 {
 	pev->nextthink = gpGlobals->time + 0.1;
 
+	// WIND
+	float flWindVel = 6;
+	float flwindmult = 0.25;
+
+	float calculatedWind = sin(gpGlobals->time * flwindmult) * flWindVel; // only calculate this once
+
+	pev->velocity = pev->velocity + (gpGlobals->v_up * calculatedWind);
+	pev->velocity = pev->velocity + (gpGlobals->v_right * calculatedWind);
+	// WIND END
+
 	if (pev->waterlevel == 0)
 		return;
+	
 
 	UTIL_BubbleTrail(pev->origin - pev->velocity * 0.1, pev->origin, 1);
 }

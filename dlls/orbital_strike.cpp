@@ -125,11 +125,14 @@ void COrbStrike::PrimaryAttack()
 
 		return;
 	}
+
+	// TO-DO: actual strike entity
+	// laser? explosive? kinetic projectile? plasma? a ton of hornets?
+
 #endif // !CLIENT_DLL
+
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 0)
-	{
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", SUIT_SENTENCE, SUIT_REPEAT_OK);
-	}
 
 	m_flNextPrimaryAttack = GetNextAttackDelay(60);
 

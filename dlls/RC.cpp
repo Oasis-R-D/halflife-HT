@@ -234,36 +234,30 @@ void CRC::DriveThink()
 
 	const bool onGround = FBitSet(pev->flags, FL_ONGROUND);
 
-	int ft = 0, bk = 0, rt = 0, lf = 0, jmp = 0;
+	int ft = 0, bk = 0, rt = 0, lf = 0, jump = 0;
 
 	if (onGround)
 	{
+		// TO-DO: make holding opposite inputs cancel it
+
 		if ((m_pController->pev->button & IN_BACK) != 0)
-		{
 			bk = -1;
-		}
 		
 		if ((m_pController->pev->button & IN_FORWARD) != 0)
-		{
 			ft = 1;
-		}
 
 		if ((m_pController->pev->button & IN_MOVERIGHT) != 0)
-		{
 			rt = -1;
-		}
 		
 		if ((m_pController->pev->button & IN_MOVELEFT) != 0)
-		{
 			lf = 1;
-		}
 
 		if (m_fJumpDelay == -1)
 			m_fJumpDelay = gpGlobals->time + RC_JUMP_DELAY;
 		else if ((m_pController->m_afButtonPressed & IN_JUMP) != 0 && m_fJumpDelay < gpGlobals->time)
 		{
 			m_fJumpDelay = -1; // set once we are on ground
-			jmp = 1;
+			jump = 1;
 		}
 	}
 
@@ -285,13 +279,10 @@ void CRC::DriveThink()
 	//---------------------------------
 		
 	if (abs(movespeed) > 0 && onGround)
-	{
+		// TO-DO: this is not how you loop SFX, needs loop timer
 		EMIT_SOUND_DYN(edict(), CHAN_ITEM, "rc/drive_loop2.wav", movespeed / RC_MAX_DRIVESPEED, ATTN_NORM, SND_CHANGE_PITCH | SND_CHANGE_VOL, 75 + (movespeed / RC_MAX_DRIVESPEED) * 0.25);
-	}
 	else if (abs(movespeed) == 0 || !onGround)
-	{
 		STOP_SOUND(edict(), CHAN_ITEM, "rc/drive_loop2.wav");
-	}
 
 	//---------------------------------
 	//	MOVE BASED ON INPUTS
@@ -300,7 +291,7 @@ void CRC::DriveThink()
 	int turn = lf + rt; 		// make it into 1 value, -1 if left, 1 if right, 0 if none or both
 	const int drive = ft + bk;	// make it into 1 value, -1 if reverse, 1 if forward, 0 if none or both (const because it can be)
 	
-	// simulate front wheel turning
+	// simulate real wheel turning (flipped dirs in reverse)
 	if (drive == -1)
 		turn *= -1;
 
@@ -312,11 +303,9 @@ void CRC::DriveThink()
 	}
 
 	if (drive != 0)
-	{
 		pev->velocity = pev->velocity + (drive * gpGlobals->v_forward * RC_SPEED_DRIVE * DT);
-	}
 
-	if (jmp != 0)
+	if (jump != 0)
 	{
 		pev->velocity.z += RC_SPEED_JUMP;
 		EMIT_SOUND(edict(), CHAN_ITEM, "rc/power_jump.wav", 1.0, ATTN_NORM); 
@@ -328,8 +317,9 @@ void CRC::DriveThink()
 
 	m_pCamera->pev->origin = pev->origin + Vector(0, 0, RC_CAM_OFFSET);
 	m_pCamera->pev->angles = pev->angles;
+
 	// report status
-	ALERT(at_console, "DRIVE: %d, TURN %d, JUMP %d, DT %f, CAM %f %f %f\n", drive, turn, jmp, DT, m_pCamera->pev->origin.x, m_pCamera->pev->origin.y, m_pCamera->pev->origin.z);
+	ALERT(at_console, "DRIVE: %d, TURN %d, JUMP %d, DT %f, CAM %f %f %f\n", drive, turn, jump, DT, m_pCamera->pev->origin.x, m_pCamera->pev->origin.y, m_pCamera->pev->origin.z);
 }
 
 void CRC::ExplodeThink()
