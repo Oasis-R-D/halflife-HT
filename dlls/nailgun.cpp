@@ -61,7 +61,7 @@ CNail* CNail::NailCreate()
 void CNail::Spawn()
 {
 	Precache();
-	pev->movetype = MOVETYPE_FLY;
+	pev->movetype = MOVETYPE_BOUNCE;
 	pev->solid = SOLID_BBOX;
 
 	pev->gravity = 0.8;
