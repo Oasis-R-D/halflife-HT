@@ -166,8 +166,8 @@ void CNail::BubbleThink()
 	pev->nextthink = gpGlobals->time + 0.1;
 
 	// WIND
-	float flWindVel = 6;
-	float flwindmult = 0.25;
+	float flWindVel = 16;
+	float flwindmult = 0.2;
 
 	float calculatedWind = sin(gpGlobals->time * flwindmult) * flWindVel; // only calculate this once
 
