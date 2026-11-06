@@ -213,7 +213,7 @@ void CRC::DriveThink()
 {
 	if (!m_pController)
 	{
-		ALERT(at_console, "no controller!\n");
+		ALERT(at_error, "RC car couldn't find controller!\n");
 		ExplodeThink();
 		return;
 	}
@@ -224,7 +224,7 @@ void CRC::DriveThink()
 
 	if (!m_pCamera)
 	{
-		ALERT(at_console, "no camera!\n");
+		ALERT(at_error, "RC car couldn't find camera!\n");
 		return;
 	}
 	
@@ -238,19 +238,17 @@ void CRC::DriveThink()
 
 	if (onGround)
 	{
-		// TO-DO: make holding opposite inputs cancel it
-
 		if ((m_pController->pev->button & IN_BACK) != 0)
-			bk = -1;
+			bk += -1;
 		
 		if ((m_pController->pev->button & IN_FORWARD) != 0)
-			ft = 1;
+			ft += 1;
 
 		if ((m_pController->pev->button & IN_MOVERIGHT) != 0)
-			rt = -1;
+			rt += -1;
 		
 		if ((m_pController->pev->button & IN_MOVELEFT) != 0)
-			lf = 1;
+			lf += 1;
 
 		if (m_fJumpDelay == -1)
 			m_fJumpDelay = gpGlobals->time + RC_JUMP_DELAY;
@@ -346,13 +344,9 @@ void CRC::ExplodeThink()
 			WRITE_COORD(pev->origin.y);
 			WRITE_COORD(pev->origin.z);
 			if (iContents != CONTENTS_WATER)
-			{
 				WRITE_SHORT(g_sModelIndexFireball);
-			}
 			else
-			{
 				WRITE_SHORT(g_sModelIndexWExplosion);
-			}
 			WRITE_BYTE((m_iDamage - 50) * .60); // scale * 10
 			WRITE_BYTE(15);					   // framerate
 			WRITE_BYTE(TE_EXPLFLAG_NONE);
