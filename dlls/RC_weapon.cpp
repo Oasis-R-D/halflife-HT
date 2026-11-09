@@ -118,9 +118,7 @@ void CRCWeapon::Throw(int type)
 	// Move origin up if crouched and start trace a bit outside of body ( 20 units instead of 16 )
 	trace_origin = m_pPlayer->pev->origin;
 	if ((m_pPlayer->pev->flags & FL_DUCKING) != 0)
-	{
 		trace_origin = trace_origin - (VEC_HULL_MIN - VEC_DUCK_HULL_MIN);
-	}
 
 	// find place to toss monster
 	UTIL_TraceLine(trace_origin + gpGlobals->v_forward * 20, trace_origin + gpGlobals->v_forward * 64, dont_ignore_monsters, NULL, &tr);
